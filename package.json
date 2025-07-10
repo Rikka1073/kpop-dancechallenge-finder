@@ -17,7 +17,8 @@
     "daisyui": "^5.0.46",
     "next": "15.3.5",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "swr": "^2.3.4"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.12",
