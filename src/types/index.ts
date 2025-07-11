@@ -18,6 +18,10 @@ export type Videos = {
   }[];
 };
 
+export type VideoCardProps = {
+  video: Videos;
+};
+
 export type ChildrenProps = {
   children: React.ReactNode;
 };

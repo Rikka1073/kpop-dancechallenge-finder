@@ -1,19 +1,28 @@
 "use client";
 
+import VideoCard from "@/components/feature/VideoCard";
 import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
-import { fetchGroups, fetchSongs, getAllVideos } from "@/libs/supabaseFunction";
-import { Record } from "@/types";
+import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs/supabaseFunction";
+import { Record, Videos } from "@/types";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 const Search = () => {
   const [selectedItems, setSelectedItems] = useState<Record[]>([]);
+  const [filteredData, setFilteredData] = useState<Videos[]>([]);
   const { data: videos, error: videosError, isLoading: videosLoading } = useSWR("videos", getAllVideos);
   const { data: songs, error: songsError, isLoading: songsLoading } = useSWR("songs", fetchSongs);
   const { data: groups, error: groupsError, isLoading: groupsLoading } = useSWR("groups", fetchGroups);
   const isLoading = songsLoading || videosLoading || groupsLoading;
   const isError = songsError || videosError || groupsError;
+
+  // //初期表示の動画データ
+  useEffect(() => {
+    if (videos) {
+      setFilteredData(videos);
+    }
+  }, [videos]);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading data</div>;
@@ -23,17 +32,26 @@ const Search = () => {
     setSelectedItems((prev) => {
       const isSelected = prev.some((item) => item.id === id);
       if (isSelected) {
-        const updatedSelectedItems = prev.filter((item) => item.id !== id);
-        return updatedSelectedItems;
+        // 既に選択されている場合は削除
+        return prev.filter((item) => item.id !== id);
       } else {
-        const updatedSelectedItems = [...prev, { id, name: select, type: buttonName }];
-        return updatedSelectedItems;
+        // 新たに選択する場合は追加
+        return [...prev, { id, name: select }];
       }
     });
+
+    try {
+      const filteredData = await getMatchedGroupId(id, buttonName);
+      setFilteredData(filteredData ?? []);
+    } catch (error) {
+      console.error("Error fetching filtered data:", error);
+      setFilteredData([]);
+    }
   };
 
   const onclickClear = () => {
     setSelectedItems([]);
+    setFilteredData(videos || []);
   };
 
   return (
@@ -55,7 +73,7 @@ const Search = () => {
           <h3 className="text-2xl font-bold mb-3">グループで検索</h3>
           <div className="flex flex-wrap gap-2">
             <div className="flex flex-wrap gap-2">
-              {groups && groups.map((item) => <Button key={item.id} id={item.id} name="songs" text={item.group_name} onClick={(event) => onclickButton(item.id, item.group_name, event)} />)}
+              {groups && groups.map((item) => <Button key={item.id} id={item.id} name="groups" text={item.group_name} onClick={(event) => onclickButton(item.id, item.group_name, event)} />)}
             </div>
           </div>
         </div>
@@ -76,6 +94,27 @@ const Search = () => {
             </div>
           </div>
         )}
+
+        <div>
+          <div className="flex justify-between mb-4 items-center">
+            <h3 className="text-2xl font-bold mb-3">検索結果（{filteredData.length}件）</h3>
+          </div>
+
+          {filteredData && filteredData.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+              {filteredData.map((video: Videos) => (
+                <div key={video.id} className="mb-4">
+                  <VideoCard video={video} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-10">
+              <p className="font-bold text-xl text-center mb-4">条件に一致する動画が見つかりませんでした</p>
+              <p className="font-bold text-md text-center">別の条件で検索してみてください</p>
+            </div>
+          )}
+        </div>
       </Layout>
     </div>
   );
