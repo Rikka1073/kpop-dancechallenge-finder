@@ -49,11 +49,6 @@ const Search = () => {
     }
   };
 
-  const onclickClear = () => {
-    setSelectedItems([]);
-    setFilteredData(videos || []);
-  };
-
   return (
     <div>
       <Layout>
@@ -82,7 +77,6 @@ const Search = () => {
           <div className="mb-8 bg-white p-4 rounded-lg shadow-md">
             <div className="flex justify-between items-center mb-4">
               <h4 className="text-xl font-bold">選択中の条件</h4>
-              <Button onClick={onclickClear} className="hover:text-red-500 hover:bg-purple-50 font-bold bg-white text-black p-2" id="clear-button" name="clear" text="すべてクリア" />
             </div>
             <div className="flex flex-wrap gap-2">
               {selectedItems &&
