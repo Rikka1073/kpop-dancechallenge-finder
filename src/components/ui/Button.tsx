@@ -4,7 +4,7 @@ const Button = ({ id, name, text, onClick, className }: ButtonProps) => {
   return (
     <div>
       <button id={id} name={name} onClick={onClick} className={className ? className : "btn btn-neutral btn-outline rounded-2xl"}>
-        {name === "clear" ? "おはよう" + text : text}
+        {"#" + text}
       </button>
     </div>
   );
