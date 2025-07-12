@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
 import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs/supabaseFunction";
 import { Record, Videos } from "@/types";
+import { Music, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
@@ -62,26 +63,40 @@ const Search = () => {
     }
   };
 
+  const onclickClear = () => {
+    setSelectedItems([]);
+    setFilteredData(videos || []);
+  };
+
+  const buttonColors = ["btn-primary", "btn-secondary", "btn-accent", "btn-info", "btn-success", "btn-warning", "btn-error"];
+  const buttonStyles = ["bg-primary!", "bg-secondary!", "bg-accent!", "bg-info!", "bg-success!", "bg-warning!", "bg-error!"];
+
   return (
     <div>
       <Layout>
-        <h2 className="text-4xl font-bold mb-3 text-center text-violet-500" data-testid="title">
+        <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center text-violet-500" data-testid="title">
           ダンスチャレンジ検索
         </h2>
-        <div className="text-center mb-6">お気に入りの楽曲やグループを選んで検索しよう！</div>
+        <div className="text-center mb-8">お気に入りの楽曲やグループを選んで検索しよう！</div>
 
         <div className="flex justify-center mb-8">
-          <div className="flex gap-2 bg-white p-4 rounded-lg">
+          <div className="flex flex-col md:flex-row gap-2 bg-white p-4 rounded-lg">
             <button
-              className={`btn btn-lg btn-ghost rounded-2xl ${selectedButton === "songs" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white" : "btn"}`}
+              className={`btn btn-lg btn-ghost rounded-2xl hover:bg-purple-50 hover:text-purple-400 ${
+                selectedButton === "songs" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"
+              }`}
               onClick={() => onClickSelectButton("songs")}
             >
+              <Music />
               楽曲で検索
             </button>
             <button
-              className={`btn btn-lg btn-ghost rounded-2xl ${selectedButton === "groups" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white" : "btn"}`}
+              className={`btn btn-lg btn-ghost rounded-2xl hover:bg-purple-50  hover:text-purple-400 ${
+                selectedButton === "groups" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"
+              }`}
               onClick={() => onClickSelectButton("groups")}
             >
+              <Users />
               グループで検索
             </button>
           </div>
@@ -89,19 +104,39 @@ const Search = () => {
 
         {selectedButton === "songs" && (
           <div className="mb-8">
-            <h3 className="text-2xl font-bold mb-3">楽曲で検索</h3>
+            <h3 className="text-xl md:text-2xl font-bold mb-3">楽曲で検索</h3>
             <div className="flex flex-wrap gap-2">
-              {songs && songs.map((item) => <Button key={item.id} id={item.id} name="songs" text={item.song_name} onClick={(event) => onclickButton(item.id, item.song_name, event)} />)}
+              {songs &&
+                songs.map((item, index) => (
+                  <Button
+                    key={item.id}
+                    id={item.id}
+                    name="songs"
+                    text={item.song_name}
+                    onClick={(event) => onclickButton(item.id, item.song_name, event)}
+                    className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none ${buttonStyles[index % buttonStyles.length]}`}`}
+                  />
+                ))}
             </div>
           </div>
         )}
 
         {selectedButton === "groups" && (
           <div className="mb-8">
-            <h3 className="text-2xl font-bold mb-3">グループで検索</h3>
+            <h3 className="text-xl md:text-2xl font-bold mb-3">グループで検索</h3>
             <div className="flex flex-wrap gap-2">
               <div className="flex flex-wrap gap-2">
-                {groups && groups.map((item) => <Button key={item.id} id={item.id} name="groups" text={item.group_name} onClick={(event) => onclickButton(item.id, item.group_name, event)} />)}
+                {groups &&
+                  groups.map((item, index) => (
+                    <Button
+                      key={item.id}
+                      id={item.id}
+                      name="groups"
+                      text={item.group_name}
+                      onClick={(event) => onclickButton(item.id, item.group_name, event)}
+                      className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none hover:text-white ${buttonStyles[index % buttonStyles.length]}`}`}
+                    />
+                  ))}
               </div>
             </div>
           </div>
@@ -110,13 +145,23 @@ const Search = () => {
         {selectedItems.length > 0 && (
           <div className="mb-8 bg-white p-4 rounded-lg shadow-md">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="text-xl font-bold">選択中の{selectedButton === "songs" ? "楽曲" : "グループ"}</h4>
+              <div className="flex items-center gap-2">
+                {selectedButton === "songs" ? <Music className="text-purple-400" /> : <Users className="text-purple-400" />}
+                <h4 className="text-lg font-bold">選択中の{selectedButton === "songs" ? "楽曲" : "グループ"}</h4>
+              </div>
+              <Button
+                onClick={onclickClear}
+                className="hover:text-red-500 hover:bg-purple-50 font-bold bg-white text-black rounded-2xl btn-ghost!"
+                id="clear-button"
+                name="clear"
+                text="すべてクリア"
+              />
             </div>
             <div className="flex flex-wrap gap-2">
               {selectedItems &&
                 selectedItems.map((selectedItem) => (
                   <div key={selectedItem.id} className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm">
-                    {selectedItem.name}
+                    #{selectedItem.name}
                   </div>
                 ))}
             </div>
@@ -124,8 +169,8 @@ const Search = () => {
         )}
 
         <div>
-          <div className="flex justify-between mb-4 items-center">
-            <h3 className="text-2xl font-bold mb-3">
+          <div className="flex justify-between mb-3 items-center">
+            <h3 className="text-xl md:text-2xl font-bold">
               {selectedItems.length > 0 ? "検索結果" : "すべての動画"}（{filteredData.length}件）
             </h3>
           </div>
