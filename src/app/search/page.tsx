@@ -10,6 +10,7 @@ import useSWR from "swr";
 
 const Search = () => {
   const [selectedItems, setSelectedItems] = useState<Record[]>([]);
+  const [selectedButton, setSelectedButton] = useState<string>("songs");
   const [filteredData, setFilteredData] = useState<Videos[]>([]);
   const { data: videos, error: videosError, isLoading: videosLoading } = useSWR("videos", getAllVideos);
   const { data: songs, error: songsError, isLoading: songsLoading } = useSWR("songs", fetchSongs);
@@ -36,7 +37,7 @@ const Search = () => {
         return prev.filter((item) => item.id !== id);
       } else {
         // 新たに選択する場合は追加
-        return [...prev, { id, name: select }];
+        return [{ id, name: select }];
       }
     });
 
@@ -49,6 +50,18 @@ const Search = () => {
     }
   };
 
+  const onClickSelectButton = (type: string) => {
+    if (type === "songs") {
+      setSelectedButton("songs");
+      setSelectedItems([]);
+      setFilteredData(videos || []);
+    } else if (type === "groups") {
+      setSelectedButton("groups");
+      setSelectedItems([]);
+      setFilteredData(videos || []);
+    }
+  };
+
   return (
     <div>
       <Layout>
@@ -57,26 +70,47 @@ const Search = () => {
         </h2>
         <div className="text-center mb-6">お気に入りの楽曲やグループを選んで検索しよう！</div>
 
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold mb-3">楽曲で検索</h3>
-          <div className="flex flex-wrap gap-2">
-            {songs && songs.map((item) => <Button key={item.id} id={item.id} name="songs" text={item.song_name} onClick={(event) => onclickButton(item.id, item.song_name, event)} />)}
+        <div className="flex justify-center mb-8">
+          <div className="flex gap-2 bg-white p-4 rounded-lg">
+            <button
+              className={`btn btn-lg btn-ghost rounded-2xl ${selectedButton === "songs" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white" : "btn"}`}
+              onClick={() => onClickSelectButton("songs")}
+            >
+              楽曲で検索
+            </button>
+            <button
+              className={`btn btn-lg btn-ghost rounded-2xl ${selectedButton === "groups" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white" : "btn"}`}
+              onClick={() => onClickSelectButton("groups")}
+            >
+              グループで検索
+            </button>
           </div>
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold mb-3">グループで検索</h3>
-          <div className="flex flex-wrap gap-2">
+        {selectedButton === "songs" && (
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold mb-3">楽曲で検索</h3>
             <div className="flex flex-wrap gap-2">
-              {groups && groups.map((item) => <Button key={item.id} id={item.id} name="groups" text={item.group_name} onClick={(event) => onclickButton(item.id, item.group_name, event)} />)}
+              {songs && songs.map((item) => <Button key={item.id} id={item.id} name="songs" text={item.song_name} onClick={(event) => onclickButton(item.id, item.song_name, event)} />)}
             </div>
           </div>
-        </div>
+        )}
+
+        {selectedButton === "groups" && (
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold mb-3">グループで検索</h3>
+            <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
+                {groups && groups.map((item) => <Button key={item.id} id={item.id} name="groups" text={item.group_name} onClick={(event) => onclickButton(item.id, item.group_name, event)} />)}
+              </div>
+            </div>
+          </div>
+        )}
 
         {selectedItems.length > 0 && (
           <div className="mb-8 bg-white p-4 rounded-lg shadow-md">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="text-xl font-bold">選択中の条件</h4>
+              <h4 className="text-xl font-bold">選択中の{selectedButton === "songs" ? "楽曲" : "グループ"}</h4>
             </div>
             <div className="flex flex-wrap gap-2">
               {selectedItems &&
@@ -91,7 +125,9 @@ const Search = () => {
 
         <div>
           <div className="flex justify-between mb-4 items-center">
-            <h3 className="text-2xl font-bold mb-3">検索結果（{filteredData.length}件）</h3>
+            <h3 className="text-2xl font-bold mb-3">
+              {selectedItems.length > 0 ? "検索結果" : "すべての動画"}（{filteredData.length}件）
+            </h3>
           </div>
 
           {filteredData && filteredData.length > 0 ? (
