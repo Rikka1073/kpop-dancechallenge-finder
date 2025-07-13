@@ -38,3 +38,17 @@ export type Record = {
   id: string;
   name: string;
 };
+
+export type GroupDetail = {
+  groups: {
+    id: string;
+    group_name: string;
+  };
+};
+
+export type SongDetail = {
+  songs: {
+    id: string;
+    song_name: string;
+  };
+};
