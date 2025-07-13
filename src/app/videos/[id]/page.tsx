@@ -1,11 +1,13 @@
 import Header from "@/components/feature/Header";
 import { getAllVideos } from "@/libs/supabaseFunction";
 import { GroupDetail, SongDetail } from "@/types";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Youtube } from "lucide-react";
 import Link from "next/link";
 
-const Videos = async ({ params }: { params: { id: string } }) => {
-  const { id } = params;
+export const runtime = "edge";
+
+const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = await params;
   console.log("Fetching video with ID:", id);
   const data = await getAllVideos().then((data) => (data ? data.find((video) => video.id === id) : undefined));
 
@@ -74,6 +76,12 @@ const Videos = async ({ params }: { params: { id: string } }) => {
               <div>
                 このダンスチャレンジ動画は、{data.video_groups.map((group: GroupDetail) => group.groups.group_name).join("と")}によるコラボレーション作品です。 楽曲「
                 {data.video_songs.map((song: SongDetail) => song.songs.song_name)}」に合わせた素晴らしいパフォーマンスをお楽しみください。
+              </div>
+              <div>
+                <Link href={`https://www.youtube.com/shorts/${data.youtube_id}/`} target="_blank" className="btn bg-red-600 text-white mt-4 w-full font-bold">
+                  <Youtube />
+                  YouTubeで視聴
+                </Link>
               </div>
             </div>
           </div>
