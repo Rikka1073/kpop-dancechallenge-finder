@@ -1,5 +1,4 @@
 import Header from "@/components/feature/Header";
-import Layout from "@/components/layout/Layout";
 import { getAllVideos } from "@/libs/supabaseFunction";
 import { GroupDetail, SongDetail } from "@/types";
 import { ArrowLeft } from "lucide-react";
@@ -29,8 +28,6 @@ const Videos = async ({ params }: { params: { id: string } }) => {
       return views.toString();
     }
   };
-
-  const grpoupNames = data.video_groups.map((group: GroupDetail) => group.groups.group_name).join(", ");
 
   return (
     <div>
