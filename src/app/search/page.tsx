@@ -61,9 +61,6 @@ const Search = () => {
     if (emblaApi) emblaApi.scrollNext();
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error loading data</div>;
-
   const onclickButton = async (id: string, select: string, event: React.MouseEvent<HTMLButtonElement>) => {
     const buttonName = event.currentTarget.name;
     setSelectedItems((prev) => {
@@ -104,6 +101,8 @@ const Search = () => {
   };
 
   const buttonStyles = ["bg-primary!", "bg-secondary!", "bg-accent!", "bg-info!", "bg-success!", "bg-warning!", "bg-error!"];
+
+  if (isError) return <div>Error loading data</div>;
 
   return (
     <div>
@@ -156,7 +155,7 @@ const Search = () => {
               <div className="embla__container">
                 {limitedButton.map((chunk, slideIndex) => (
                   <div key={slideIndex} className="embla__slide">
-                    <div className="grid grid-cols-2 gap-2 md:grid-cols-5 md:w-full md:p-2">
+                    <div className="grid grid-cols-2 gap-2 md:grid-cols-5 md:w-full p-2">
                       {chunk.map((item, index) => (
                         <div key={item.id}>
                           <Button
@@ -196,7 +195,7 @@ const Search = () => {
               <div className="embla__container">
                 {limitedButton.map((chunk, slideIndex) => (
                   <div key={slideIndex} className="embla__slide">
-                    <div className="grid grid-cols-2 gap-2 md:grid-cols-5 md:w-full md:p-2">
+                    <div className="grid grid-cols-2 gap-2 md:grid-cols-5 md:w-full p-2">
                       {chunk.map((item, index) => (
                         <div key={item.id}>
                           <Button
@@ -266,6 +265,11 @@ const Search = () => {
             </div>
           )}
         </div>
+        {isLoading && (
+          <div className="flex justify-center items-center">
+            <span className="loading loading-spinner text-primary loading-xl"></span>
+          </div>
+        )}
       </Layout>
     </div>
   );
