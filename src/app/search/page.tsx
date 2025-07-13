@@ -1,5 +1,6 @@
 "use client";
 
+import Header from "@/components/feature/Header";
 import VideoCard from "@/components/feature/VideoCard";
 import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
@@ -73,6 +74,7 @@ const Search = () => {
 
   return (
     <div>
+      <Header />
       <Layout>
         <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center text-violet-500" data-testid="title">
           ダンスチャレンジ検索
