@@ -6,8 +6,9 @@ import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
 import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs/supabaseFunction";
 import { Record, Videos } from "@/types";
-import { Music, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { Music, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
 const Search = () => {
@@ -19,6 +20,7 @@ const Search = () => {
   const { data: groups, error: groupsError, isLoading: groupsLoading } = useSWR("groups", fetchGroups);
   const isLoading = songsLoading || videosLoading || groupsLoading;
   const isError = songsError || videosError || groupsError;
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
 
   // //初期表示の動画データ
   useEffect(() => {
@@ -26,6 +28,38 @@ const Search = () => {
       setFilteredData(videos);
     }
   }, [videos]);
+
+  const chankArray = <T,>(array: T[], chunkSize: number): T[][] => {
+    const result: T[][] = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      result.push(array.slice(i, i + chunkSize));
+    }
+    return result;
+  };
+
+  const limitedButton = useMemo(() => {
+    if (selectedButton === "songs" && songs) {
+      return chankArray(songs, 10);
+    } else if (selectedButton === "groups" && groups) {
+      return chankArray(groups, 10);
+    }
+    return [];
+  }, [groups, songs, selectedButton]);
+
+  useEffect(() => {
+    if (emblaApi) {
+      console.log(emblaApi.slideNodes()); // Access API
+    }
+  }, [emblaApi, limitedButton]);
+
+  // Embla Carousel navigation functions
+  const scrollPrev = () => {
+    if (emblaApi) emblaApi.scrollPrev();
+  };
+
+  const scrollNext = () => {
+    if (emblaApi) emblaApi.scrollNext();
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading data</div>;
@@ -69,7 +103,6 @@ const Search = () => {
     setFilteredData(videos || []);
   };
 
-  const buttonColors = ["btn-primary", "btn-secondary", "btn-accent", "btn-info", "btn-success", "btn-warning", "btn-error"];
   const buttonStyles = ["bg-primary!", "bg-secondary!", "bg-accent!", "bg-info!", "bg-success!", "bg-warning!", "bg-error!"];
 
   return (
@@ -106,39 +139,80 @@ const Search = () => {
 
         {selectedButton === "songs" && (
           <div className="mb-8">
-            <h3 className="text-xl md:text-2xl font-bold mb-3">楽曲で検索</h3>
-            <div className="flex flex-wrap gap-2">
-              {songs &&
-                songs.map((item, index) => (
-                  <Button
-                    key={item.id}
-                    id={item.id}
-                    name="songs"
-                    text={item.song_name}
-                    onClick={(event) => onclickButton(item.id, item.song_name, event)}
-                    className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none ${buttonStyles[index % buttonStyles.length]}`}`}
-                  />
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-xl md:text-2xl font-bold">楽曲で検索</h3>
+              {limitedButton.length > 1 && (
+                <div className="flex gap-2">
+                  <button onClick={scrollPrev} className="bg-white hover:bg-gray-50 text-gray-600 hover:text-purple-600 rounded-full p-2 shadow-lg transition-all" aria-label="前へ">
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button onClick={scrollNext} className="bg-white hover:bg-gray-50 text-gray-600 hover:text-purple-600 rounded-full p-2 shadow-lg transition-all" aria-label="次へ">
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="embla" ref={emblaRef}>
+              <div className="embla__container">
+                {limitedButton.map((chunk, slideIndex) => (
+                  <div key={slideIndex} className="embla__slide">
+                    <div className="grid grid-cols-2 gap-2 md:grid-cols-5 md:w-full md:p-2">
+                      {chunk.map((item, index) => (
+                        <div key={item.id}>
+                          <Button
+                            key={item.id}
+                            id={item.id}
+                            name="songs"
+                            text={item.song_name}
+                            onClick={(event) => onclickButton(item.id, item.song_name, event)}
+                            className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none ${buttonStyles[index % buttonStyles.length]}`}`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ))}
+              </div>
             </div>
           </div>
         )}
 
         {selectedButton === "groups" && (
           <div className="mb-8">
-            <h3 className="text-xl md:text-2xl font-bold mb-3">グループで検索</h3>
-            <div className="flex flex-wrap gap-2">
-              <div className="flex flex-wrap gap-2">
-                {groups &&
-                  groups.map((item, index) => (
-                    <Button
-                      key={item.id}
-                      id={item.id}
-                      name="groups"
-                      text={item.group_name}
-                      onClick={(event) => onclickButton(item.id, item.group_name, event)}
-                      className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none hover:text-white ${buttonStyles[index % buttonStyles.length]}`}`}
-                    />
-                  ))}
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-xl md:text-2xl font-bold">グループで検索</h3>
+              {limitedButton.length > 1 && (
+                <div className="flex gap-2">
+                  <button onClick={scrollPrev} className="bg-white hover:bg-gray-50 text-gray-600 hover:text-purple-600 rounded-full p-2 shadow-lg transition-all" aria-label="前へ">
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button onClick={scrollNext} className="bg-white hover:bg-gray-50 text-gray-600 hover:text-purple-600 rounded-full p-2 shadow-lg transition-all" aria-label="次へ">
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="embla" ref={emblaRef}>
+              <div className="embla__container">
+                {limitedButton.map((chunk, slideIndex) => (
+                  <div key={slideIndex} className="embla__slide">
+                    <div className="grid grid-cols-2 gap-2 md:grid-cols-5 md:w-full md:p-2">
+                      {chunk.map((item, index) => (
+                        <div key={item.id}>
+                          <Button
+                            id={item.id}
+                            name="groups"
+                            text={item.group_name}
+                            onClick={(event) => onclickButton(item.id, item.group_name, event)}
+                            className={`${
+                              selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none hover:text-white ${buttonStyles[index % buttonStyles.length]}`
+                            }`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
