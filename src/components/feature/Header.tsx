@@ -3,12 +3,12 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <div className="navbar bg-base-100 shadow-sm mb-10">
+    <div className="navbar bg-base-100 shadow-sm">
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">daisyUI</a>
       </div>
       <div className="flex-none">
-        <ul className="menu menu-horizontal px-1 gap-2">
+        <ul className="menu menu-horizontal px-1 gap-2 hidden sm:flex">
           <li>
             <Link href="/" className="btn hover:text-purple-400 bg-white border-none shadow-none">
               <House />

@@ -82,7 +82,7 @@ const Search = () => {
         <div className="text-center mb-8">お気に入りの楽曲やグループを選んで検索しよう！</div>
 
         <div className="flex justify-center mb-8">
-          <div className="flex flex-col md:flex-row gap-2 bg-white p-4 rounded-lg">
+          <div className="flex flex-col md:flex-row gap-2 bg-white p-4 rounded-lg w-full md:w-auto">
             <button
               className={`btn btn-lg btn-ghost rounded-2xl hover:bg-purple-50 hover:text-purple-400 ${
                 selectedButton === "songs" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"
