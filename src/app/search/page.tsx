@@ -105,7 +105,7 @@ const Search = () => {
   if (isError) return <div>Error loading data</div>;
 
   return (
-    <div>
+    <div className="text-black">
       <Header />
       <Layout>
         <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center text-violet-500" data-testid="title">

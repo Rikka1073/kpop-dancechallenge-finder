@@ -22,7 +22,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
   return (
     <Link href={`/videos/${video.id}`}>
       <div className="rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:scale-105">
-        <div className="card bg-base-100 rounded-2xl">
+        <div className="card rounded-2xl">
           <div className="relative">
             <figure>
               <Image src={thumbnail_url || "https://via.placeholder.com/360x640"} alt={title} width={360} height={640} className="w-full aspect-[9/16] object-cover rounded-t-2xl" />

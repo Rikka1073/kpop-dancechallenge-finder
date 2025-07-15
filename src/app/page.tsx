@@ -43,7 +43,7 @@ export default function Home() {
   ];
 
   return (
-    <>
+    <div className="text-black">
       <Header />
       <section>
         <div className="text-center py-20 p-4 sparkle-bg">
@@ -220,6 +220,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
