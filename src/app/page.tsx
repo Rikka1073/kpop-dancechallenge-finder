@@ -1,5 +1,5 @@
 import Header from "@/components/feature/Header";
-import { ArrowRight, Check, Heart, Play, Search, Star, TrendingUp } from "lucide-react";
+import { ArrowRight, Check, Heart, Play, Search, Star, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -42,6 +42,36 @@ export default function Home() {
     },
   ];
 
+  const painPoints = [
+    {
+      icon: <X className="text-red-500" size={24} />,
+      text: '"NewJeans ダンスチャレンジ"で検索しても公式MVばかり',
+    },
+    {
+      icon: <X className="text-red-500" size={24} />,
+      text: "一般人の踊ってみた動画が混ざって見つからない",
+    },
+    {
+      icon: <X className="text-red-500" size={24} />,
+      text: "好きなグループの新しいダンス動画を毎回探すのが面倒",
+    },
+  ];
+
+  const solutions = [
+    {
+      icon: <Check className="text-green-500" size={24} />,
+      text: "アイドルのダンスチャレンジだけを厳選収録",
+    },
+    {
+      icon: <Check className="text-green-500" size={24} />,
+      text: "ワンタップで推しグループの動画一覧",
+    },
+    {
+      icon: <Check className="text-green-500" size={24} />,
+      text: "新着動画も見逃さない通知機能",
+    },
+  ];
+
   return (
     <div className="text-black">
       <Header />
@@ -78,45 +108,48 @@ export default function Home() {
         </div>
       </section>
 
-      <section>
-        <div className="py-20 p-4 bg-white">
+      <section id="concept">
+        <div className="py-20 px-4 bg-white">
           <div className="container mx-auto">
             <div className="max-w-5xl mx-auto">
-              <div className="mb-10 text-center">
+              <div className="text-center mb-16">
                 <div className="mb-4">
-                  <span className="px-3 py-2 bg-purple-200 rounded-2xl">CONCEPT</span>
+                  <span className="px-3 py-2 bg-purple-200 rounded-2xl">PROBLEM & SOLUTION</span>
                 </div>
-                <h2 className="text-4xl mb-6 font-bold">K-POPダンスの新しい楽しみ方</h2>
-                <p className="md:text-xl">
-                  異なるグループのアーティスト同士がコラボレーションするダンスチャレンジ動画。 <br />
-                  従来では見ることのできない貴重な組み合わせを、いつでもどこでも楽しめます。
-                </p>
+                <h2 className="text-4xl mb-6 font-bold">こんな経験ありませんか？</h2>
               </div>
-              <div className="grid gap-8 md:grid-cols-2">
-                <div className="md:text-left text-center">
-                  <h3 className="text-3xl mb-6 font-bold">なぜこのサイトが生まれたのか？</h3>
-                  <div className="space-y-4 md:text-left text-center md:text-lg">
-                    <p>K-POPファンなら誰もが夢見る「もしあのグループとあのグループがコラボしたら...」 そんな願いを叶えるダンスチャレンジ動画が、SNSに散らばって見つけにくい現状がありました。</p>
-                    <p>このサイトは、そんな貴重なコラボレーション動画を一箇所に集め、 楽曲やグループから簡単に検索できるプラットフォームとして誕生しました。</p>
-                    <p className="text-purple-600 font-bold">あなたの「見たい」がきっと見つかる場所です。</p>
+              <div className="grid md:grid-cols-2 gap-12 items-start max-w-6xl mx-auto mb-12">
+                <div>
+                  <h3 className="text-3xl font-bold text-red-600 mb-8 flex items-center">
+                    <X className="mr-3 flex-shrink-0" />
+                    <span>よくある困りごと</span>
+                  </h3>
+                  <div className="space-y-6">
+                    {painPoints.map((point, index) => (
+                      <div key={index} className="flex items-start space-x-4 p-4 bg-red-50 rounded-xl border border-red-100 h-22">
+                        <div className="flex-shrink-0 mt-1">{point.icon}</div>
+                        <p className="text-gray-700 text-lg leading-relaxed">{point.text}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8 shadow-xl">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white rounded-2xl p-4 shadow-lg">
-                      <div className="w-full aspect-[9/16] bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl flex items-center justify-center">
-                        <Play className="text-white" />
+                <div>
+                  <h3 className="text-3xl font-bold text-green-600 mb-8 flex items-center">
+                    <Check className="mr-3 flex-shrink-0" />
+                    <span>このサイトなら解決！</span>
+                  </h3>
+                  <div className="space-y-6">
+                    {solutions.map((solution, index) => (
+                      <div key={index} className="flex items-start space-x-4 p-4 bg-green-50 rounded-xl border border-green-100 h-22">
+                        <div className="flex-shrink-0 mt-1">{solution.icon}</div>
+                        <p className="text-gray-700 text-lg leading-relaxed">{solution.text}</p>
                       </div>
-                      <p className="text-sm font-semibold mt-2">NewJeans × LE SSERAFIM</p>
-                    </div>
-                    <div className="bg-white rounded-2xl p-4 shadow-lg">
-                      <div className="w-full aspect-[9/16] bg-gradient-to-br from-blue-400 to-purple-400 rounded-xl flex items-center justify-center">
-                        <Play className="text-white" />
-                      </div>
-                      <p className="text-sm font-semibold mt-2">IVE × aespa</p>
-                    </div>
+                    ))}
                   </div>
                 </div>
+              </div>
+              <div className="text-center">
+                <p className="md:text-xl font-semibold text-purple-600">あなたの「見たい」がきっと見つかる場所です</p>
               </div>
             </div>
           </div>
@@ -198,7 +231,7 @@ export default function Home() {
           <div className="max-w-5xl mx-auto text-center">
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center">
-                <Star className="text-white" size={32} />
+                <Star className="text-white" />
               </div>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">今すぐK-POPダンスの世界へ</h2>
