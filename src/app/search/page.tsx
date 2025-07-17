@@ -108,7 +108,7 @@ const Search = () => {
     <div className="text-black">
       <Header />
       <Layout>
-        <h2 className="text-2xl md:text-3xl font-bold mb-3 text-center text-violet-500" data-testid="title">
+        <h2 className="text-2xl md:text-4xl font-bold mb-3 text-center text-violet-500" data-testid="title">
           ダンスチャレンジ検索
         </h2>
         <div className="text-center mb-8">お気に入りの楽曲やグループを選んで検索しよう！</div>

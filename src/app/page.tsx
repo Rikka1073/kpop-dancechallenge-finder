@@ -86,7 +86,7 @@ export default function Home() {
                 <br />
                 検索アプリ
               </h1>
-              <p className="mb-6 md:text-2xl">
+              <p className="mb-6 text-lg">
                 アイドル同士が踊るショート形式の
                 <br className="md:hidden" />
                 ダンスチャレンジ動画を
@@ -128,7 +128,7 @@ export default function Home() {
                     {painPoints.map((point, index) => (
                       <div key={index} className="flex items-center space-x-4 p-4 bg-red-50 rounded-xl border border-red-100 h-22">
                         <div className="flex-shrink-0 mt-1">{point.icon}</div>
-                        <p className="text-gray-700 text-lg leading-relaxed">{point.text}</p>
+                        <p className="text-lg leading-relaxed">{point.text}</p>
                       </div>
                     ))}
                   </div>
@@ -142,14 +142,14 @@ export default function Home() {
                     {solutions.map((solution, index) => (
                       <div key={index} className="flex items-center space-x-4 p-4 bg-green-50 rounded-xl border border-green-100 h-22">
                         <div className="flex-shrink-0 mt-1">{solution.icon}</div>
-                        <p className="text-gray-700 text-lg leading-relaxed">{solution.text}</p>
+                        <p className="text-lg leading-relaxed">{solution.text}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
               <div className="text-center">
-                <p className="md:text-xl font-semibold text-purple-600">あなたの「見たい」がきっと見つかる場所です</p>
+                <p className="text-lg font-semibold text-purple-600 md:text-xl">あなたの「見たい」がきっと見つかる場所です</p>
               </div>
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function Home() {
                   <span className="px-3 py-2 bg-purple-200 rounded-2xl inline-block">FEATURES</span>
                 </div>
                 <h2 className="text-4xl mb-6 font-bold">3つの特徴</h2>
-                <p className="md:text-xl">K-POPダンスチャレンジを最高に楽しむための機能をご紹介</p>
+                <p className="text-xl md:text-xl">K-POPダンスチャレンジを最高に楽しむための機能をご紹介</p>
               </div>
               <div className="grid md:grid-cols-3 gap-8 flex-grow">
                 {featureCards &&
@@ -174,7 +174,7 @@ export default function Home() {
                       <div className="bg-white rounded-3xl p-8 shadow-xl text-center h-full w-full">
                         <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center m-auto mb-4">{feature.icon}</div>
                         <h3 className="text-3xl font-bold mb-2">{feature.title}</h3>
-                        <p className="text-gray-600 md:text-lg">{feature.description}</p>
+                        <p className="text-lg">{feature.description}</p>
                       </div>
                     </div>
                   ))}
@@ -193,7 +193,7 @@ export default function Home() {
                   <span className="px-3 py-2 bg-purple-200 rounded-2xl inline-block">HOW TO USE</span>
                 </div>
                 <h2 className="text-4xl mb-6 font-bold">使い方は簡単3ステップ</h2>
-                <p>誰でも直感的に使える設計で、すぐにお気に入りの動画が見つかります</p>
+                <p className="text-xl md:text-xl">誰でも直感的に使える設計で、すぐにお気に入りの動画が見つかります</p>
               </div>
               {steps.map((step, index) => (
                 <div key={step.id} className="flex items-center mb-12 last:mb-0">
@@ -203,8 +203,8 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="flex-grow">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">{step.title}</h3>
-                    <p className="text-gray-600 text-lg">{step.description}</p>
+                    <h3 className="text-3xl font-bold mb-2">{step.title}</h3>
+                    <p className="text-lg md:text-xl">{step.description}</p>
                   </div>
                   {index < steps.length - 1 ? (
                     <div className="hidden md:block ml-8">
@@ -234,8 +234,8 @@ export default function Home() {
                 <Star className="text-white" />
               </div>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">今すぐK-POPダンスの世界へ</h2>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">今すぐK-POPダンスの世界へ</h2>
+            <p className="text-lg mb-8 leading-relaxed md:text-xl">
               あなたが探していたあの動画、見たことのない新しいコラボレーション。
               <br />
               すべてがここで見つかります。
