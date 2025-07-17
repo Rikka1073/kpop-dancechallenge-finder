@@ -50,18 +50,16 @@ body {
 
 @layer utilities {
   @media (hover: none) {
-    .btn-ghost {
-      --btn-bg: #a855f7; /* 初期の紫 */
+    .btn-ghost:not(.btn-active):not(:hover):not(:active):not(:focus-visible) {
+      --btn-bg: #a855f7;
       --btn-border: #a855f7;
       --btn-fg: #ffffff;
-      --btn-shadow: none;
-      --btn-noise: none;
     }
 
     .btn-ghost:active,
     .btn-ghost:focus,
     .btn-ghost:hover {
-      --btn-bg: #9333ea; /* 濃い紫 */
+      --btn-bg: #9333ea;
       --btn-border: #9333ea;
     }
   }
