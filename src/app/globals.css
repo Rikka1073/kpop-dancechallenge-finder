@@ -49,10 +49,13 @@ body {
 }
 
 @layer utilities {
-  &:not(.btn-active, :hover, :active:focus, :focus-visible) {
-    --btn-shadow: "";
-    --btn-bg: #fff;
-    --btn-border: #fff;
-    --btn-noise: none;
+  @media (hover: none) {
+    &:not(.btn-active, :hover, :active:focus, :focus-visible) {
+      .btn-ghost {
+        --btn-bg: #a855f7; /* 元の紫色 */
+        --btn-border: #a855f7;
+        --btn-fg: #ffffff;
+      }
+    }
   }
 }
