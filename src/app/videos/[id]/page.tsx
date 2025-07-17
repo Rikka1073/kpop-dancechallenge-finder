@@ -32,7 +32,7 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
   };
 
   return (
-    <div>
+    <div className="text-black">
       <Header />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Link href="/search" className="link flex gap-2 no-underline font-bold hover:text-purple-400 mb-4">
@@ -41,7 +41,6 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
         </Link>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 flex justify-center">
-            {/* <div className="flex flex-col md:flex-row justify-center gap-4"> */}
             <iframe
               src={`https://www.youtube.com/embed/${data.youtube_id}`}
               title={data.title}
@@ -51,7 +50,6 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
               allowFullScreen
               className="rounded-2xl w-full max-w-sm h-auto aspect-[9/16]"
             />
-            {/* </div> */}
           </div>
           <div className="lg:col-span-1">
             <div className="bg-white p-4 rounded-2xl shadow-lg w-full">

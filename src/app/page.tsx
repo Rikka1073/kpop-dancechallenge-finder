@@ -44,31 +44,31 @@ export default function Home() {
 
   const painPoints = [
     {
-      icon: <X className="text-red-500" size={24} />,
-      text: '"NewJeans ダンスチャレンジ"で検索しても公式MVばかり',
+      icon: <X className="text-red-500" />,
+      text: '"IZ*ONE ダンスチャレンジ"で検索しても公式MVばかり',
     },
     {
-      icon: <X className="text-red-500" size={24} />,
+      icon: <X className="text-red-500" />,
       text: "一般人の踊ってみた動画が混ざって見つからない",
     },
     {
-      icon: <X className="text-red-500" size={24} />,
+      icon: <X className="text-red-500" />,
       text: "好きなグループの新しいダンス動画を毎回探すのが面倒",
     },
   ];
 
   const solutions = [
     {
-      icon: <Check className="text-green-500" size={24} />,
+      icon: <Check className="text-green-500" />,
       text: "アイドルのダンスチャレンジだけを厳選収録",
     },
     {
-      icon: <Check className="text-green-500" size={24} />,
-      text: "ワンタップで推しグループの動画一覧",
+      icon: <Check className="text-green-500" />,
+      text: "アイドルの公式ダンスチャレンジだけを厳選収録",
     },
     {
-      icon: <Check className="text-green-500" size={24} />,
-      text: "新着動画も見逃さない通知機能",
+      icon: <Check className="text-green-500" />,
+      text: "ワンタップで推しグループの動画一覧",
     },
   ];
 
@@ -114,7 +114,7 @@ export default function Home() {
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-16">
                 <div className="mb-4">
-                  <span className="px-3 py-2 bg-purple-200 rounded-2xl">PROBLEM & SOLUTION</span>
+                  <span className="px-3 py-2 bg-purple-200 rounded-2xl inline-block">PROBLEM & SOLUTION</span>
                 </div>
                 <h2 className="text-4xl mb-6 font-bold">こんな経験ありませんか？</h2>
               </div>
@@ -126,7 +126,7 @@ export default function Home() {
                   </h3>
                   <div className="space-y-6">
                     {painPoints.map((point, index) => (
-                      <div key={index} className="flex items-start space-x-4 p-4 bg-red-50 rounded-xl border border-red-100 h-22">
+                      <div key={index} className="flex items-center space-x-4 p-4 bg-red-50 rounded-xl border border-red-100 h-22">
                         <div className="flex-shrink-0 mt-1">{point.icon}</div>
                         <p className="text-gray-700 text-lg leading-relaxed">{point.text}</p>
                       </div>
@@ -140,7 +140,7 @@ export default function Home() {
                   </h3>
                   <div className="space-y-6">
                     {solutions.map((solution, index) => (
-                      <div key={index} className="flex items-start space-x-4 p-4 bg-green-50 rounded-xl border border-green-100 h-22">
+                      <div key={index} className="flex items-center space-x-4 p-4 bg-green-50 rounded-xl border border-green-100 h-22">
                         <div className="flex-shrink-0 mt-1">{solution.icon}</div>
                         <p className="text-gray-700 text-lg leading-relaxed">{solution.text}</p>
                       </div>
@@ -162,7 +162,7 @@ export default function Home() {
             <div className="max-w-5xl mx-auto">
               <div className="mb-10 text-center">
                 <div className="mb-4">
-                  <span className="px-3 py-2 bg-purple-200 rounded-2xl">FEATURES</span>
+                  <span className="px-3 py-2 bg-purple-200 rounded-2xl inline-block">FEATURES</span>
                 </div>
                 <h2 className="text-4xl mb-6 font-bold">3つの特徴</h2>
                 <p className="md:text-xl">K-POPダンスチャレンジを最高に楽しむための機能をご紹介</p>
@@ -190,7 +190,7 @@ export default function Home() {
             <div className="max-w-5xl mx-auto">
               <div className="mb-10 text-center">
                 <div className="mb-4">
-                  <span className="px-3 py-2 bg-purple-200 rounded-2xl">HOW TO USE</span>
+                  <span className="px-3 py-2 bg-purple-200 rounded-2xl inline-block">HOW TO USE</span>
                 </div>
                 <h2 className="text-4xl mb-6 font-bold">使い方は簡単3ステップ</h2>
                 <p>誰でも直感的に使える設計で、すぐにお気に入りの動画が見つかります</p>

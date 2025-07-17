@@ -29,8 +29,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
             </figure>
             <div className="absolute bottom-2 left-2 badge badge-xs md:badge-sm font-bold badge-neutral">{formatViewCount(view_count)} viwes</div>
           </div>
-
-          <div className="card-body rounded-2xl p-3 md:p-5">
+          <div className="card-body rounded-b-2xl p-3 md:p-5 bg-white">
             <h2 className="card-title mb-6 line-clamp-2 text-sm md:text-lg">{title}</h2>
             <div className="card-actions">
               <div className="flex items-center gap-2 mb-2">
