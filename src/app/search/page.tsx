@@ -116,7 +116,7 @@ const Search = () => {
         <div className="flex justify-center mb-8">
           <div className="flex flex-col md:flex-row gap-2 bg-white p-4 rounded-lg w-full md:w-auto">
             <button
-              className={`btn btn-lg rounded-2xl hover:bg-purple-50 hover:text-purple-400 border-none 
+              className={`btn btn-lg rounded-2xl hover:bg-purple-50 hover:text-purple-400 border-none bg-white
                 ${selectedButton === "songs" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"}`}
               onClick={() => onClickSelectButton("songs")}
             >
@@ -124,7 +124,7 @@ const Search = () => {
               楽曲で検索
             </button>
             <button
-              className={`btn btn-lg rounded-2xl hover:bg-purple-50  hover:text-purple-400 border-none
+              className={`btn btn-lg rounded-2xl hover:bg-purple-50  hover:text-purple-400 border-none bg-white
                 ${selectedButton === "groups" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"}`}
               onClick={() => onClickSelectButton("groups")}
             >
@@ -162,7 +162,9 @@ const Search = () => {
                             name="songs"
                             text={item.song_name}
                             onClick={(event) => onclickButton(item.id, item.song_name, event)}
-                            className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none ${buttonStyles[index % buttonStyles.length]}`}`}
+                            className={`${
+                              selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none hover:text-black ${buttonStyles[index % buttonStyles.length]}`
+                            }`}
                           />
                         </div>
                       ))}
