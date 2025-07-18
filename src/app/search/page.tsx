@@ -201,9 +201,7 @@ const Search = () => {
                             name="groups"
                             text={item.group_name}
                             onClick={(event) => onclickButton(item.id, item.group_name, event)}
-                            className={`${
-                              selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none hover:text-white ${buttonStyles[index % buttonStyles.length]}`
-                            }`}
+                            className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none ${buttonStyles[index % buttonStyles.length]}`}`}
                           />
                         </div>
                       ))}

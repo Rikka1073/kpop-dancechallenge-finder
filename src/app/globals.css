@@ -47,20 +47,3 @@ body {
       radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
   }
 }
-
-@layer utilities {
-  @media (hover: none) {
-    .btn-ghost:not(.btn-active):not(:hover):not(:active):not(:focus-visible) {
-      --btn-bg: #a855f7;
-      --btn-border: #a855f7;
-      --btn-fg: #ffffff;
-    }
-
-    .btn-ghost:active,
-    .btn-ghost:focus,
-    .btn-ghost:hover {
-      --btn-bg: #9333ea;
-      --btn-border: #9333ea;
-    }
-  }
-}
