@@ -119,15 +119,16 @@ const Search = () => {
               id="songs-button"
               className={`btn-lg hover:bg-purple-50 hover:text-purple-400 border-none 
                 ${selectedButton === "songs" && "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white"} 
-                active:bg-purple-100 active:text-purple-500 @media (hover: hover) { hover:bg-purple-50 hover:text-purple-400 }`}
+                @media (hover: hover) { hover:bg-purple-50 hover:text-purple-400 }`}
               onClick={() => onClickSelectButton("songs")}
             >
               <Music />
               楽曲で検索
             </Button>
             <Button
-              className={`btn btn-lg rounded-2xl hover:bg-purple-50  hover:text-purple-400 border-none 
-                ${selectedButton === "groups" && "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white"}`}
+              className={`btn-lg hover:bg-purple-50  hover:text-purple-400 border-none 
+                ${selectedButton === "groups" && "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white"}
+                @media (hover: hover) { hover:bg-purple-50 hover:text-purple-400 }`}
               onClick={() => onClickSelectButton("groups")}
             >
               <Users />
