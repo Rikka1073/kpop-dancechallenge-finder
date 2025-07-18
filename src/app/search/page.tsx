@@ -117,18 +117,16 @@ const Search = () => {
           <div className="flex flex-col md:flex-row gap-2 bg-white p-4 rounded-lg w-full md:w-auto">
             <Button
               id="songs-button"
-              className={`btn-lg hover:bg-purple-50 hover:text-purple-400 border-none 
-                ${selectedButton === "songs" && "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white"} 
-                active:bg-purple-100 active:text-purple-500 @media (hover: hover) { hover:bg-purple-50 hover:text-purple-400 }`}
+              className={`btn-lg hover:bg-purple-50 hover:text-purple-400 border-none active:bg-purple-100 active:text-purple-400
+                ${selectedButton === "songs" && "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white active:text-white"} `}
               onClick={() => onClickSelectButton("songs")}
             >
               <Music />
               楽曲で検索
             </Button>
             <Button
-              className={`btn-lg hover:bg-purple-50  hover:text-purple-400 border-none 
-                ${selectedButton === "groups" && "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white"} 
-                active:bg-purple-100 active:text-white @media (hover: hover) { hover:bg-purple-50 hover:text-purple-400 }`}
+              className={`btn-lg hover:bg-purple-50  hover:text-purple-400 border-none active:bg-purple-100 active:text-purple-400
+                ${selectedButton === "groups" && "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white active:text-white"}`}
               onClick={() => onClickSelectButton("groups")}
             >
               <Users />
@@ -165,7 +163,7 @@ const Search = () => {
                             name="songs"
                             onClick={(event) => onclickButton(item.id, item.song_name, event)}
                             className={`${
-                              selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none hover:text-black ${buttonStyles[index % buttonStyles.length]}`
+                              selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none active:text-white ${buttonStyles[index % buttonStyles.length]}`
                             }`}
                           >
                             #{item.song_name}
