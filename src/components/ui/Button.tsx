@@ -1,17 +1,17 @@
 import { ButtonProps } from "@/types";
-import { X } from "lucide-react";
 
-const Button = ({ id, name, text, onClick, className }: ButtonProps) => {
+const Button = ({ id, name, onClick, className, children }: ButtonProps) => {
   return (
     <div>
       <button id={id} name={name} onClick={onClick} className={`btn w-full md:btn-lg rounded-2xl btn-outline bg-white ${className && className}`}>
-        {name === "clear" ? (
+        {/* {name === "clear" ? (
           <>
             <X /> {text}
           </>
         ) : (
           "#" + text
-        )}
+        )} */}
+        {children}
       </button>
     </div>
   );

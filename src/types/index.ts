@@ -27,11 +27,11 @@ export type ChildrenProps = {
 };
 
 export type ButtonProps = {
-  id: string;
-  name: string;
-  text: string;
+  id?: string;
+  name?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
+  children?: React.ReactNode;
 };
 
 export type Record = {
