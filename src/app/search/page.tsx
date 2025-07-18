@@ -163,7 +163,8 @@ const Search = () => {
                             name="songs"
                             onClick={(event) => onclickButton(item.id, item.song_name, event)}
                             className={`${
-                              selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none active:text-white ${buttonStyles[index % buttonStyles.length]}`
+                              selectedItems.some((selected) => selected.id === item.id) &&
+                              `text-white shadow-none border-none active:text-white hover:text-white ${buttonStyles[index % buttonStyles.length]}`
                             }`}
                           >
                             #{item.song_name}
