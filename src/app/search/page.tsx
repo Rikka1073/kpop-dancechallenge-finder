@@ -116,18 +116,16 @@ const Search = () => {
         <div className="flex justify-center mb-8">
           <div className="flex flex-col md:flex-row gap-2 bg-white p-4 rounded-lg w-full md:w-auto">
             <button
-              className={`btn btn-lg btn-ghost rounded-2xl hover:bg-purple-50 hover:text-purple-400 ${
-                selectedButton === "songs" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"
-              }`}
+              className={`btn btn-lg rounded-2xl hover:bg-purple-50 hover:text-purple-400 border-none 
+                ${selectedButton === "songs" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"}`}
               onClick={() => onClickSelectButton("songs")}
             >
               <Music />
               楽曲で検索
             </button>
             <button
-              className={`btn btn-lg btn-ghost rounded-2xl hover:bg-purple-50  hover:text-purple-400 ${
-                selectedButton === "groups" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"
-              }`}
+              className={`btn btn-lg rounded-2xl hover:bg-purple-50  hover:text-purple-400 border-none
+                ${selectedButton === "groups" ? "transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white" : "btn"}`}
               onClick={() => onClickSelectButton("groups")}
             >
               <Users />
@@ -226,7 +224,7 @@ const Search = () => {
               </div>
               <Button
                 onClick={onclickClear}
-                className="hover:text-red-500 hover:bg-purple-50 font-bold bg-white text-black rounded-2xl btn-ghost!"
+                className="hover:text-red-500 hover:bg-purple-50 font-bold bg-white text-black rounded-2xl border-none!"
                 id="clear-button"
                 name="clear"
                 text="すべてクリア"

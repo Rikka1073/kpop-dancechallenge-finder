@@ -34,13 +34,13 @@ const VideoCard = ({ video }: VideoCardProps) => {
             <div className="card-actions">
               <div className="flex items-center gap-2 mb-2">
                 {video_groups.map((badge) => (
-                  <div className="bg-fuchsia-100 text-purple-600 font-bold badge badge-xs md:badge-md" key={badge.groups.id}>
+                  <div className="bg-fuchsia-100 text-purple-600 font-bold badge badge-xs md:badge-md border-none" key={badge.groups.id}>
                     <span>{badge.groups.group_name}</span>
                   </div>
                 ))}
               </div>
               {video_songs.map((badge) => (
-                <div className="bg-red-100 text-red-600 font-bold badge badge-xs md:badge-md" key={badge.songs.id}>
+                <div className="bg-red-100 text-red-600 font-bold badge badge-xs md:badge-md border-none" key={badge.songs.id}>
                   <span>#{badge.songs.song_name}</span>
                 </div>
               ))}
