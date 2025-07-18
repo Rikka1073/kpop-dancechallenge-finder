@@ -161,12 +161,13 @@ const Search = () => {
                             key={item.id}
                             id={item.id}
                             name="songs"
-                            text={item.song_name}
                             onClick={(event) => onclickButton(item.id, item.song_name, event)}
                             className={`${
                               selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none hover:text-black ${buttonStyles[index % buttonStyles.length]}`
                             }`}
-                          />
+                          >
+                            #{item.song_name}
+                          </Button>
                         </div>
                       ))}
                     </div>
@@ -202,10 +203,11 @@ const Search = () => {
                           <Button
                             id={item.id}
                             name="groups"
-                            text={item.group_name}
                             onClick={(event) => onclickButton(item.id, item.group_name, event)}
                             className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none ${buttonStyles[index % buttonStyles.length]}`}`}
-                          />
+                          >
+                            {item.group_name}
+                          </Button>
                         </div>
                       ))}
                     </div>
@@ -223,13 +225,9 @@ const Search = () => {
                 {selectedButton === "songs" ? <Music className="text-purple-400" /> : <Users className="text-purple-400" />}
                 <h4 className="text-lg font-bold">選択中の{selectedButton === "songs" ? "楽曲" : "グループ"}</h4>
               </div>
-              <Button
-                onClick={onclickClear}
-                className="hover:text-red-500 hover:bg-purple-50 font-bold bg-white text-black rounded-2xl border-none!"
-                id="clear-button"
-                name="clear"
-                text="すべてクリア"
-              />
+              <Button onClick={onclickClear} className="hover:text-red-500 hover:bg-purple-50 font-bold bg-white text-black rounded-2xl border-none!" id="clear-button" name="clear">
+                すべてクリア
+              </Button>
             </div>
             <div className="flex flex-wrap gap-2">
               {selectedItems &&
