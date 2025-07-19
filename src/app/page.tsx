@@ -168,9 +168,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center">
-                <p className="text-lg font-semibold text-purple-600 md:text-xl">
-                  あなたの「見たい」がきっと見つかる場所です
-                </p>
+                <p className="text-lg font-semibold text-purple-600 md:text-xl">あなたの「見たい」が見つかる場所です</p>
               </div>
             </div>
           </div>

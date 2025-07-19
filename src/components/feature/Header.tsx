@@ -5,7 +5,7 @@ const Header = () => {
   return (
     <div className="navbar shadow-sm">
       <div className="flex-1">
-        <Link href="/" className="btn btn-ghost text-xl">
+        <Link href="/" className="btn text-xl">
           daisyUI
         </Link>
       </div>
