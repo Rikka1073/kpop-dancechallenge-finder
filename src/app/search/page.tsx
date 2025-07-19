@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs/supabaseFunction";
 import { Record, Videos } from "@/types";
 import useEmblaCarousel from "embla-carousel-react";
-import { Music, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Music, Users, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
@@ -129,14 +129,14 @@ const Search = () => {
           <div className="flex w-full flex-col gap-2 rounded-lg bg-white p-4 md:w-auto md:flex-row">
             <Button
               id="songs-button"
-              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 active:bg-purple-100 active:text-purple-400 ${selectedButton === "songs" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white active:text-white"} `}
+              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 active:bg-white active:text-black ${selectedButton === "songs" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white active:text-white"} `}
               onClick={() => onClickSelectButton("songs")}
             >
               <Music />
               楽曲で検索
             </Button>
             <Button
-              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 active:bg-purple-100 active:text-purple-400 ${selectedButton === "groups" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white active:text-white"}`}
+              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 active:bg-white active:text-black ${selectedButton === "groups" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white active:text-white"}`}
               onClick={() => onClickSelectButton("groups")}
             >
               <Users />
@@ -262,6 +262,7 @@ const Search = () => {
                 id="clear-button"
                 name="clear"
               >
+                <X />
                 すべてクリア
               </Button>
             </div>
