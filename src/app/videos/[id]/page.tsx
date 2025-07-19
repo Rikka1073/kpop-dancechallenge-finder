@@ -57,7 +57,7 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
               <h3 className="text-md font-bold text-gray-600 mb-3">参加アーティスト</h3>
               <div className="flex flex-wrap gap-2 mb-2">
                 {data.video_groups.map((group: GroupDetail) => (
-                  <div key={group.groups.id} className="badge bg-fuchsia-100 text-purple-600 font-bold">
+                  <div key={group.groups.id} className="badge bg-fuchsia-100 text-purple-600 font-bold border-none">
                     {group.groups.group_name}
                   </div>
                 ))}
@@ -65,7 +65,7 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
               <h3 className="text-md font-bold text-gray-600 mb-3">楽曲</h3>
               <div className="mb-2">
                 {data.video_songs.map((song: SongDetail) => (
-                  <div key={song.songs.id} className="badge bg-red-100 text-red-600 font-bold">
+                  <div key={song.songs.id} className="badge bg-red-100 text-red-600 font-bold border-none">
                     {song.songs.song_name}
                   </div>
                 ))}
