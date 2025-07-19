@@ -34,13 +34,13 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
   return (
     <div className="text-black">
       <Header />
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <Link href="/search" className="link flex gap-2 no-underline font-bold hover:text-purple-400 mb-4">
+      <div className="container mx-auto max-w-6xl px-4 py-8">
+        <Link href="/search" className="link mb-4 flex gap-2 font-bold no-underline hover:text-purple-400">
           <ArrowLeft />
           検索に戻る
         </Link>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 flex justify-center">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="flex justify-center lg:col-span-2">
             <iframe
               src={`https://www.youtube.com/embed/${data.youtube_id}`}
               title={data.title}
@@ -48,35 +48,44 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
-              className="rounded-2xl w-full max-w-sm h-auto aspect-[9/16]"
+              className="aspect-[9/16] h-auto w-full max-w-sm rounded-2xl"
             />
           </div>
           <div className="lg:col-span-1">
-            <div className="bg-white p-4 rounded-2xl shadow-lg w-full">
-              <h2 className="text-lg font-bold mb-4">動画情報</h2>
-              <h3 className="text-md font-bold text-gray-600 mb-3">参加アーティスト</h3>
-              <div className="flex flex-wrap gap-2 mb-2">
+            <div className="w-full rounded-2xl bg-white p-4 shadow-lg">
+              <h2 className="mb-4 text-lg font-bold">動画情報</h2>
+              <h3 className="text-md mb-3 font-bold text-gray-600">参加アーティスト</h3>
+              <div className="mb-2 flex flex-wrap gap-2">
                 {data.video_groups.map((group: GroupDetail) => (
-                  <div key={group.groups.id} className="badge bg-fuchsia-100 text-purple-600 font-bold border-none">
+                  <div key={group.groups.id} className="badge border-none bg-fuchsia-100 font-bold text-purple-600">
                     {group.groups.group_name}
                   </div>
                 ))}
               </div>
-              <h3 className="text-md font-bold text-gray-600 mb-3">楽曲</h3>
+              <h3 className="text-md mb-3 font-bold text-gray-600">楽曲</h3>
               <div className="mb-2">
                 {data.video_songs.map((song: SongDetail) => (
-                  <div key={song.songs.id} className="badge bg-red-100 text-red-600 font-bold border-none">
+                  <div key={song.songs.id} className="badge border-none bg-red-100 font-bold text-red-600">
                     {song.songs.song_name}
                   </div>
                 ))}
               </div>
-              <div className="text-gray-600 border-b-2 border-b-gray-300 pb-3 mb-3">{formatViewCount(data.view_count)} viwes</div>
-              <div>
-                このダンスチャレンジ動画は、{data.video_groups.map((group: GroupDetail) => group.groups.group_name).join("と")}によるコラボレーション作品です。 楽曲「
-                {data.video_songs.map((song: SongDetail) => song.songs.song_name)}」に合わせた素晴らしいパフォーマンスをお楽しみください。
+              <div className="mb-3 border-b-2 border-b-gray-300 pb-3 text-gray-600">
+                {formatViewCount(data.view_count)} viwes
               </div>
               <div>
-                <Link href={`https://www.youtube.com/shorts/${data.youtube_id}/`} target="_blank" className="btn bg-red-600 text-white mt-4 w-full font-bold">
+                このダンスチャレンジ動画は、
+                {data.video_groups.map((group: GroupDetail) => group.groups.group_name).join("と")}
+                によるコラボレーション作品です。 楽曲「
+                {data.video_songs.map((song: SongDetail) => song.songs.song_name)}
+                」に合わせた素晴らしいパフォーマンスをお楽しみください。
+              </div>
+              <div>
+                <Link
+                  href={`https://www.youtube.com/shorts/${data.youtube_id}/`}
+                  target="_blank"
+                  className="btn mt-4 w-full bg-red-600 font-bold text-white"
+                >
                   <Youtube />
                   YouTubeで視聴
                 </Link>

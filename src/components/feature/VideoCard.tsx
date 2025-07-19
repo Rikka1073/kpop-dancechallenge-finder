@@ -21,26 +21,40 @@ const VideoCard = ({ video }: VideoCardProps) => {
 
   return (
     <Link href={`/videos/${video.id}`}>
-      <div className="rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:scale-105">
+      <div className="transform rounded-2xl shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl">
         <div className="card rounded-2xl">
           <div className="relative">
             <figure>
-              <Image src={thumbnail_url || "https://via.placeholder.com/360x640"} alt={title} width={360} height={640} className="w-full aspect-[9/16] object-cover rounded-t-2xl" />
+              <Image
+                src={thumbnail_url || "https://via.placeholder.com/360x640"}
+                alt={title}
+                width={360}
+                height={640}
+                className="aspect-[9/16] w-full rounded-t-2xl object-cover"
+              />
             </figure>
-            <div className="absolute bottom-2 left-2 badge badge-xs md:badge-sm font-bold badge-neutral">{formatViewCount(view_count)} viwes</div>
+            <div className="badge badge-xs md:badge-sm badge-neutral absolute bottom-2 left-2 font-bold">
+              {formatViewCount(view_count)} viwes
+            </div>
           </div>
-          <div className="card-body rounded-b-2xl p-3 md:p-5 bg-white">
+          <div className="card-body rounded-b-2xl bg-white p-3 md:p-5">
             <h2 className="card-title mb-6 line-clamp-2 text-sm md:text-lg">{title}</h2>
             <div className="card-actions">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="mb-2 flex items-center gap-2">
                 {video_groups.map((badge) => (
-                  <div className="bg-fuchsia-100 text-purple-600 font-bold badge badge-xs md:badge-md border-none" key={badge.groups.id}>
+                  <div
+                    className="badge badge-xs md:badge-md border-none bg-fuchsia-100 font-bold text-purple-600"
+                    key={badge.groups.id}
+                  >
                     <span>{badge.groups.group_name}</span>
                   </div>
                 ))}
               </div>
               {video_songs.map((badge) => (
-                <div className="bg-red-100 text-red-600 font-bold badge badge-xs md:badge-md border-none" key={badge.songs.id}>
+                <div
+                  className="badge badge-xs md:badge-md border-none bg-red-100 font-bold text-red-600"
+                  key={badge.songs.id}
+                >
                   <span>#{badge.songs.song_name}</span>
                 </div>
               ))}

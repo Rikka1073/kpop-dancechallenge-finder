@@ -7,25 +7,32 @@ export default function Home() {
     {
       id: 1,
       title: "簡単検索",
-      description: "楽曲名やグループ名で瞬時に動画を検索。お気に入りのアーティストのダンスチャレンジがすぐに見つかります。",
-      icon: <Search className="w-8 h-8 text-purple-600" />,
+      description:
+        "楽曲名やグループ名で瞬時に動画を検索。お気に入りのアーティストのダンスチャレンジがすぐに見つかります。",
+      icon: <Search className="h-8 w-8 text-purple-600" />,
     },
     {
       id: 2,
       title: "ショート動画",
       description: "TikTok風の縦型ショート動画で、サクサク視聴。移動中でも気軽にK-POPダンスを楽しめます。",
-      icon: <Play className="w-8 h-8 text-purple-600" />,
+      icon: <Play className="h-8 w-8 text-purple-600" />,
     },
     {
       id: 3,
       title: "視聴体験",
       description: "YouTubeでの視聴も可能。高画質でダンスパフォーマンスを楽しめます。",
-      icon: <Heart className="w-8 h-8 text-purple-600" />,
+      icon: <Heart className="h-8 w-8 text-purple-600" />,
     },
   ];
 
   const steps = [
-    { id: 1, number: "01", title: "検索方法を選択", description: "楽曲検索またはグループ検索を選んでください", color: "from-purple-500 to-purple-600" },
+    {
+      id: 1,
+      number: "01",
+      title: "検索方法を選択",
+      description: "楽曲検索またはグループ検索を選んでください",
+      color: "from-purple-500 to-purple-600",
+    },
     {
       id: 2,
       number: "02",
@@ -76,10 +83,10 @@ export default function Home() {
     <div className="text-black">
       <Header />
       <section>
-        <div className="text-center py-20 p-4 sparkle-bg">
+        <div className="sparkle-bg p-4 py-20 text-center">
           <div className="container mx-auto">
-            <div className="max-w-5xl mx-auto">
-              <h1 className="text-5xl font-bold mb-6 gradient-text" data-testid="home-title">
+            <div className="mx-auto max-w-5xl">
+              <h1 className="gradient-text mb-6 text-5xl font-bold" data-testid="home-title">
                 K-POPダンス
                 <br className="md:hidden" />
                 チャレンジ
@@ -91,14 +98,20 @@ export default function Home() {
                 <br className="md:hidden" />
                 ダンスチャレンジ動画を
                 <br />
-                <span className="text-purple-600 font-bold">簡単に検索・視聴</span>できるWebアプリ
+                <span className="font-bold text-purple-600">簡単に検索・視聴</span>できるWebアプリ
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/search" className="btn btn-lg md:btn-xl btn-ghost rounded-2xl gap-2 flex transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white text-lg">
+              <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                <Link
+                  href="/search"
+                  className="btn btn-lg md:btn-xl btn-ghost flex gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-lg text-white transition-all hover:text-white"
+                >
                   今すぐはじめる
                   <Play />
                 </Link>
-                <Link href="/search" className="btn btn-lg btn-outline md:btn-xl hover:bg-purple-600 text-purple-600 rounded-2xl hover:text-white text-lg">
+                <Link
+                  href="/search"
+                  className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white"
+                >
                   詳しく見る
                   <ArrowRight />
                 </Link>
@@ -109,39 +122,45 @@ export default function Home() {
       </section>
 
       <section id="concept">
-        <div className="py-20 px-4 bg-white">
+        <div className="bg-white px-4 py-20">
           <div className="container mx-auto">
-            <div className="max-w-5xl mx-auto">
-              <div className="text-center mb-16">
+            <div className="mx-auto max-w-5xl">
+              <div className="mb-16 text-center">
                 <div className="mb-4">
-                  <span className="px-3 py-2 bg-purple-200 rounded-2xl inline-block">PROBLEM & SOLUTION</span>
+                  <span className="inline-block rounded-2xl bg-purple-200 px-3 py-2">PROBLEM & SOLUTION</span>
                 </div>
-                <h2 className="text-4xl mb-6 font-bold">こんな経験ありませんか？</h2>
+                <h2 className="mb-6 text-4xl font-bold">こんな経験ありませんか？</h2>
               </div>
-              <div className="grid md:grid-cols-2 gap-12 items-start max-w-6xl mx-auto mb-12">
+              <div className="mx-auto mb-12 grid max-w-6xl items-start gap-12 md:grid-cols-2">
                 <div>
-                  <h3 className="text-3xl font-bold text-red-600 mb-8 flex items-center">
+                  <h3 className="mb-8 flex items-center text-3xl font-bold text-red-600">
                     <X className="mr-3 flex-shrink-0" />
                     <span>よくある困りごと</span>
                   </h3>
                   <div className="space-y-6">
                     {painPoints.map((point, index) => (
-                      <div key={index} className="flex items-center space-x-4 p-4 bg-red-50 rounded-xl border border-red-100 h-22">
-                        <div className="flex-shrink-0 mt-1">{point.icon}</div>
+                      <div
+                        key={index}
+                        className="flex h-22 items-center space-x-4 rounded-xl border border-red-100 bg-red-50 p-4"
+                      >
+                        <div className="mt-1 flex-shrink-0">{point.icon}</div>
                         <p className="text-lg leading-relaxed">{point.text}</p>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold text-green-600 mb-8 flex items-center">
+                  <h3 className="mb-8 flex items-center text-3xl font-bold text-green-600">
                     <Check className="mr-3 flex-shrink-0" />
                     <span>このサイトなら解決！</span>
                   </h3>
                   <div className="space-y-6">
                     {solutions.map((solution, index) => (
-                      <div key={index} className="flex items-center space-x-4 p-4 bg-green-50 rounded-xl border border-green-100 h-22">
-                        <div className="flex-shrink-0 mt-1">{solution.icon}</div>
+                      <div
+                        key={index}
+                        className="flex h-22 items-center space-x-4 rounded-xl border border-green-100 bg-green-50 p-4"
+                      >
+                        <div className="mt-1 flex-shrink-0">{solution.icon}</div>
                         <p className="text-lg leading-relaxed">{solution.text}</p>
                       </div>
                     ))}
@@ -149,7 +168,9 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center">
-                <p className="text-lg font-semibold text-purple-600 md:text-xl">あなたの「見たい」がきっと見つかる場所です</p>
+                <p className="text-lg font-semibold text-purple-600 md:text-xl">
+                  あなたの「見たい」がきっと見つかる場所です
+                </p>
               </div>
             </div>
           </div>
@@ -157,23 +178,25 @@ export default function Home() {
       </section>
 
       <section>
-        <div className="py-20 p-4">
+        <div className="p-4 py-20">
           <div className="container mx-auto">
-            <div className="max-w-5xl mx-auto">
+            <div className="mx-auto max-w-5xl">
               <div className="mb-10 text-center">
                 <div className="mb-4">
-                  <span className="px-3 py-2 bg-purple-200 rounded-2xl inline-block">FEATURES</span>
+                  <span className="inline-block rounded-2xl bg-purple-200 px-3 py-2">FEATURES</span>
                 </div>
-                <h2 className="text-4xl mb-6 font-bold">3つの特徴</h2>
+                <h2 className="mb-6 text-4xl font-bold">3つの特徴</h2>
                 <p className="text-xl md:text-xl">K-POPダンスチャレンジを最高に楽しむための機能をご紹介</p>
               </div>
-              <div className="grid md:grid-cols-3 gap-8 flex-grow">
+              <div className="grid flex-grow gap-8 md:grid-cols-3">
                 {featureCards &&
                   featureCards.map((feature) => (
                     <div key={feature.id} className="flex">
-                      <div className="bg-white rounded-3xl p-8 shadow-xl text-center h-full w-full">
-                        <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center m-auto mb-4">{feature.icon}</div>
-                        <h3 className="text-3xl font-bold mb-2">{feature.title}</h3>
+                      <div className="h-full w-full rounded-3xl bg-white p-8 text-center shadow-xl">
+                        <div className="m-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100">
+                          {feature.icon}
+                        </div>
+                        <h3 className="mb-2 text-3xl font-bold">{feature.title}</h3>
                         <p className="text-lg">{feature.description}</p>
                       </div>
                     </div>
@@ -185,36 +208,38 @@ export default function Home() {
       </section>
 
       <section>
-        <div className="py-20 p-4 bg-white">
+        <div className="bg-white p-4 py-20">
           <div className="container mx-auto">
-            <div className="max-w-5xl mx-auto">
+            <div className="mx-auto max-w-5xl">
               <div className="mb-10 text-center">
                 <div className="mb-4">
-                  <span className="px-3 py-2 bg-purple-200 rounded-2xl inline-block">HOW TO USE</span>
+                  <span className="inline-block rounded-2xl bg-purple-200 px-3 py-2">HOW TO USE</span>
                 </div>
-                <h2 className="text-4xl mb-6 font-bold">使い方は簡単3ステップ</h2>
+                <h2 className="mb-6 text-4xl font-bold">使い方は簡単3ステップ</h2>
                 <p className="text-xl md:text-xl">誰でも直感的に使える設計で、すぐにお気に入りの動画が見つかります</p>
               </div>
               {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center mb-12 last:mb-0">
-                  <div className="flex-shrink-0 mr-8">
-                    <div className={`w-20 h-20 bg-gradient-to-r ${step.color} rounded-2xl flex items-center justify-center shadow-xl`}>
-                      <span className="text-white font-bold text-xl">{step.number}</span>
+                <div key={step.id} className="mb-12 flex items-center last:mb-0">
+                  <div className="mr-8 flex-shrink-0">
+                    <div
+                      className={`h-20 w-20 bg-gradient-to-r ${step.color} flex items-center justify-center rounded-2xl shadow-xl`}
+                    >
+                      <span className="text-xl font-bold text-white">{step.number}</span>
                     </div>
                   </div>
                   <div className="flex-grow">
-                    <h3 className="text-3xl font-bold mb-2">{step.title}</h3>
+                    <h3 className="mb-2 text-3xl font-bold">{step.title}</h3>
                     <p className="text-lg md:text-xl">{step.description}</p>
                   </div>
                   {index < steps.length - 1 ? (
-                    <div className="hidden md:block ml-8">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
+                    <div className="ml-8 hidden md:block">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg">
                         <ArrowRight className="text-gray-300" />
                       </div>
                     </div>
                   ) : (
-                    <div className="hidden md:block ml-8">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+                    <div className="ml-8 hidden md:block">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-green-600 shadow-lg">
                         <Check className="text-gray-300" />
                       </div>
                     </div>
@@ -226,26 +251,32 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 px-4">
+      <section className="px-4 py-20">
         <div className="container mx-auto">
-          <div className="max-w-5xl mx-auto text-center">
-            <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center">
+          <div className="mx-auto max-w-5xl text-center">
+            <div className="mb-6 flex justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600">
                 <Star className="text-white" />
               </div>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">今すぐK-POPダンスの世界へ</h2>
-            <p className="text-lg mb-8 leading-relaxed md:text-xl">
+            <h2 className="mb-6 text-4xl font-bold md:text-5xl">今すぐK-POPダンスの世界へ</h2>
+            <p className="mb-8 text-lg leading-relaxed md:text-xl">
               あなたが探していたあの動画、見たことのない新しいコラボレーション。
               <br />
               すべてがここで見つかります。
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/search" className="btn btn-lg md:btn-xl btn-ghost rounded-2xl gap-2 flex transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:text-white text-lg">
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+              <Link
+                href="/search"
+                className="btn btn-lg md:btn-xl btn-ghost flex gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-lg text-white transition-all hover:text-white"
+              >
                 今すぐはじめる
                 <Search />
               </Link>
-              <Link href="/search" className="btn btn-lg btn-outline md:btn-xl hover:bg-purple-600 text-purple-600 rounded-2xl hover:text-white text-lg">
+              <Link
+                href="/search"
+                className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white"
+              >
                 人気動画を見る
                 <TrendingUp />
               </Link>

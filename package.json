@@ -11,7 +11,7 @@
     "preview": "npm run pages:build && wrangler pages dev",
     "deploy": "npm run pages:build && wrangler pages deploy",
     "test": "vitest",
-    "format": "prettier --write ."
+    "format": "prettier --write 'src/**/*.tsx'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.4",

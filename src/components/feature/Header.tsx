@@ -10,21 +10,24 @@ const Header = () => {
         </Link>
       </div>
       <div className="flex-none">
-        <ul className="menu menu-horizontal px-1 gap-2 hidden sm:flex">
+        <ul className="menu menu-horizontal hidden gap-2 px-1 sm:flex">
           <li>
-            <Link href="/" className="btn hover:text-purple-400 bg-white border-none shadow-none">
+            <Link href="/" className="btn border-none bg-white shadow-none hover:text-purple-400">
               <House />
               ホーム
             </Link>
           </li>
           <li>
-            <Link href="/search" className="btn hover:text-purple-400 bg-white border-none shadow-none">
+            <Link href="/search" className="btn border-none bg-white shadow-none hover:text-purple-400">
               <Search />
               検索
             </Link>
           </li>
           <li>
-            <Link href="/search" className="btn transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white  duration-200 shadow-xl hover:shadow-2xl transform hover:scale-105 rounded-2xl">
+            <Link
+              href="/search"
+              className="btn transform rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl"
+            >
               <User />
               ログイン
             </Link>
