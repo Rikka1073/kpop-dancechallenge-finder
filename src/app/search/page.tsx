@@ -164,7 +164,7 @@ const Search = () => {
                             onClick={(event) => onclickButton(item.id, item.song_name, event)}
                             className={`${
                               selectedItems.some((selected) => selected.id === item.id) &&
-                              `text-white shadow-none border-none active:text-black hover:text-black ${buttonStyles[index % buttonStyles.length]}`
+                              `text-white shadow-none border-none${buttonStyles[index % buttonStyles.length]} active:text-black hover:text-black`
                             }`}
                           >
                             #{item.song_name}
@@ -207,7 +207,7 @@ const Search = () => {
                             onClick={(event) => onclickButton(item.id, item.group_name, event)}
                             className={`${
                               selectedItems.some((selected) => selected.id === item.id) &&
-                              `text-white shadow-none border-none active:text-black hover:text-black ${buttonStyles[index % buttonStyles.length]}`
+                              `text-white shadow-none border-none  ${buttonStyles[index % buttonStyles.length]} active:text-black hover:text-black`
                             }`}
                           >
                             {item.group_name}
