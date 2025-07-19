@@ -8,7 +8,6 @@ import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs
 import { Record, Videos } from "@/types";
 import useEmblaCarousel from "embla-carousel-react";
 import { Music, Users, ChevronLeft, ChevronRight, X } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
