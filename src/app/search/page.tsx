@@ -162,9 +162,9 @@ const Search = () => {
                             id={item.id}
                             name="songs"
                             onClick={(event) => onclickButton(item.id, item.song_name, event)}
-                            className={`${
+                            className={`hover:text-black active:text-black ${
                               selectedItems.some((selected) => selected.id === item.id) &&
-                              `text-white shadow-none border-none${buttonStyles[index % buttonStyles.length]} active:text-black hover:text-black`
+                              `text-white shadow-none border-none hover:text-white active:text-white ${buttonStyles[index % buttonStyles.length]}`
                             }`}
                           >
                             #{item.song_name}
@@ -205,10 +205,7 @@ const Search = () => {
                             id={item.id}
                             name="groups"
                             onClick={(event) => onclickButton(item.id, item.group_name, event)}
-                            className={`${
-                              selectedItems.some((selected) => selected.id === item.id) &&
-                              `text-white shadow-none border-none  ${buttonStyles[index % buttonStyles.length]} active:text-black hover:text-black`
-                            }`}
+                            className={`${selectedItems.some((selected) => selected.id === item.id) && `text-white shadow-none border-none ${buttonStyles[index % buttonStyles.length]}`}`}
                           >
                             {item.group_name}
                           </Button>
