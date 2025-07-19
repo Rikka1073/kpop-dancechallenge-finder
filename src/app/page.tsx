@@ -103,14 +103,14 @@ export default function Home() {
               <div className="flex flex-col justify-center gap-4 sm:flex-row">
                 <Link
                   href="/search"
-                  className="btn btn-lg md:btn-xl btn-ghost flex gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-lg text-white transition-all hover:text-white active:bg-purple-100 active:text-purple-400"
+                  className="link flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-lg text-white no-underline transition-all hover:text-white"
                 >
                   今すぐはじめる
                   <Play />
                 </Link>
                 <Link
                   href="/search"
-                  className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white active:bg-transparent"
+                  className="link flex items-center justify-center rounded-2xl border border-purple-600 p-4 text-lg text-purple-600 no-underline hover:bg-purple-600 hover:text-white"
                 >
                   詳しく見る
                   <ArrowRight />
