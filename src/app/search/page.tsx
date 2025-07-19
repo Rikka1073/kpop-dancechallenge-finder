@@ -117,9 +117,6 @@ const Search = () => {
     <div className="text-black">
       <Header />
       <Layout>
-        <Link href="/" className="mb-4 inline-block text-lg font-bold text-purple-600 hover:underline">
-          ホームに戻る
-        </Link>
         <h2 className="mb-3 text-center text-2xl font-bold text-violet-500 md:text-4xl" data-testid="title">
           ダンスチャレンジ検索
         </h2>
