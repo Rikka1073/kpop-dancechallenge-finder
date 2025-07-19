@@ -254,11 +254,11 @@ const Search = () => {
                 ) : (
                   <Users className="text-purple-400" />
                 )}
-                <h4 className="text-lg font-bold">選択中の{selectedButton === "songs" ? "楽曲" : "グループ"}</h4>
+                <h4 className="text-xl font-bold">選択中の{selectedButton === "songs" ? "楽曲" : "グループ"}</h4>
               </div>
               <Button
                 onClick={onclickClear}
-                className="rounded-2xl border-none! bg-white font-bold text-black hover:bg-purple-50 hover:text-red-500"
+                className="rounded-2xl border bg-white font-bold text-black hover:bg-purple-50 hover:text-red-500"
                 id="clear-button"
                 name="clear"
               >
