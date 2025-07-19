@@ -93,7 +93,7 @@ export default function Home() {
                 <br />
                 検索アプリ
               </h1>
-              <p className="mb-6 text-lg">
+              <p className="mb-6 text-lg md:text-xl">
                 アイドル同士が踊るショート形式の
                 <br className="md:hidden" />
                 ダンスチャレンジ動画を
@@ -103,14 +103,14 @@ export default function Home() {
               <div className="flex flex-col justify-center gap-4 sm:flex-row">
                 <Link
                   href="/search"
-                  className="btn btn-lg md:btn-xl btn-ghost flex gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-lg text-white transition-all hover:text-white"
+                  className="btn btn-lg md:btn-xl btn-ghost flex gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-lg text-white transition-all hover:text-white active:bg-purple-100 active:text-purple-400"
                 >
                   今すぐはじめる
                   <Play />
                 </Link>
                 <Link
                   href="/search"
-                  className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white"
+                  className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white active:bg-purple-600 active:text-white"
                 >
                   詳しく見る
                   <ArrowRight />
@@ -215,7 +215,7 @@ export default function Home() {
                 <div className="mb-4">
                   <span className="inline-block rounded-2xl bg-purple-200 px-3 py-2">HOW TO USE</span>
                 </div>
-                <h2 className="mb-6 text-4xl font-bold">使い方は簡単3ステップ</h2>
+                <h2 className="mb-6 text-2xl font-bold md:text-4xl">使い方は簡単3ステップ</h2>
                 <p className="text-xl md:text-xl">誰でも直感的に使える設計で、すぐにお気に入りの動画が見つかります</p>
               </div>
               {steps.map((step, index) => (
