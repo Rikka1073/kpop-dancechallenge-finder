@@ -49,17 +49,3 @@ body {
       radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
   }
 }
-
-a,
-button {
-  -webkit-tap-highlight-color: transparent!;
-  touch-action: manipulation!;
-  user-select: none!;
-}
-
-a,
-button:active {
-  -webkit-tap-highlight-color: transparent!;
-  touch-action: manipulation!;
-  user-select: none!;
-}
