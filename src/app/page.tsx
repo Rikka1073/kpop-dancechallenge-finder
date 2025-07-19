@@ -109,7 +109,7 @@ export default function Home() {
                   <Play />
                 </Link>
                 <Link
-                  href="/search"
+                  href="#concept"
                   className="link flex items-center justify-center rounded-2xl border border-purple-600 p-4 text-lg text-purple-600 no-underline hover:bg-purple-600 hover:text-white"
                 >
                   詳しく見る
@@ -257,7 +257,7 @@ export default function Home() {
                 <Star className="text-white" />
               </div>
             </div>
-            <h2 className="mb-6 text-4xl font-bold md:text-5xl">今すぐK-POPダンスの世界へ</h2>
+            <h2 className="mb-6 text-4xl font-bold md:text-4xl">今すぐK-POPダンスの世界へ</h2>
             <p className="mb-8 text-lg leading-relaxed md:text-xl">
               あなたが探していたあの動画、見たことのない新しいコラボレーション。
               <br />
@@ -266,14 +266,14 @@ export default function Home() {
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Link
                 href="/search"
-                className="btn btn-lg md:btn-xl btn-ghost flex gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-lg text-white transition-all hover:text-white"
+                className="link flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-lg text-white no-underline transition-all hover:text-white"
               >
                 今すぐはじめる
                 <Search />
               </Link>
               <Link
                 href="/search"
-                className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white active:bg-transparent"
+                className="link flex items-center justify-center gap-2 rounded-2xl border border-purple-600 p-4 text-lg text-purple-600 no-underline hover:bg-purple-600 hover:text-white active:bg-transparent"
               >
                 人気動画を見る
                 <TrendingUp />

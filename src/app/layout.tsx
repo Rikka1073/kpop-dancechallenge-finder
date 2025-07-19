@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" className="scroll-smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <main className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
           <Suspense fallback={<Loading />}>{children}</Suspense>
