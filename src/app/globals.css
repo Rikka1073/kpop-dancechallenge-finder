@@ -53,4 +53,6 @@ body {
 a,
 button {
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }
