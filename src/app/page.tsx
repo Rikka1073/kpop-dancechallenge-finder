@@ -110,7 +110,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/search"
-                  className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white"
+                  className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white active:bg-transparent"
                 >
                   詳しく見る
                   <ArrowRight />
@@ -275,7 +275,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/search"
-                className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white"
+                className="btn btn-lg btn-outline md:btn-xl rounded-2xl text-lg text-purple-600 hover:bg-purple-600 hover:text-white active:bg-transparent"
               >
                 人気動画を見る
                 <TrendingUp />
