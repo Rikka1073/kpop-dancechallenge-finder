@@ -136,7 +136,7 @@ const Search = () => {
               楽曲で検索
             </Button>
             <Button
-              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 active:bg-white active:text-black ${selectedButton === "groups" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white active:text-white"}`}
+              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 ${selectedButton === "groups" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white"}`}
               onClick={() => onClickSelectButton("groups")}
             >
               <Users />
@@ -151,20 +151,20 @@ const Search = () => {
               <h3 className="text-xl font-bold md:text-2xl">楽曲で検索</h3>
               {limitedButton.length > 1 && (
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={scrollPrev}
-                    className="rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
+                    className="md:btn-md rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
                     aria-label="前へ"
                   >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button
+                    <ChevronLeft />
+                  </Button>
+                  <Button
                     onClick={scrollNext}
-                    className="rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
+                    className="md:btn-md rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
                     aria-label="次へ"
                   >
-                    <ChevronRight size={20} />
-                  </button>
+                    <ChevronRight />
+                  </Button>
                 </div>
               )}
             </div>
@@ -180,10 +180,7 @@ const Search = () => {
                             id={item.id}
                             name="songs"
                             onClick={(event) => onclickButton(item.id, item.song_name, event)}
-                            className={`hover:text-black active:text-black ${
-                              selectedItems.some((selected) => selected.id === item.id) &&
-                              `border-none text-white shadow-none hover:text-white active:text-white ${buttonStyles[index % buttonStyles.length]}`
-                            }`}
+                            className={`${selectedItems.some((selected) => selected.id === item.id) && `border-none text-white shadow-none hover:text-white active:text-white ${buttonStyles[index % buttonStyles.length]}`}`}
                           >
                             #{item.song_name}
                           </Button>
