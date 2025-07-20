@@ -1,5 +1,4 @@
 import Header from "@/components/feature/Header";
-import Button from "@/components/ui/Button";
 import { ArrowRight, Check, Heart, Play, Search, Star, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 
