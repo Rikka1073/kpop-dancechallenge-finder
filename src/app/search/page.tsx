@@ -4,10 +4,11 @@ import Header from "@/components/feature/Header";
 import VideoCard from "@/components/feature/VideoCard";
 import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
+import CarouselButton from "@/components/ui/CarouselButton";
 import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs/supabaseFunction";
 import { Record, Videos } from "@/types";
 import useEmblaCarousel from "embla-carousel-react";
-import { Music, Users, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Music, Users, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
@@ -51,15 +52,6 @@ const Search = () => {
       console.log(emblaApi.slideNodes()); // Access API
     }
   }, [emblaApi, limitedButton]);
-
-  // Embla Carousel navigation functions
-  const scrollPrev = () => {
-    if (emblaApi) emblaApi.scrollPrev();
-  };
-
-  const scrollNext = () => {
-    if (emblaApi) emblaApi.scrollNext();
-  };
 
   const onclickButton = async (id: string, select: string, event: React.MouseEvent<HTMLButtonElement>) => {
     const buttonName = event.currentTarget.name;
@@ -149,24 +141,7 @@ const Search = () => {
           <div className="mb-8">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-xl font-bold md:text-2xl">楽曲で検索</h3>
-              {limitedButton.length > 1 && (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={scrollPrev}
-                    className="md:btn-md rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
-                    aria-label="前へ"
-                  >
-                    <ChevronLeft />
-                  </Button>
-                  <Button
-                    onClick={scrollNext}
-                    className="md:btn-md rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
-                    aria-label="次へ"
-                  >
-                    <ChevronRight />
-                  </Button>
-                </div>
-              )}
+              {limitedButton.length > 1 && <CarouselButton emblaApi={emblaApi} />}
             </div>
             <div className="embla" ref={emblaRef}>
               <div className="embla__container">
@@ -198,24 +173,7 @@ const Search = () => {
           <div className="mb-8">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-xl font-bold md:text-2xl">グループで検索</h3>
-              {limitedButton.length > 1 && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={scrollPrev}
-                    className="rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
-                    aria-label="前へ"
-                  >
-                    <ChevronLeft />
-                  </button>
-                  <button
-                    onClick={scrollNext}
-                    className="rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
-                    aria-label="次へ"
-                  >
-                    <ChevronRight />
-                  </button>
-                </div>
-              )}
+              {limitedButton.length > 1 && <CarouselButton emblaApi={emblaApi} />}
             </div>
             <div className="embla" ref={emblaRef}>
               <div className="embla__container">
@@ -255,7 +213,7 @@ const Search = () => {
               </div>
               <Button
                 onClick={onclickClear}
-                className="rounded-2xl border bg-white font-bold text-black hover:bg-purple-50 hover:text-red-500"
+                className="rounded-2xl border bg-white font-bold text-black hover:bg-purple-50 hover:text-red-500 md:border-none"
                 id="clear-button"
                 name="clear"
               >

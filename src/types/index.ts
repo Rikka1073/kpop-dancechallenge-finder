@@ -34,6 +34,10 @@ export type ButtonProps = {
   children?: React.ReactNode;
 };
 
+export type CarouselButtonProps = {
+  emblaApi?: { scrollPrev: () => void; scrollNext: () => void };
+};
+
 export type Record = {
   id: string;
   name: string;
