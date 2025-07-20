@@ -129,7 +129,7 @@ const Search = () => {
           <div className="flex w-full flex-col gap-2 rounded-lg bg-white p-4 md:w-auto md:flex-row">
             <Button
               id="songs-button"
-              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 active:bg-white active:text-black ${selectedButton === "songs" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white active:text-white"} `}
+              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 ${selectedButton === "songs" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white"} `}
               onClick={() => onClickSelectButton("songs")}
             >
               <Music />
@@ -208,14 +208,14 @@ const Search = () => {
                     className="rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
                     aria-label="前へ"
                   >
-                    <ChevronLeft size={20} />
+                    <ChevronLeft />
                   </button>
                   <button
                     onClick={scrollNext}
                     className="rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
                     aria-label="次へ"
                   >
-                    <ChevronRight size={20} />
+                    <ChevronRight />
                   </button>
                 </div>
               )}
