@@ -121,7 +121,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Button className="hover:bg-purple-50 hover:text-purple-400">こんにちわ</Button>
+      <Button className="bg-red-500! hover:bg-purple-50 hover:text-purple-400">こんにちわ</Button>
 
       <section id="concept">
         <div className="bg-white px-4 py-20">
