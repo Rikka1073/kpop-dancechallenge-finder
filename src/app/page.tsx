@@ -1,4 +1,5 @@
 import Header from "@/components/feature/Header";
+import Button from "@/components/ui/Button";
 import { ArrowRight, Check, Heart, Play, Search, Star, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 
@@ -6,22 +7,21 @@ export default function Home() {
   const featureCards = [
     {
       id: 1,
-      title: "簡単検索",
-      description:
-        "楽曲名やグループ名で瞬時に動画を検索。お気に入りのアーティストのダンスチャレンジがすぐに見つかります。",
+      title: "ワンタップ検索",
+      description: "NewJeansタップ → 最新ダンス動画が即表示。もう長時間検索する必要はありません。",
       icon: <Search className="h-8 w-8 text-purple-600" />,
     },
     {
       id: 2,
       title: "ショート動画",
       description: "TikTok風の縦型ショート動画で、サクサク視聴。移動中でも気軽にK-POPダンスを楽しめます。",
-      icon: <Play className="h-8 w-8 text-purple-600" />,
+      icon: <Play className="h-8 w-8 text-red-600" />,
     },
     {
       id: 3,
-      title: "視聴体験",
-      description: "YouTubeでの視聴も可能。高画質でダンスパフォーマンスを楽しめます。",
-      icon: <Heart className="h-8 w-8 text-purple-600" />,
+      title: "厳選コラボ動画",
+      description: "アイドル同士のダンスチャレンジだけを厳選収録。一般人の踊ってみた動画に邪魔されません。",
+      icon: <Heart className="h-8 w-8 text-rose-700" />,
     },
   ];
 
@@ -121,6 +121,8 @@ export default function Home() {
         </div>
       </section>
 
+      <Button className="hover:bg-purple-50 hover:text-purple-400">こんにちわ</Button>
+
       <section id="concept">
         <div className="bg-white px-4 py-20">
           <div className="container mx-auto">
@@ -190,11 +192,11 @@ export default function Home() {
                 {featureCards &&
                   featureCards.map((feature) => (
                     <div key={feature.id} className="flex">
-                      <div className="h-full w-full rounded-3xl bg-white p-8 text-center shadow-xl">
+                      <div className="h-full w-full transform rounded-3xl bg-white p-8 text-center shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl">
                         <div className="m-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100">
                           {feature.icon}
                         </div>
-                        <h3 className="mb-2 text-3xl font-bold">{feature.title}</h3>
+                        <h3 className="mb-2 text-2xl font-bold">{feature.title}</h3>
                         <p className="text-lg">{feature.description}</p>
                       </div>
                     </div>
