@@ -1,5 +1,5 @@
 import Header from "@/components/feature/Header";
-import { ArrowRight, Check, Heart, Play, Search, Star, TrendingUp, X } from "lucide-react";
+import { ArrowRight, Check, Heart, Play, Search, Shield, Star, TrendingUp, X, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -7,19 +7,21 @@ export default function Home() {
     {
       id: 1,
       title: "ワンタップ検索",
-      description: "NewJeansタップ → 最新ダンス動画が即表示。もう長時間検索する必要はありません。",
-      icon: <Search className="h-8 w-8 text-purple-600" />,
+      description: "複雑な検索キーワードは不要。グループ名をタップするだけで、関連するダンス動画が瞬時に表示されます。",
+      icon: <Zap className="h-8 w-8 text-purple-600" />,
     },
     {
       id: 2,
-      title: "ショート動画",
-      description: "TikTok風の縦型ショート動画で、サクサク視聴。移動中でも気軽にK-POPダンスを楽しめます。",
-      icon: <Play className="h-8 w-8 text-red-600" />,
+      title: "厳選公式コラボ動画",
+      description:
+        "アイドル同士のダンスチャレンジのみを厳選収録。一般人の動画や宣伝動画は完全除外で、質の高いコンテンツだけをお届け。",
+      icon: <Shield className="h-8 w-8 text-red-600" />,
     },
     {
       id: 3,
-      title: "厳選コラボ動画",
-      description: "アイドル同士のダンスチャレンジだけを厳選収録。一般人の踊ってみた動画に邪魔されません。",
+      title: "推し活サポート",
+      description:
+        "好きなグループの動画を一覧で管理。1タップで推しの全ダンス動画にアクセスでき、新着動画も見逃しません。",
       icon: <Heart className="h-8 w-8 text-rose-700" />,
     },
   ];
@@ -143,7 +145,7 @@ export default function Home() {
                         className="flex h-22 items-center space-x-4 rounded-xl border border-red-100 bg-red-50 p-4"
                       >
                         <div className="mt-1 flex-shrink-0">{point.icon}</div>
-                        <p className="text-lg leading-relaxed">{point.text}</p>
+                        <p className="text-lg leading-relaxed text-gray-600">{point.text}</p>
                       </div>
                     ))}
                   </div>
@@ -160,7 +162,7 @@ export default function Home() {
                         className="flex h-22 items-center space-x-4 rounded-xl border border-green-100 bg-green-50 p-4"
                       >
                         <div className="mt-1 flex-shrink-0">{solution.icon}</div>
-                        <p className="text-lg leading-relaxed">{solution.text}</p>
+                        <p className="text-lg leading-relaxed text-gray-600">{solution.text}</p>
                       </div>
                     ))}
                   </div>
@@ -194,7 +196,7 @@ export default function Home() {
                           {feature.icon}
                         </div>
                         <h3 className="mb-2 text-2xl font-bold">{feature.title}</h3>
-                        <p className="text-lg">{feature.description}</p>
+                        <p className="text-lg text-gray-600">{feature.description}</p>
                       </div>
                     </div>
                   ))}
@@ -213,7 +215,9 @@ export default function Home() {
                   <span className="inline-block rounded-2xl bg-purple-200 px-3 py-2">HOW TO USE</span>
                 </div>
                 <h2 className="mb-6 text-2xl font-bold md:text-4xl">使い方は簡単3ステップ</h2>
-                <p className="text-xl md:text-xl">誰でも直感的に使える設計で、すぐにお気に入りの動画が見つかります</p>
+                <p className="text-xl text-gray-600 md:text-xl">
+                  誰でも直感的に使える設計で、すぐにお気に入りの動画が見つかります
+                </p>
               </div>
               {steps.map((step, index) => (
                 <div key={step.id} className="mb-12 flex items-center last:mb-0">
@@ -226,7 +230,7 @@ export default function Home() {
                   </div>
                   <div className="flex-grow">
                     <h3 className="mb-2 text-3xl font-bold">{step.title}</h3>
-                    <p className="text-lg md:text-xl">{step.description}</p>
+                    <p className="text-lg text-gray-600 md:text-xl">{step.description}</p>
                   </div>
                   {index < steps.length - 1 ? (
                     <div className="ml-8 hidden md:block">
@@ -257,7 +261,7 @@ export default function Home() {
               </div>
             </div>
             <h2 className="mb-6 text-4xl font-bold md:text-4xl">今すぐK-POPダンスの世界へ</h2>
-            <p className="mb-8 text-lg leading-relaxed md:text-xl">
+            <p className="mb-8 text-lg leading-relaxed text-gray-600 md:text-xl">
               あなたが探していたあの動画、見たことのない新しいコラボレーション。
               <br />
               すべてがここで見つかります。
