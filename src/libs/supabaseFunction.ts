@@ -2,7 +2,9 @@ import { supabase } from "./supabase";
 
 // 全ての動画を取得（初期表示用）
 export const getAllVideos = async () => {
-  const { data, error } = await supabase.from("videos").select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`);
+  const { data, error } = await supabase
+    .from("videos")
+    .select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`);
 
   if (error) {
     console.log("Error fetching videos:", error);
@@ -25,7 +27,7 @@ export const fetchSongs = async () => {
 
 // グループの情報を取得
 export const fetchGroups = async () => {
-  const { data, error } = await supabase.from("groups").select("*");
+  const { data, error } = await supabase.from("groups").select("*").not("display_order", "is", null);
   if (error) {
     console.log("Error fetching Groups:", error);
   } else if (data) {
@@ -34,6 +36,7 @@ export const fetchGroups = async () => {
   }
 };
 
+// 特定のグループまたは曲に関連する動画を取得
 export const getMatchedGroupId = async (id: string, buttonName: string) => {
   console.log("Fetching videos for group or song ID:", id);
   if (buttonName === "songs") {
@@ -56,7 +59,10 @@ export const getMatchedGroupId = async (id: string, buttonName: string) => {
     }
   } else if (buttonName === "groups") {
     console.log("groups:", id);
-    const { data: videoIds, error: videoError } = await supabase.from("video_groups").select("video_id").eq("group_id", id);
+    const { data: videoIds, error: videoError } = await supabase
+      .from("video_groups")
+      .select("video_id")
+      .eq("group_id", id);
 
     if (videoError) {
       console.log("Error fetching video IDs:", videoError);
