@@ -58,7 +58,12 @@ export type SongDetail = {
 };
 
 export type RegisterInputs = {
-  youtubeVideoId: string;
+  videoId: {
+    id: string;
+  };
+  songId: string;
+  firstGroupId: string;
+  secondGroupId: string;
 };
 
 export type VideoData = {
@@ -66,4 +71,16 @@ export type VideoData = {
   title: string;
   thumbnailUrl: string;
   viewCount: number;
+};
+
+export type VideoGroupData = {
+  videoId: string;
+
+  firstGroupId: string;
+  secondGroupId: string;
+};
+
+export type VideoSongData = {
+  videoId: string;
+  songId: string;
 };

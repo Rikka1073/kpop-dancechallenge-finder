@@ -1,4 +1,4 @@
-import { VideoData } from "@/types";
+import { VideoData, VideoGroupData, VideoSongData } from "@/types";
 import { supabase } from "./supabase";
 
 // 全ての動画を取得（初期表示用）
@@ -19,7 +19,8 @@ export const getAllVideos = async () => {
 export const getAllRegisteredVideos = async () => {
   const { data, error } = await supabase
     .from("videos")
-    .select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`);
+    .select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`)
+    .or("video_groups.is.null,video_songs.is.null");
 
   if (error) {
     console.log("Error fetching videos:", error);
@@ -135,10 +136,52 @@ export const registerVideo = async (videoData: VideoData) => {
 };
 
 // 動画のグループ詳細を登録
-export const registerVideoGroup = async (videoId: string, groupId: string, songId: string) => {
+export const registerVideoGroup = async (detailsGroupDate: VideoGroupData) => {
+  const { videoId } = detailsGroupDate;
+  console.log("Video ID:", videoId);
+  const groupDataId = await fetchGroups();
+  const firstGroupId = groupDataId?.find((group) => group.group_name === detailsGroupDate.firstGroupId);
+  const secondGroupId = groupDataId?.find((group) => group.group_name === detailsGroupDate.secondGroupId);
+  console.log("First Group ID:", firstGroupId.id);
+  console.log("Second Group ID:", secondGroupId.id);
+  const insertData = [
+    {
+      video_id: videoId,
+      group_id: firstGroupId.id,
+    },
+    {
+      video_id: videoId,
+      group_id: secondGroupId.id,
+    },
+  ];
+
+  console.log("Insert Data:", insertData);
+
+  const { data, error } = await supabase.from("video_groups").insert(insertData).select("*");
+
+  if (error) {
+    console.log("Error registering video details:", error);
+  } else if (data) {
+    console.log("Video details registered successfully:", data);
+    return data || [];
+  }
+};
+
+// 動画の曲詳細を登録
+export const registerVideoSong = async (detailsSongDate: VideoSongData) => {
+  const { videoId } = detailsSongDate;
+  console.log("Video ID:", videoId);
+  const songDataId = await fetchSongs();
+  const songId = songDataId?.find((song) => song.song_name === detailsSongDate.songId);
+  console.log("Song ID:", songId.id);
   const { data, error } = await supabase
-    .from("video_groups")
-    .insert({ video_id: videoId, group_id: groupId, song_id: songId })
+    .from("video_songs")
+    .insert([
+      {
+        video_id: videoId,
+        song_id: songId.id,
+      },
+    ])
     .select("*");
 
   if (error) {
