@@ -1,4 +1,4 @@
-import { House, Search, User } from "lucide-react";
+import { CirclePlus, House, Search, User } from "lucide-react";
 import Link from "next/link";
 
 const Header = () => {
@@ -21,6 +21,12 @@ const Header = () => {
             <Link href="/search" className="link no-underline hover:bg-transparent hover:text-purple-400">
               <Search />
               検索
+            </Link>
+          </li>
+          <li>
+            <Link href="/register" className="link no-underline hover:bg-transparent hover:text-purple-400">
+              <CirclePlus />
+              動画登録
             </Link>
           </li>
           <li>
