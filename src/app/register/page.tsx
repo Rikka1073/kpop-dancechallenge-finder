@@ -83,7 +83,7 @@ const Register = () => {
           <h2 className="mb-3 text-2xl font-bold text-purple-600 md:text-4xl">動画登録管理</h2>
           <p className="text-lg md:text-xl">YouTube URLを入力して動画を自動登録</p>
         </div>
-        <div className="flex items-center justify-center px-60">
+        <div className="m-auto flex w-full items-center justify-center md:w-3xl">
           <div className="flex w-full flex-col gap-2 rounded-2xl bg-white p-4">
             <p className="font-bold">YouTube URL</p>
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
