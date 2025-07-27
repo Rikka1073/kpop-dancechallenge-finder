@@ -56,3 +56,7 @@ export type SongDetail = {
     song_name: string;
   };
 };
+
+export type RegisterInputs = {
+  youtubeVideoId: string;
+};
