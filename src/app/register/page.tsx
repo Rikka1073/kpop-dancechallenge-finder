@@ -4,8 +4,6 @@ import Layout from "@/components/layout/Layout";
 import { getAllVideos, registerVideo } from "@/libs/supabaseFunction";
 import { RegisterInputs } from "@/types";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { vi } from "vitest";
-import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 const Register = () => {
   const {
@@ -37,7 +35,8 @@ const Register = () => {
       return true;
     }
   };
-  // YouTube APIから動画情報を取得するためのサンプルコード
+
+  // YouTube APIから動画情報を取得
   const fetchYouTubeVideoData = async (id: string) => {
     const videoId = id;
     const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
