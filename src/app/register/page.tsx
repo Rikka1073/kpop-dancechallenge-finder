@@ -3,6 +3,8 @@ import Header from "@/components/feature/Header";
 import Layout from "@/components/layout/Layout";
 import { getAllRegisteredVideos, registerVideo } from "@/libs/supabaseFunction";
 import { RegisterInputs } from "@/types";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
@@ -10,6 +12,7 @@ const Register = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<RegisterInputs>();
   const [completed, setCompleted] = useState(false);
@@ -25,10 +28,12 @@ const Register = () => {
         console.log("動画はすでに登録されています");
         setCompleted(false);
         setExistingVideos(true);
+        reset();
         return;
       } else {
         setCompleted(true);
         setExistingVideos(false);
+        reset();
       }
       await fetchYouTubeVideoData(videoId);
     } else {
@@ -70,6 +75,10 @@ const Register = () => {
     <div>
       <Header />
       <Layout>
+        <Link href="/" className="link mb-4 flex gap-2 font-bold no-underline hover:text-purple-400">
+          <ArrowLeft />
+          TOPへ戻る
+        </Link>
         <div className="mb-6 text-center">
           <h2 className="mb-3 text-2xl font-bold text-purple-600 md:text-4xl">動画登録管理</h2>
           <p className="text-lg md:text-xl">YouTube URLを入力して動画を自動登録</p>
@@ -96,7 +105,11 @@ const Register = () => {
         </div>
         {completed && (
           <div className="mt-4 text-center">
-            <p className="text-lg text-green-600">動画の登録が完了しました！</p>
+            <p className="text-lg text-green-600">
+              動画の登録が完了しました！
+              <br />
+              反映までしばらくお待ちください。
+            </p>
           </div>
         )}
         {existingVideos && (
