@@ -5,6 +5,20 @@ import { supabase } from "./supabase";
 export const getAllVideos = async () => {
   const { data, error } = await supabase
     .from("videos")
+    .select(`*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`);
+
+  if (error) {
+    console.log("Error fetching videos:", error);
+  } else if (data) {
+    console.log("Videos fetched successfully:", data);
+    return data || [];
+  }
+};
+
+// 登録済みの動画を取得
+export const getAllRegisteredVideos = async () => {
+  const { data, error } = await supabase
+    .from("videos")
     .select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`);
 
   if (error) {
@@ -116,6 +130,21 @@ export const registerVideo = async (videoData: VideoData) => {
     console.log("Error fetching videos:", error);
   } else if (data) {
     console.log("Videos fetched successfully:", data);
+    return data || [];
+  }
+};
+
+// 動画のグループ詳細を登録
+export const registerVideoGroup = async (videoId: string, groupId: string, songId: string) => {
+  const { data, error } = await supabase
+    .from("video_groups")
+    .insert({ video_id: videoId, group_id: groupId, song_id: songId })
+    .select("*");
+
+  if (error) {
+    console.log("Error registering video details:", error);
+  } else if (data) {
+    console.log("Video details registered successfully:", data);
     return data || [];
   }
 };

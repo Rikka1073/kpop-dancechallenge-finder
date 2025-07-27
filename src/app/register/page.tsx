@@ -1,8 +1,9 @@
 "use client";
 import Header from "@/components/feature/Header";
 import Layout from "@/components/layout/Layout";
-import { getAllVideos, registerVideo } from "@/libs/supabaseFunction";
+import { getAllRegisteredVideos, registerVideo } from "@/libs/supabaseFunction";
 import { RegisterInputs } from "@/types";
+import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 const Register = () => {
@@ -11,6 +12,8 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterInputs>();
+  const [completed, setCompleted] = useState(false);
+  const [existingVideos, setExistingVideos] = useState(false);
 
   const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
     console.log(data);
@@ -20,8 +23,12 @@ const Register = () => {
       const existingVideos = await checkVideoExists(videoId);
       if (existingVideos) {
         console.log("動画はすでに登録されています");
-        alert("動画はすでに登録されています");
+        setCompleted(false);
+        setExistingVideos(true);
         return;
+      } else {
+        setCompleted(true);
+        setExistingVideos(false);
       }
       await fetchYouTubeVideoData(videoId);
     } else {
@@ -30,10 +37,12 @@ const Register = () => {
   };
 
   const checkVideoExists = async (youtubeVideoId: string) => {
-    const registeredVideo = await getAllVideos();
+    const registeredVideo = await getAllRegisteredVideos();
+    console.log("registeredVideo", youtubeVideoId);
     if (registeredVideo?.some((video) => video.youtube_id === youtubeVideoId)) {
       return true;
     }
+    return false;
   };
 
   // YouTube APIから動画情報を取得
@@ -53,6 +62,8 @@ const Register = () => {
       thumbnailUrl: videosData.items[0].snippet.thumbnails.maxres.url,
       viewCount: videosData.items[0].statistics.viewCount,
     });
+
+    return;
   };
 
   return (
@@ -83,6 +94,16 @@ const Register = () => {
             </form>
           </div>
         </div>
+        {completed && (
+          <div className="mt-4 text-center">
+            <p className="text-lg text-green-600">動画の登録が完了しました！</p>
+          </div>
+        )}
+        {existingVideos && (
+          <div className="mt-4 text-center">
+            <p className="text-lg text-red-600">動画はすでに登録されています</p>
+          </div>
+        )}
       </Layout>
     </div>
   );
