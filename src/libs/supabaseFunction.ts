@@ -1,3 +1,4 @@
+import { VideoData } from "@/types";
 import { supabase } from "./supabase";
 
 // 全ての動画を取得（初期表示用）
@@ -95,5 +96,26 @@ export const getMatchedGroupId = async (id: string, buttonName: string) => {
       console.log("Videos fetched successfully:", data);
       return data;
     }
+  }
+};
+
+// 動画の登録
+export const registerVideo = async (videoData: VideoData) => {
+  const { id, title, thumbnailUrl, viewCount } = videoData;
+  const { data, error } = await supabase
+    .from("videos")
+    .insert({
+      youtube_id: id,
+      title: title,
+      thumbnail_url: thumbnailUrl,
+      view_count: viewCount,
+    })
+    .select("*");
+
+  if (error) {
+    console.log("Error fetching videos:", error);
+  } else if (data) {
+    console.log("Videos fetched successfully:", data);
+    return data || [];
   }
 };

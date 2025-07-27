@@ -1,24 +1,60 @@
 "use client";
 import Header from "@/components/feature/Header";
 import Layout from "@/components/layout/Layout";
+import { getAllVideos, registerVideo } from "@/libs/supabaseFunction";
 import { RegisterInputs } from "@/types";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { vi } from "vitest";
+import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 const Register = () => {
-  const onClickRegisterButton = () => {
-    // console.log(url);
-  };
-
-  // const videoUrl = "https://www.youtube.com/shorts/7rEWKNzngtE";
-  // const newUrl = videoUrl.match(/shorts\/([a-zA-Z0-9_-]+)/);
-  // console.log(newUrl);
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterInputs>();
-  const onSubmit: SubmitHandler<RegisterInputs> = (data) => console.log(data);
+
+  const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
+    console.log(data);
+    const youtubeVideoId = data.youtubeVideoId.match(/shorts\/([a-zA-Z0-9_-]+)/);
+    if (youtubeVideoId) {
+      const videoId = youtubeVideoId[1];
+      const existingVideos = await checkVideoExists(videoId);
+      if (existingVideos) {
+        console.log("動画はすでに登録されています");
+        alert("動画はすでに登録されています");
+        return;
+      }
+      await fetchYouTubeVideoData(videoId);
+    } else {
+      console.error("YouTube ShortsのURLを正しく入力してください");
+    }
+  };
+
+  const checkVideoExists = async (youtubeVideoId: string) => {
+    const registeredVideo = await getAllVideos();
+    if (registeredVideo?.some((video) => video.youtube_id === youtubeVideoId)) {
+      return true;
+    }
+  };
+  // YouTube APIから動画情報を取得するためのサンプルコード
+  const fetchYouTubeVideoData = async (id: string) => {
+    const videoId = id;
+    const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${apiKey}`
+    );
+
+    const videosData = await response.json();
+    console.log("videosData", videosData.items[0].id);
+    registerVideo({
+      id: videosData.items[0].id,
+      title: videosData.items[0].snippet.title,
+      thumbnailUrl: videosData.items[0].snippet.thumbnails.maxres.url,
+      viewCount: videosData.items[0].statistics.viewCount,
+    });
+  };
 
   return (
     <div>
@@ -44,7 +80,6 @@ const Register = () => {
                 type="submit"
                 value="動画情報を登録"
                 className="btn-lg w-full rounded-2xl border-none bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-lg text-white md:text-xl"
-                onClick={onClickRegisterButton}
               />
             </form>
           </div>

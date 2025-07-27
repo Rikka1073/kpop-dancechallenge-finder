@@ -60,3 +60,10 @@ export type SongDetail = {
 export type RegisterInputs = {
   youtubeVideoId: string;
 };
+
+export type VideoData = {
+  id: string;
+  title: string;
+  thumbnailUrl: string;
+  viewCount: number;
+};
