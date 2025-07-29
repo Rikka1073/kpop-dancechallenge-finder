@@ -58,9 +58,7 @@ export type SongDetail = {
 };
 
 export type RegisterInputs = {
-  videoId: {
-    id: string;
-  };
+  videoId: string;
   songId: string;
   firstGroupId: string;
   secondGroupId: string;
@@ -75,7 +73,6 @@ export type VideoData = {
 
 export type VideoGroupData = {
   videoId: string;
-
   firstGroupId: string;
   secondGroupId: string;
 };
