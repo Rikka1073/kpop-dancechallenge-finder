@@ -244,7 +244,7 @@ const Search = () => {
           {filteredData && filteredData.length > 0 ? (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
               {filteredData.map((video: Videos) => (
-                <div key={video.id} className="mb-4">
+                <div key={video.id}>
                   <VideoCard video={video} />
                 </div>
               ))}

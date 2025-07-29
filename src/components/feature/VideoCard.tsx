@@ -21,8 +21,8 @@ const VideoCard = ({ video }: VideoCardProps) => {
 
   return (
     <Link href={`/videos/${video.id}`}>
-      <div className="transform rounded-2xl shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl">
-        <div className="card rounded-2xl">
+      <div className="h-full transform rounded-2xl shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl">
+        <div className="card h-full rounded-2xl">
           <div className="relative">
             <figure>
               <Image
@@ -40,7 +40,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
           <div className="card-body rounded-b-2xl bg-white p-3 md:p-5">
             <h2 className="card-title mb-6 line-clamp-2 text-sm md:text-lg">{title}</h2>
             <div className="card-actions">
-              <div className="mb-2 flex items-center gap-2">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
                 {video_groups.map((badge) => (
                   <div
                     className="badge badge-xs md:badge-md border-none bg-fuchsia-100 font-bold text-purple-600"
