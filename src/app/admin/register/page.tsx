@@ -29,6 +29,7 @@ const AdminPage = () => {
     <div>
       <Header />
       <Layout>
+        <p>テスト</p>
         <div className="flex items-center justify-center">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="flex justify-center lg:col-span-2">
