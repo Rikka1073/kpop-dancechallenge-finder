@@ -9,7 +9,6 @@ import {
   registerVideoSong,
 } from "@/libs/supabaseFunction";
 import { RegisterInputs } from "@/types";
-import { Divide } from "lucide-react";
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
 import useSWR from "swr";
@@ -18,11 +17,7 @@ const AdminPage = () => {
   const { data: videos } = useSWR("videos", getAllRegisteredVideos);
   const { data: songs } = useSWR("songs", fetchSongs);
   const { data: groups } = useSWR("groups", fetchGroups);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterInputs>();
+  const { register, handleSubmit } = useForm<RegisterInputs>();
 
   const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
     console.log("Submitted data:", data);
