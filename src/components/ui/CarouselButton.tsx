@@ -14,14 +14,14 @@ const CarouselButton = ({ emblaApi }: CarouselButtonProps) => {
     <div className="flex gap-2">
       <Button
         onClick={scrollPrev}
-        className="md:btn-md rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
+        className="lg:btn-md rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
         aria-label="前へ"
       >
         <ChevronLeft />
       </Button>
       <Button
         onClick={scrollNext}
-        className="md:btn-md rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
+        className="lg:btn-md rounded-full bg-white p-2 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:text-purple-600"
         aria-label="次へ"
       >
         <ChevronRight />
