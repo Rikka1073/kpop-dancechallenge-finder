@@ -1,4 +1,5 @@
 "use client";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { CirclePlus, House, Search, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,12 +38,17 @@ const Header = () => {
             </ul>
           </div>
         </div>
-        <Link
-          href="/search"
-          className="link transform rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 font-bold text-white no-underline shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl"
-        >
-          ログイン
-        </Link>
+        <SignedOut>
+          <SignInButton />
+          <SignUpButton>
+            <button className="link transform rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 font-bold text-white no-underline shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl">
+              Sign Up
+            </button>
+          </SignUpButton>
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
       </div>
     </div>
   );
