@@ -4,7 +4,6 @@ import "./globals.css";
 import { Suspense } from "react";
 import Loading from "./loading";
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,14 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="ja" className="scroll-smooth">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <main className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-            <Suspense fallback={<Loading />}>{children}</Suspense>
-          </main>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="ja" className="scroll-smooth">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <main className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+          <Suspense fallback={<Loading />}>
+            <ClerkProvider>{children}</ClerkProvider>
+          </Suspense>
+        </main>
+      </body>
+    </html>
   );
 }
