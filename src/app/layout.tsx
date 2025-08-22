@@ -28,11 +28,11 @@ export default function RootLayout({
   return (
     <html lang="ja" className="scroll-smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <main className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+        <ClerkProvider>
           <Suspense fallback={<Loading />}>
-            <ClerkProvider>{children}</ClerkProvider>
+            <main className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">{children}</main>
           </Suspense>
-        </main>
+        </ClerkProvider>
       </body>
     </html>
   );
