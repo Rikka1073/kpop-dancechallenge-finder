@@ -26,14 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className="scroll-smooth">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ClerkProvider>
+    <ClerkProvider>
+      <html lang="ja" className="scroll-smooth">
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <Suspense fallback={<Loading />}>
             <main className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">{children}</main>
           </Suspense>
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
