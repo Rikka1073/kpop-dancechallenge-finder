@@ -6,6 +6,8 @@ vi.mock("@clerk/nextjs", () => {
     Protect: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     SignedIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     SignedOut: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    SignUpButton: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    SignInButton: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     useUser: () => ({
       isSignedIn: true,
       user: { id: "user_123", fullName: "Test User" },
