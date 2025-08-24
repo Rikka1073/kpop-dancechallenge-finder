@@ -20,12 +20,7 @@ const nextConfig = {
       };
 
       // Clerk関連のモジュールを外部化
-      config.externals = [
-        ...(config.externals || []),
-        {
-          "@clerk/nextjs/server": "commonjs @clerk/nextjs/server",
-        },
-      ];
+      config.externals = [...(config.externals || []), "@clerk/nextjs/server", "@clerk/backend"];
     }
 
     return config;
