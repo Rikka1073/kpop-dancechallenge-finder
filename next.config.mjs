@@ -9,9 +9,15 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
-        path: require.resolve("path-browserify"),
+        path: false,
         fs: false,
         os: false,
+        crypto: false,
+        stream: false,
+        http: false,
+        https: false,
+        zlib: false,
+        url: false,
       };
     }
     return config;
