@@ -90,10 +90,10 @@ const Register = () => {
               <input
                 type="text"
                 placeholder="https://"
-                {...register("youtubeVideoId", { required: true })}
+                {...register("videoId", { required: true })}
                 className="input input-lg w-full focus-within:border-none focus:outline-purple-600"
               />
-              {errors.youtubeVideoId && <span className="font-bold text-red-500">入力必須です</span>}
+              {errors.videoId && <span className="font-bold text-red-500">入力必須です</span>}
               <p>YouTube ShortsのURLを入力してください</p>
               <input
                 type="submit"
