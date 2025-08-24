@@ -20,7 +20,7 @@ const Register = () => {
 
   const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
     console.log(data);
-    const youtubeVideoId = data.youtubeVideoId.match(/shorts\/([a-zA-Z0-9_-]+)/);
+    const youtubeVideoId = data.videoId.match(/shorts\/([a-zA-Z0-9_-]+)/);
     if (youtubeVideoId) {
       const videoId = youtubeVideoId[1];
       const existingVideos = await checkVideoExists(videoId);
