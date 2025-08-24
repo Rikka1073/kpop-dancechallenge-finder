@@ -5,9 +5,6 @@ const nextConfig = {
   images: {
     domains: ["i.ytimg.com"],
   },
-  experimental: {
-    serverComponentsExternalPackages: ["@clerk/nextjs"],
-  },
 };
 
 if (process.env.NODE_ENV === "development") {
