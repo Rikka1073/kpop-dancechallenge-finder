@@ -4,16 +4,18 @@ import { GroupDetail, SongDetail } from "@/types";
 import { ArrowLeft, Youtube } from "lucide-react";
 import Link from "next/link";
 
-export async function generateStaticParams() {
-  const videos = await getAllVideos();
+// export async function generateStaticParams() {
+//   const videos = await getAllVideos();
 
-  if (!videos) {
-    return [];
-  }
-  return videos.map((video) => ({
-    id: video.id,
-  }));
-}
+//   if (!videos) {
+//     return [];
+//   }
+//   return videos.map((video) => ({
+//     id: video.id,
+//   }));
+// }
+
+export const runtime = "edge";
 
 const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
