@@ -87,7 +87,7 @@ export default function Home() {
         <div className="sparkle-bg p-4 py-20 text-center">
           <div className="container mx-auto">
             <div className="mx-auto max-w-5xl">
-              <h1 className="gradient-text mb-6 text-5xl font-bold" data-testid="home-title">
+              <h1 className="gradient-text mb-6 text-5xl font-bold" data-testid="main-title">
                 K-POPダンス
                 <br className="md:hidden" />
                 チャレンジ
@@ -130,7 +130,9 @@ export default function Home() {
                 <div className="mb-4">
                   <span className="inline-block rounded-2xl bg-purple-200 px-3 py-2">PROBLEM & SOLUTION</span>
                 </div>
-                <h2 className="mb-6 text-4xl font-bold">こんな経験ありませんか？</h2>
+                <h2 className="mb-6 text-4xl font-bold" data-testid="first-subTitle">
+                  こんな経験ありませんか？
+                </h2>
               </div>
               <div className="mx-auto mb-12 grid max-w-6xl items-start gap-12 md:grid-cols-2">
                 <div>
@@ -184,7 +186,9 @@ export default function Home() {
                 <div className="mb-4">
                   <span className="inline-block rounded-2xl bg-purple-200 px-3 py-2">FEATURES</span>
                 </div>
-                <h2 className="mb-6 text-4xl font-bold">3つの特徴</h2>
+                <h2 className="mb-6 text-4xl font-bold" data-testid="second-subTitle">
+                  3つの特徴
+                </h2>
                 <p className="text-xl md:text-xl">K-POPダンスチャレンジを最高に楽しむための機能をご紹介</p>
               </div>
               <div className="grid flex-grow gap-8 md:grid-cols-3">
@@ -214,7 +218,9 @@ export default function Home() {
                 <div className="mb-4">
                   <span className="inline-block rounded-2xl bg-purple-200 px-3 py-2">HOW TO USE</span>
                 </div>
-                <h2 className="mb-6 text-2xl font-bold md:text-4xl">使い方は簡単3ステップ</h2>
+                <h2 className="mb-6 text-2xl font-bold md:text-4xl" data-testid="third-subTitle">
+                  使い方は簡単3ステップ
+                </h2>
                 <p className="text-xl text-gray-600 md:text-xl">
                   誰でも直感的に使える設計で、すぐにお気に入りの動画が見つかります
                 </p>
@@ -260,7 +266,9 @@ export default function Home() {
                 <Star className="text-white" />
               </div>
             </div>
-            <h2 className="mb-6 text-4xl font-bold md:text-4xl">今すぐK-POPダンスの世界へ</h2>
+            <h2 className="mb-6 text-4xl font-bold md:text-4xl" data-testid="fourth-subTitle">
+              今すぐK-POPダンスの世界へ
+            </h2>
             <p className="mb-8 text-lg leading-relaxed text-gray-600 md:text-xl">
               あなたが探していたあの動画、見たことのない新しいコラボレーション。
               <br />
