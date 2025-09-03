@@ -1,7 +1,8 @@
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Home from "@/app/page";
 import { ClerkProvider } from "@clerk/nextjs";
+import RootLayout from "@/app/layout";
 
 vi.mock("@clerk/nextjs", () => ({
   ClerkProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -14,11 +15,14 @@ vi.mock("@clerk/nextjs", () => ({
 }));
 
 describe("トップページのテスト", () => {
-  render(
-    <ClerkProvider>
-      <Home />
-    </ClerkProvider>
-  );
+  beforeEach(() => {
+    render(
+      <ClerkProvider>
+        <Home />
+      </ClerkProvider>
+    );
+  });
+
   test("メインタイトルが表示されること", () => {
     expect(screen.getByTestId("main-title")).toBeInTheDocument();
   });
@@ -33,5 +37,16 @@ describe("トップページのテスト", () => {
   });
   test("第四のサブタイトルが表示されること", () => {
     expect(screen.getByTestId("fourth-subTitle")).toBeInTheDocument();
+  });
+});
+
+describe("ページコンポーネント", () => {
+  test("正常にレンダリングされること", () => {
+    render(
+      <RootLayout>
+        <div>テスト</div>
+      </RootLayout>
+    );
+    expect(screen.getByTestId("main-content")).toBeInTheDocument();
   });
 });

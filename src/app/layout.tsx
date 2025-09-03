@@ -1,19 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Loading from "./loading";
 import { ClerkProvider } from "@clerk/nextjs";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -28,9 +17,14 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="ja" className="scroll-smooth">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body className="font-sans antialiased">
           <Suspense fallback={<Loading />}>
-            <main className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">{children}</main>
+            <main
+              className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50"
+              data-testid="main-content"
+            >
+              {children}
+            </main>
           </Suspense>
         </body>
       </html>
