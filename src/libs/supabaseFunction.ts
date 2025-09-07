@@ -36,7 +36,7 @@ export const fetchSongs = async () => {
   if (error) {
     console.log("Error fetching songs:", error);
   } else if (data) {
-    console.log("Videos fetched successfully:", data);
+    console.log("Songs fetched successfully:", data);
     return data;
   }
 };
@@ -47,7 +47,7 @@ export const fetchGroups = async () => {
   if (error) {
     console.log("Error fetching Groups:", error);
   } else if (data) {
-    console.log("Videos fetched successfully:", data);
+    console.log("Groups fetched successfully:", data);
     return data;
   }
 };
