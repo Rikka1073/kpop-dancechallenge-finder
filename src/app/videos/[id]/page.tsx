@@ -15,8 +15,6 @@ export async function generateStaticParams() {
   }));
 }
 
-export const runtime = "edge";
-
 const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   console.log("Fetching video with ID:", id);
