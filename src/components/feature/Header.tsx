@@ -11,7 +11,7 @@ const Header = () => {
   return (
     <div className="navbar w-full justify-between px-4 shadow-sm">
       <div>
-        <Link href="/" className="link text-xl text-black no-underline">
+        <Link href="/" className="link text-xl text-black no-underline" data-testid="header-main-title">
           K-POP Challenge
         </Link>
       </div>
