@@ -21,10 +21,13 @@ const VideoCard = ({ video }: VideoCardProps) => {
 
   return (
     <Link href={`/videos/${video.id}`}>
-      <div className="h-full transform rounded-2xl shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl">
+      <div
+        className="h-full transform rounded-2xl shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl"
+        data-testid="video-card"
+      >
         <div className="card h-full rounded-2xl">
           <div className="relative">
-            <figure>
+            <figure data-testid="video-thumbnail">
               <Image
                 src={thumbnail_url || "https://via.placeholder.com/360x640"}
                 alt={title}
@@ -33,12 +36,17 @@ const VideoCard = ({ video }: VideoCardProps) => {
                 className="aspect-[9/16] w-full rounded-t-2xl object-cover"
               />
             </figure>
-            <div className="badge badge-xs md:badge-sm badge-neutral absolute bottom-2 left-2 font-bold">
+            <div
+              className="badge badge-xs md:badge-sm badge-neutral absolute bottom-2 left-2 font-bold"
+              data-testid="view-count"
+            >
               {formatViewCount(view_count)} viwes
             </div>
           </div>
           <div className="card-body rounded-b-2xl bg-white p-3 md:p-5">
-            <h2 className="card-title mb-6 line-clamp-2 text-sm md:text-lg">{title}</h2>
+            <h2 className="card-title mb-6 line-clamp-2 text-sm md:text-lg" data-testid="video-title">
+              {title}
+            </h2>
             <div className="card-actions">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 {video_groups.map((badge) => (
