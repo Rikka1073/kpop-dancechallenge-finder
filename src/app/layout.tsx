@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Suspense } from "react";
-import Loading from "./loading";
+import Loading from "../components/feature/loading";
 import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
