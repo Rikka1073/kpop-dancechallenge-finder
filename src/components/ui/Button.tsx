@@ -8,6 +8,7 @@ const Button = ({ id, name, onClick, className, children }: ButtonProps) => {
         name={name}
         onClick={onClick}
         className={`btn md:btn-md lg:btn-lg btn-outline w-full rounded-2xl bg-white ${className && className}`}
+        data-testid="button-component"
       >
         {children}
       </button>
