@@ -1,3 +1,4 @@
+import formatViewCount from "@/libs/formatViewCount";
 import { VideoCardProps } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,19 +6,6 @@ import React from "react";
 
 const VideoCard = ({ video }: VideoCardProps) => {
   const { title, thumbnail_url, view_count, video_groups, video_songs } = video;
-
-  // view_countのフォーマット関数
-  const formatViewCount = (views: number) => {
-    if (views >= 1000000) {
-      const formattedViews = (views / 1000000).toFixed(1) + "M";
-      return formattedViews;
-    } else if (views >= 1000) {
-      const formattedViews = (views / 1000).toFixed(1) + "K";
-      return formattedViews;
-    } else {
-      return views.toString();
-    }
-  };
 
   return (
     <Link href={`/videos/${video.id}`}>
@@ -40,7 +28,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
               className="badge badge-xs md:badge-sm badge-neutral absolute bottom-2 left-2 font-bold"
               data-testid="view-count"
             >
-              {formatViewCount(view_count)} viwes
+              {formatViewCount(view_count)} views
             </div>
           </div>
           <div className="card-body rounded-b-2xl bg-white p-3 md:p-5">

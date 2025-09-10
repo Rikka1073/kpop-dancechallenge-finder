@@ -1,4 +1,5 @@
 import Header from "@/components/feature/Header";
+import formatViewCount from "@/libs/formatViewCount";
 import { getAllVideos } from "@/libs/supabaseFunction";
 import { GroupDetail, SongDetail } from "@/types";
 import { ArrowLeft, Youtube } from "lucide-react";
@@ -26,19 +27,6 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
   } else if (data.error) {
     return <div>Error loading video</div>;
   }
-
-  // view_countのフォーマット関数
-  const formatViewCount = (views: number) => {
-    if (views >= 1000000) {
-      const formattedViews = (views / 1000000).toFixed(1) + "M";
-      return formattedViews;
-    } else if (views >= 1000) {
-      const formattedViews = (views / 1000).toFixed(1) + "K";
-      return formattedViews;
-    } else {
-      return views.toString();
-    }
-  };
 
   return (
     <div className="text-black">
