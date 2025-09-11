@@ -5,7 +5,7 @@ import VideoCard from "@/components/feature/VideoCard";
 import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
 import CarouselButton from "@/components/ui/CarouselButton";
-import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs/supabaseFunction";
+import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs/supabase/supabaseFunction";
 import { Record, Videos } from "@/types";
 import useEmblaCarousel from "embla-carousel-react";
 import { Music, Users, X } from "lucide-react";

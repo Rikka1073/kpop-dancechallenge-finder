@@ -7,7 +7,7 @@ import {
   getAllRegisteredVideos,
   registerVideoGroup,
   registerVideoSong,
-} from "@/libs/supabaseFunction";
+} from "@/libs/supabase/supabaseFunction";
 import { RegisterInputs } from "@/types";
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
