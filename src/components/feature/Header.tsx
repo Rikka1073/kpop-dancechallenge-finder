@@ -1,3 +1,4 @@
+"use client";
 import { Protect, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { CirclePlus, House, Search, ShieldUser } from "lucide-react";
 import Link from "next/link";
