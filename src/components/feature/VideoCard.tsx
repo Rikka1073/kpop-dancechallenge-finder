@@ -46,14 +46,18 @@ const VideoCard = ({ video }: VideoCardProps) => {
                   </div>
                 ))}
               </div>
-              {video_songs.map((badge) => (
-                <div
-                  className="badge badge-xs md:badge-md border-none bg-red-100 font-bold text-red-600"
-                  key={badge.songs.id}
-                >
-                  <span>#{badge.songs.song_name}</span>
-                </div>
-              ))}
+            </div>
+            <div className="card-actions">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                {video_songs.map((badge) => (
+                  <div
+                    className="badge badge-xs md:badge-md border-none bg-red-100 font-bold text-red-600"
+                    key={badge.songs.id}
+                  >
+                    <span>#{badge.songs.song_name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

@@ -149,7 +149,7 @@ const Search = () => {
               <div className="embla__container">
                 {limitedButton.map((chunk, slideIndex) => (
                   <div key={slideIndex} className="embla__slide">
-                    <div className="grid grid-cols-2 gap-2 p-2 md:w-full md:grid-cols-5">
+                    <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                       {chunk.map((item, index) => (
                         <div key={item.id}>
                           <Button
@@ -181,7 +181,7 @@ const Search = () => {
               <div className="embla__container">
                 {limitedButton.map((chunk, slideIndex) => (
                   <div key={slideIndex} className="embla__slide">
-                    <div className="grid grid-cols-2 gap-2 p-2 md:w-full md:grid-cols-5">
+                    <div className="grid grid-cols-2 gap-2 p-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                       {chunk.map((item, index) => (
                         <div key={item.id}>
                           <Button
@@ -242,7 +242,7 @@ const Search = () => {
           </div>
 
           {filteredData && filteredData.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-y-10 lg:grid-cols-4 xl:grid-cols-5">
               {filteredData.map((video: Videos) => (
                 <div key={video.id}>
                   <VideoCard video={video} />
