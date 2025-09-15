@@ -14,7 +14,7 @@ import useSWR from "swr";
 
 const Search = () => {
   const [selectedItems, setSelectedItems] = useState<Record[]>([]);
-  const [selectedButton, setSelectedButton] = useState<string>("songs");
+  const [selectedButton, setSelectedButton] = useState<string>("groups");
   const [filteredData, setFilteredData] = useState<Videos[]>([]);
   const { data: videos, error: videosError, isLoading: videosLoading } = useSWR("videos", getAllVideos);
   const { data: songs, error: songsError, isLoading: songsLoading } = useSWR("songs", fetchSongs);
@@ -122,6 +122,13 @@ const Search = () => {
         <div className="mb-8 flex justify-center">
           <div className="flex w-full flex-col gap-2 rounded-lg bg-white p-4 md:w-auto md:flex-row">
             <Button
+              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 ${selectedButton === "groups" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white"}`}
+              onClick={() => onClickSelectButton("groups")}
+            >
+              <Users />
+              グループで検索
+            </Button>
+            <Button
               id="songs-button"
               className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 ${selectedButton === "songs" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white"} `}
               onClick={() => onClickSelectButton("songs")}
@@ -129,15 +136,39 @@ const Search = () => {
               <Music />
               楽曲で検索
             </Button>
-            <Button
-              className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 ${selectedButton === "groups" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white"}`}
-              onClick={() => onClickSelectButton("groups")}
-            >
-              <Users />
-              グループで検索
-            </Button>
           </div>
         </div>
+
+        {selectedButton === "groups" && (
+          <div className="mb-8">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-xl font-bold md:text-2xl">グループで検索</h3>
+              {limitedButton.length > 1 && <CarouselButton emblaApi={emblaApi} />}
+            </div>
+            <div className="embla" ref={emblaRef}>
+              <div className="embla__container">
+                {limitedButton.map((chunk, slideIndex) => (
+                  <div key={slideIndex} className="embla__slide">
+                    <div className="grid grid-cols-2 gap-2 p-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                      {chunk.map((item, index) => (
+                        <div key={item.id}>
+                          <Button
+                            id={item.id}
+                            name="groups"
+                            onClick={(event) => onclickButton(item.id, item.group_name, event)}
+                            className={`${selectedItems.some((selected) => selected.id === item.id) && `border-none text-white shadow-none ${buttonStyles[index % buttonStyles.length]}`}`}
+                          >
+                            #{item.group_name}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {selectedButton === "songs" && (
           <div className="mb-8">
@@ -160,37 +191,6 @@ const Search = () => {
                             className={`${selectedItems.some((selected) => selected.id === item.id) && `border-none text-white shadow-none hover:text-white active:text-white ${buttonStyles[index % buttonStyles.length]}`}`}
                           >
                             #{item.song_name}
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {selectedButton === "groups" && (
-          <div className="mb-8">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-xl font-bold md:text-2xl">グループで検索</h3>
-              {limitedButton.length > 1 && <CarouselButton emblaApi={emblaApi} />}
-            </div>
-            <div className="embla" ref={emblaRef}>
-              <div className="embla__container">
-                {limitedButton.map((chunk, slideIndex) => (
-                  <div key={slideIndex} className="embla__slide">
-                    <div className="grid grid-cols-2 gap-2 p-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                      {chunk.map((item, index) => (
-                        <div key={item.id}>
-                          <Button
-                            id={item.id}
-                            name="groups"
-                            onClick={(event) => onclickButton(item.id, item.group_name, event)}
-                            className={`${selectedItems.some((selected) => selected.id === item.id) && `border-none text-white shadow-none ${buttonStyles[index % buttonStyles.length]}`}`}
-                          >
-                            #{item.group_name}
                           </Button>
                         </div>
                       ))}
