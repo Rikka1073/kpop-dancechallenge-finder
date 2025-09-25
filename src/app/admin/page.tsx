@@ -2,12 +2,11 @@
 import Header from "@/components/feature/Header";
 import Layout from "@/components/layout/Layout";
 import {
-  fetchGroups,
-  fetchSongs,
   getAllRegisteredVideos,
   registerVideoGroup,
   registerVideoSong,
-} from "@/libs/supabase/supabaseFunction";
+} from "@/libs/supabase/registerSupabaseFunction";
+import { fetchGroups, fetchSongs } from "@/libs/supabase/supabaseFunction";
 import { RegisterInputs } from "@/types";
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -17,12 +16,13 @@ const AdminPage = () => {
   const { data: videos } = useSWR("videos", getAllRegisteredVideos);
   const { data: songs } = useSWR("songs", fetchSongs);
   const { data: groups } = useSWR("groups", fetchGroups);
-  const { register, handleSubmit } = useForm<RegisterInputs>();
+  const { register, handleSubmit, reset } = useForm<RegisterInputs>();
 
   const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
     console.log("Submitted data:", data);
     await registerVideoGroup(data);
     await registerVideoSong(data);
+    reset();
   };
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 import Header from "@/components/feature/Header";
 import Layout from "@/components/layout/Layout";
-import { getAllRegisteredVideos, registerVideo } from "@/libs/supabase/supabaseFunction";
+import { getAllRegisteredVideos, registerVideo } from "@/libs/supabase/registerSupabaseFunction";
 import { RegisterInputs } from "@/types";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";

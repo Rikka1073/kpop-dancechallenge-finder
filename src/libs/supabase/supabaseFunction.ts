@@ -1,26 +1,11 @@
-import { VideoData, VideoGroupData, VideoSongData } from "@/types";
 import { supabase } from "./supabase";
 
 // 全ての動画を取得（初期表示用）
 export const getAllVideos = async () => {
   const { data, error } = await supabase
     .from("videos")
-    .select(`*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`);
-
-  if (error) {
-    console.log("Error fetching videos:", error);
-  } else if (data) {
-    console.log("Videos fetched successfully:", data);
-    return data || [];
-  }
-};
-
-// 登録済みの動画を取得
-export const getAllRegisteredVideos = async () => {
-  const { data, error } = await supabase
-    .from("videos")
-    .select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`)
-    .or("video_groups.is.null,video_songs.is.null");
+    .select(`*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`)
+    .not("display", "is", false);
 
   if (error) {
     console.log("Error fetching videos:", error);
@@ -32,7 +17,12 @@ export const getAllRegisteredVideos = async () => {
 
 // 曲の情報を取得
 export const fetchSongs = async () => {
-  const { data, error } = await supabase.from("songs").select("*");
+  const { data, error } = await supabase
+    .from("songs")
+    .select("*")
+    .not("display", "is", false)
+    .order("song_name", { ascending: true });
+
   if (error) {
     console.log("Error fetching songs:", error);
   } else if (data) {
@@ -43,7 +33,12 @@ export const fetchSongs = async () => {
 
 // グループの情報を取得
 export const fetchGroups = async () => {
-  const { data, error } = await supabase.from("groups").select("*").not("display_order", "is", null);
+  const { data, error } = await supabase
+    .from("groups")
+    .select("*")
+    // .not("display", "is", false)
+    // .not("display_order", "is", null)
+    .order("group_name", { ascending: true });
   if (error) {
     console.log("Error fetching Groups:", error);
   } else if (data) {
@@ -103,7 +98,8 @@ export const getMatchedGroupId = async (id: string, buttonName: string) => {
       video_songs(songs(id, song_name))
     `
       )
-      .in("id", videoIdlist);
+      .in("id", videoIdlist)
+      .not("display", "is", false);
 
     if (error) {
       console.log("Error fetching videos:", error);
@@ -111,83 +107,5 @@ export const getMatchedGroupId = async (id: string, buttonName: string) => {
       console.log("Videos fetched successfully:", data);
       return data;
     }
-  }
-};
-
-// 動画の登録
-export const registerVideo = async (videoData: VideoData) => {
-  const { id, title, thumbnailUrl, viewCount } = videoData;
-  const { data, error } = await supabase
-    .from("videos")
-    .insert({
-      youtube_id: id,
-      title: title,
-      thumbnail_url: thumbnailUrl,
-      view_count: viewCount,
-    })
-    .select("*");
-
-  if (error) {
-    console.log("Error fetching videos:", error);
-  } else if (data) {
-    console.log("Videos fetched successfully:", data);
-    return data || [];
-  }
-};
-
-// 動画のグループ詳細を登録
-export const registerVideoGroup = async (detailsGroupDate: VideoGroupData) => {
-  const { videoId } = detailsGroupDate;
-  console.log("Video ID:", videoId);
-  const groupDataId = await fetchGroups();
-  const firstGroupId = groupDataId?.find((group) => group.group_name === detailsGroupDate.firstGroupId);
-  const secondGroupId = groupDataId?.find((group) => group.group_name === detailsGroupDate.secondGroupId);
-  console.log("First Group ID:", firstGroupId.id);
-  console.log("Second Group ID:", secondGroupId.id);
-  const insertData = [
-    {
-      video_id: videoId,
-      group_id: firstGroupId.id,
-    },
-    {
-      video_id: videoId,
-      group_id: secondGroupId.id,
-    },
-  ];
-
-  console.log("Insert Data:", insertData);
-
-  const { data, error } = await supabase.from("video_groups").insert(insertData).select("*");
-
-  if (error) {
-    console.log("Error registering video details:", error);
-  } else if (data) {
-    console.log("Video details registered successfully:", data);
-    return data || [];
-  }
-};
-
-// 動画の曲詳細を登録
-export const registerVideoSong = async (detailsSongDate: VideoSongData) => {
-  const { videoId } = detailsSongDate;
-  console.log("Video ID:", videoId);
-  const songDataId = await fetchSongs();
-  const songId = songDataId?.find((song) => song.song_name === detailsSongDate.songId);
-  console.log("Song ID:", songId.id);
-  const { data, error } = await supabase
-    .from("video_songs")
-    .insert([
-      {
-        video_id: videoId,
-        song_id: songId.id,
-      },
-    ])
-    .select("*");
-
-  if (error) {
-    console.log("Error registering video details:", error);
-  } else if (data) {
-    console.log("Video details registered successfully:", data);
-    return data || [];
   }
 };
