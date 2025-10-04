@@ -36,8 +36,8 @@ export const fetchGroups = async () => {
   const { data, error } = await supabase
     .from("groups")
     .select("*")
-    // .not("display", "is", false)
-    // .not("display_order", "is", null)
+    .not("display", "is", false)
+    .not("display_order", "is", null)
     .order("group_name", { ascending: true });
   if (error) {
     console.log("Error fetching Groups:", error);
