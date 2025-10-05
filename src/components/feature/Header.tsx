@@ -8,7 +8,7 @@ const Header = () => {
     <div className="navbar w-full justify-between px-4 shadow-sm">
       <div>
         <Link href="/" className="link text-xl text-black no-underline" data-testid="header-main-title">
-          K-POP Challenge
+          SeeKPOP
         </Link>
       </div>
       <div className="md:flex md:w-fit md:items-center md:justify-end md:gap-4">
