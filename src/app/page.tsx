@@ -1,3 +1,4 @@
+import Footer from "@/components/feature/Footer";
 import Header from "@/components/feature/Header";
 import { ArrowRight, Check, Heart, Play, Search, Shield, Star, TrendingUp, X, Zap } from "lucide-react";
 import Link from "next/link";
@@ -293,6 +294,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }
