@@ -89,11 +89,7 @@ export default function Home() {
           <div className="container mx-auto">
             <div className="mx-auto max-w-5xl">
               <h1 className="gradient-text mb-6 text-5xl font-bold" data-testid="main-title">
-                K-POPダンス
-                <br className="md:hidden" />
-                チャレンジ
-                <br />
-                検索アプリ
+                SeeKPOP
               </h1>
               <p className="mb-6 text-lg md:text-xl">
                 アイドル同士が踊るショート形式の
