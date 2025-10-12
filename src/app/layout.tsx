@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Suspense } from "react";
 import Loading from "../components/feature/loading";
-import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,19 +14,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="ja" className="scroll-smooth">
-        <body className="font-sans antialiased">
-          <Suspense fallback={<Loading />}>
-            <main
-              className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50"
-              data-testid="main-content"
-            >
-              {children}
-            </main>
-          </Suspense>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="ja" className="scroll-smooth">
+      <body className="font-sans antialiased">
+        <Suspense fallback={<Loading />}>
+          <main
+            className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50"
+            data-testid="main-content"
+          >
+            {children}
+          </main>
+        </Suspense>
+      </body>
+    </html>
   );
 }
