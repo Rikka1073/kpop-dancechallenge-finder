@@ -39,10 +39,10 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="flex justify-center lg:col-span-2">
             <iframe
-              src={`https://www.youtube.com/embed/${data.youtube_id}`}
+              src={`https://www.youtube.com/embed/${data.youtube_id}?autoplay=1&mute=1`}
               title={data.title}
               frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allow="accelerometer; autoplay 1; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
               className="aspect-[9/16] h-auto w-full max-w-sm rounded-2xl"
