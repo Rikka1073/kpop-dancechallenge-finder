@@ -1,6 +1,7 @@
 import Footer from "@/components/feature/Footer";
 import Header from "@/components/feature/Header";
 import { ArrowRight, Check, Heart, Play, Search, Shield, Star, TrendingUp, X, Zap } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -85,34 +86,53 @@ export default function Home() {
     <div className="text-black">
       <Header />
       <section>
-        <div className="sparkle-bg p-4 py-20 text-center">
-          <div className="container mx-auto">
-            <div className="mx-auto max-w-5xl">
-              <h1 className="gradient-text mb-6 text-5xl font-bold" data-testid="main-title">
-                SeeKPOP
-              </h1>
-              <p className="mb-6 text-lg md:text-xl">
-                アイドル同士が踊るショート形式の
-                <br className="md:hidden" />
-                ダンスチャレンジ動画を
-                <br />
-                <span className="font-bold text-purple-600">簡単に検索・視聴</span>できるWebアプリ
-              </p>
-              <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                <Link
-                  href="/search"
-                  className="link flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-lg text-white no-underline transition-all hover:text-white"
-                >
-                  今すぐはじめる
-                  <Play />
-                </Link>
-                <Link
-                  href="#concept"
-                  className="link flex items-center justify-center rounded-2xl border border-purple-600 p-4 text-lg text-purple-600 no-underline hover:bg-purple-600 hover:text-white"
-                >
-                  詳しく見る
-                  <ArrowRight />
-                </Link>
+        <div className="sparkle-bg py-10 md:py-20">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-7xl">
+              <div className="grid items-center gap-12 md:grid-cols-2">
+                {/* 左側: テキスト */}
+                <div className="order-2 text-center md:order-1 md:text-left">
+                  <h1 className="gradient-text mb-6 text-5xl font-bold md:text-6xl">SeeKPOP</h1>
+                  <p className="mb-4 text-2xl font-bold md:text-3xl">
+                    推しのダンスチャレンジが
+                    <br />
+                    一瞬で見つかる
+                  </p>
+                  <p className="mb-8 text-lg text-gray-700">
+                    グループ名をタップするだけ。
+                    <br />
+                    アイドル公式コラボ動画を簡単検索
+                  </p>
+                  <Link
+                    href="/search"
+                    className="link mb-8 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-lg text-white no-underline transition-all hover:text-white md:w-xs"
+                  >
+                    今すぐはじめる
+                    <Play />
+                  </Link>
+                  <Link
+                    href="#concept"
+                    className="link flex items-center justify-center rounded-2xl border border-purple-600 p-4 text-lg text-purple-600 no-underline hover:bg-purple-600 hover:text-white md:w-xs"
+                  >
+                    詳しく見る
+                    <ArrowRight />
+                  </Link>
+                </div>
+
+                {/* 右側: GIF */}
+                <div className="order-1 md:order-2">
+                  <div className="relative mx-auto max-w-sm">
+                    <Image
+                      src="/howto-seekpop.gif"
+                      alt="SeeKPOPの使い方デモ"
+                      width={400}
+                      height={800}
+                      className="h-auto w-full rounded-2xl shadow-2xl"
+                      unoptimized // GIFの場合はunoptimizedを追加
+                      priority
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
