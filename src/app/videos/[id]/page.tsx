@@ -18,10 +18,8 @@ export async function generateStaticParams() {
 
 const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
-  console.log("Fetching video with ID:", id);
   const data = await getAllVideos().then((data) => (data ? data.find((video) => video.id === id) : undefined));
 
-  console.log(data);
   if (!data) {
     return <div>Loading...</div>;
   } else if (data.error) {

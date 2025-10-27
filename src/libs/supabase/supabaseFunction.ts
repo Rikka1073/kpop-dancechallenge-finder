@@ -10,7 +10,6 @@ export const getAllVideos = async () => {
   if (error) {
     console.log("Error fetching videos:", error);
   } else if (data) {
-    console.log("Videos fetched successfully:", data);
     return data || [];
   }
 };
@@ -26,7 +25,6 @@ export const fetchSongs = async () => {
   if (error) {
     console.log("Error fetching songs:", error);
   } else if (data) {
-    console.log("Songs fetched successfully:", data);
     return data;
   }
 };
@@ -42,14 +40,12 @@ export const fetchGroups = async () => {
   if (error) {
     console.log("Error fetching Groups:", error);
   } else if (data) {
-    console.log("Groups fetched successfully:", data);
     return data;
   }
 };
 
 // 特定のグループまたは曲に関連する動画を取得
 export const getMatchedGroupId = async (id: string, buttonName: string) => {
-  console.log("Fetching videos for group or song ID:", id);
   if (buttonName === "songs") {
     const { data, error } = await supabase
       .from("videos")
@@ -65,11 +61,9 @@ export const getMatchedGroupId = async (id: string, buttonName: string) => {
     if (error) {
       console.log("Error fetching matched:", error);
     } else if (data) {
-      console.log("Matched fetched successfully:", data);
       return data;
     }
   } else if (buttonName === "groups") {
-    console.log("groups:", id);
     const { data: videoIds, error: videoError } = await supabase
       .from("video_groups")
       .select("video_id")
@@ -84,11 +78,7 @@ export const getMatchedGroupId = async (id: string, buttonName: string) => {
       return [];
     }
 
-    console.log("Video IDs fetched successfully:", videoIds);
-
     const videoIdlist = videoIds.map((item) => item.video_id);
-    console.log("Video ID list:", videoIdlist);
-
     const { data, error } = await supabase
       .from("videos")
       .select(
@@ -104,7 +94,6 @@ export const getMatchedGroupId = async (id: string, buttonName: string) => {
     if (error) {
       console.log("Error fetching videos:", error);
     } else if (data) {
-      console.log("Videos fetched successfully:", data);
       return data;
     }
   }

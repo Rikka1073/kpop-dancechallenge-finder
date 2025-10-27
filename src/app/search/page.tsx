@@ -85,12 +85,6 @@ const Search = () => {
     return [];
   }, [groups, songs, selectedButton]);
 
-  useEffect(() => {
-    if (emblaApi) {
-      console.log(emblaApi.slideNodes()); // Access API
-    }
-  }, [emblaApi, limitedButton]);
-
   const onclickButton = async (id: string, select: string, event: React.MouseEvent<HTMLButtonElement>) => {
     const buttonName = event.currentTarget.name;
     setSelectedItems((prev) => {

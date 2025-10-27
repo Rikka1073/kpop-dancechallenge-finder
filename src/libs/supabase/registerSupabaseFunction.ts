@@ -18,7 +18,6 @@ export const registerVideo = async (videoData: VideoData) => {
   if (error) {
     console.log("Error fetching videos:", error);
   } else if (data) {
-    console.log("Videos fetched successfully:", data);
     return data || [];
   }
 };
@@ -26,12 +25,9 @@ export const registerVideo = async (videoData: VideoData) => {
 // 動画のグループ詳細を登録
 export const registerVideoGroup = async (detailsGroupDate: VideoGroupData) => {
   const { videoId } = detailsGroupDate;
-  console.log("Video ID:", videoId);
   const groupDataId = await fetchGroups();
   const firstGroupId = groupDataId?.find((group) => group.group_name === detailsGroupDate.firstGroupId);
   const secondGroupId = groupDataId?.find((group) => group.group_name === detailsGroupDate.secondGroupId);
-  console.log("First Group ID:", firstGroupId.id);
-  console.log("Second Group ID:", secondGroupId.id);
   const insertData = [
     {
       video_id: videoId,
@@ -43,14 +39,11 @@ export const registerVideoGroup = async (detailsGroupDate: VideoGroupData) => {
     },
   ];
 
-  console.log("Insert Data:", insertData);
-
   const { data, error } = await supabase.from("video_groups").insert(insertData).select("*");
 
   if (error) {
     console.log("Error registering video details:", error);
   } else if (data) {
-    console.log("Video details registered successfully:", data);
     return data || [];
   }
 };
@@ -58,10 +51,8 @@ export const registerVideoGroup = async (detailsGroupDate: VideoGroupData) => {
 // 動画の曲詳細を登録
 export const registerVideoSong = async (detailsSongDate: VideoSongData) => {
   const { videoId } = detailsSongDate;
-  console.log("Video ID:", videoId);
   const songDataId = await fetchSongs();
   const songId = songDataId?.find((song) => song.song_name === detailsSongDate.songId);
-  console.log("Song ID:", songId.id);
   const { data, error } = await supabase
     .from("video_songs")
     .insert([
@@ -75,7 +66,6 @@ export const registerVideoSong = async (detailsSongDate: VideoSongData) => {
   if (error) {
     console.log("Error registering video details:", error);
   } else if (data) {
-    console.log("Video details registered successfully:", data);
     return data || [];
   }
 };
@@ -90,7 +80,6 @@ export const getAllRegisteredVideos = async () => {
   if (error) {
     console.log("Error fetching videos:", error);
   } else if (data) {
-    console.log("Videos fetched successfully:", data);
     return data || [];
   }
 };
