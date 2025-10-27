@@ -9,6 +9,7 @@ import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/libs
 import { Record, Videos } from "@/types";
 import useEmblaCarousel from "embla-carousel-react";
 import { Music, Users, X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
@@ -22,6 +23,9 @@ const Search = () => {
   const isLoading = songsLoading || videosLoading || groupsLoading;
   const isError = songsError || videosError || groupsError;
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+  const searchParams = useSearchParams();
+  const queryType = searchParams.get("type");
+  const queryId = searchParams.get("id");
 
   // //初期表示の動画データ
   useEffect(() => {
@@ -29,6 +33,40 @@ const Search = () => {
       setFilteredData(videos);
     }
   }, [videos]);
+
+  useEffect(() => {
+    if (!queryType || !queryId) return;
+
+    if (!videos || !groups || !songs) return;
+
+    const buttonType = queryType === "song" ? "songs" : "groups";
+    setSelectedButton(buttonType);
+
+    // 自動的にフィルタリングを実行
+    const fetchData = async () => {
+      try {
+        const filteredData = await getMatchedGroupId(queryId, buttonType);
+        setFilteredData(filteredData ?? []);
+
+        if (queryType === "group" && groups) {
+          const group = groups.find((g) => g.id === queryId);
+          if (group) {
+            setSelectedItems([{ id: queryId, name: group.group_name }]);
+          }
+        } else if (queryType === "song" && songs) {
+          const song = songs.find((s) => s.id === queryId);
+          if (song) {
+            setSelectedItems([{ id: queryId, name: song.song_name }]);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching filtered data:", error);
+        setFilteredData([]);
+      }
+    };
+
+    fetchData();
+  }, [queryType, queryId, videos, groups, songs]);
 
   const chankArray = <T,>(array: T[], chunkSize: number): T[][] => {
     const result: T[][] = [];
