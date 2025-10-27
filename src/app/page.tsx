@@ -123,7 +123,6 @@ export default function Home() {
                   <div className="relative mx-auto max-w-sm">
                     <video
                       src="/howto-seekpop.mp4"
-                      alt="SeeKPOPの使い方デモ"
                       width={400}
                       height={800}
                       className="h-auto w-full rounded-2xl shadow-2xl"
