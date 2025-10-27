@@ -122,13 +122,15 @@ export default function Home() {
                 {/* 右側: GIF */}
                 <div className="order-1 md:order-2">
                   <div className="relative mx-auto max-w-sm">
-                    <Image
+                    <video
                       src="/howto-seekpop.mp4"
                       alt="SeeKPOPの使い方デモ"
                       width={400}
                       height={800}
                       className="h-auto w-full rounded-2xl shadow-2xl"
-                      priority
+                      autoPlay
+                      loop
+                      muted
                     />
                   </div>
                 </div>
