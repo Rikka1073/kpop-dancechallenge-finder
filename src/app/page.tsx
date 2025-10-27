@@ -123,12 +123,11 @@ export default function Home() {
                 <div className="order-1 md:order-2">
                   <div className="relative mx-auto max-w-sm">
                     <Image
-                      src="/howto-seekpop.gif"
+                      src="/howto-seekpop.mp4"
                       alt="SeeKPOPの使い方デモ"
                       width={400}
                       height={800}
                       className="h-auto w-full rounded-2xl shadow-2xl"
-                      unoptimized // GIFの場合はunoptimizedを追加
                       priority
                     />
                   </div>
