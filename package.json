@@ -15,7 +15,6 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.31.4",
     "@supabase/supabase-js": "^2.50.4",
     "daisyui": "^5.0.46",
     "embla-carousel-react": "^8.6.0",
@@ -23,7 +22,6 @@
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.61.1",
     "swr": "^2.3.4"
   },
   "devDependencies": {

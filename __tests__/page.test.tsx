@@ -1,30 +1,15 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Home from "@/app/page";
-import { ClerkProvider } from "@clerk/nextjs";
 import RootLayout from "@/app/layout";
-
-vi.mock("@clerk/nextjs", () => ({
-  ClerkProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  Protect: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  SignedIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  SignedOut: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  SignUpButton: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  SignInButton: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  UserButton: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
 
 describe("トップページのテスト", () => {
   beforeEach(() => {
-    render(
-      <ClerkProvider>
-        <Home />
-      </ClerkProvider>
-    );
+    render(<Home />);
   });
 
   test("メインタイトルが表示されること", () => {
-    expect(screen.getByTestId("main-title")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "SeeKPOP", level: 1 })).toBeInTheDocument();
   });
   test("最初のサブタイトルが表示されること", () => {
     expect(screen.getByTestId("first-subTitle")).toBeInTheDocument();
