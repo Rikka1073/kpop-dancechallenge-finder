@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Suspense } from "react";
 import Loading from "../components/feature/loading";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,6 +23,7 @@ export default function RootLayout({
             data-testid="main-content"
           >
             {children}
+            <GoogleTagManager gtmId="GTM-K55M4XSJ" />
           </main>
         </Suspense>
       </body>
