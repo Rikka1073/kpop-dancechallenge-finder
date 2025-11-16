@@ -1,4 +1,4 @@
-import formatViewCount from "@/libs/formatViewCount";
+import formatViewCount from "@/lib/formatViewCount";
 import { VideoCardProps } from "@/types";
 import Image from "next/image";
 import Link from "next/link";

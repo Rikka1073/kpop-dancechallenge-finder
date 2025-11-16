@@ -1,4 +1,4 @@
-import formatViewCount from "@/libs/formatViewCount";
+import formatViewCount from "@/lib/formatViewCount";
 import { describe, expect } from "vitest";
 
 describe("formatViewCount", () => {

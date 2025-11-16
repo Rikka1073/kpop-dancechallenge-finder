@@ -1,6 +1,6 @@
 import Header from "@/components/feature/Header";
-import formatViewCount from "@/libs/formatViewCount";
-import { getAllVideos } from "@/libs/supabase/supabaseFunction";
+import formatViewCount from "@/lib/formatViewCount";
+import { getAllVideos } from "@/lib/supabase/supabaseFunction";
 import { GroupDetail, SongDetail } from "@/types";
 import { ArrowLeft, Youtube } from "lucide-react";
 import Link from "next/link";
