@@ -5,6 +5,8 @@ import { GroupDetail, SongDetail } from "@/types";
 import { ArrowLeft, Youtube } from "lucide-react";
 import Link from "next/link";
 
+export const runtime = "edge";
+
 export async function generateStaticParams() {
   const videos = await getAllVideos();
 
