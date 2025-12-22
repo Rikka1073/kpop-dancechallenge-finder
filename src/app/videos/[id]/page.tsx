@@ -7,17 +7,6 @@ import Link from "next/link";
 
 export const runtime = "edge";
 
-export async function generateStaticParams() {
-  const videos = await getAllVideos();
-
-  if (!videos) {
-    return [];
-  }
-  return videos.map((video) => ({
-    id: video.id,
-  }));
-}
-
 const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   const data = await getAllVideos().then((data) => (data ? data.find((video) => video.id === id) : undefined));

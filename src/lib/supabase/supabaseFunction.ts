@@ -2,15 +2,30 @@ import { supabase } from "./supabase";
 
 // 全ての動画を取得（初期表示用）
 export const getAllVideos = async () => {
-  const { data, error } = await supabase
-    .from("videos")
-    .select(`*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`)
-    .not("display", "is", false);
+  try {
+    const { data, error } = await supabase
+      .from("videos")
+      .select(`*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`)
+      .not("display", "is", false);
 
-  if (error) {
-    console.log("Error fetching videos:", error);
-  } else if (data) {
+    if (error) {
+      console.log("Error fetching videos:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
+      return [];
+    }
     return data || [];
+  } catch (err) {
+    console.log("Error fetching videos:", {
+      message: err instanceof Error ? err.message : String(err),
+      details: err instanceof Error ? err.stack : "",
+      hint: "",
+      code: "",
+    });
+    return [];
   }
 };
 
