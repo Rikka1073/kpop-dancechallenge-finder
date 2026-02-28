@@ -1,4 +1,3 @@
-import Register from "@/app/register/page";
 import Button from "@/components/ui/Button";
 import { render, screen } from "@testing-library/react";
 
