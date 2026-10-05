@@ -1,35 +1,66 @@
 import { supabase } from "./supabase";
 
-// 全ての動画を取得（初期表示用）
+const VIDEO_RELATIONS = `*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`;
+
+function logSupabaseError(context: string, error: unknown) {
+  if (error && typeof error === "object" && "message" in error) {
+    const supabaseError = error as { message?: string; details?: string; hint?: string; code?: string };
+    console.log(context, {
+      message: supabaseError.message,
+      details: supabaseError.details,
+      hint: supabaseError.hint,
+      code: supabaseError.code,
+    });
+    return;
+  }
+
+  console.log(context, {
+    message: error instanceof Error ? error.message : String(error),
+    details: error instanceof Error ? error.stack : "",
+    hint: "",
+    code: "",
+  });
+}
+
 export const getAllVideos = async () => {
   try {
     const { data, error } = await supabase
       .from("videos")
-      .select(`*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`)
-      .not("display", "is", false);
+      .select(VIDEO_RELATIONS)
+      .not("display", "is", false)
+      .order("view_count", { ascending: false });
 
     if (error) {
-      console.log("Error fetching videos:", {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-      });
+      logSupabaseError("Error fetching videos:", error);
       return [];
     }
     return data || [];
   } catch (err) {
-    console.log("Error fetching videos:", {
-      message: err instanceof Error ? err.message : String(err),
-      details: err instanceof Error ? err.stack : "",
-      hint: "",
-      code: "",
-    });
+    logSupabaseError("Error fetching videos:", err);
     return [];
   }
 };
 
-// 曲の情報を取得
+export const getVideoById = async (id: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("videos")
+      .select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`)
+      .eq("id", id)
+      .not("display", "is", false)
+      .maybeSingle();
+
+    if (error) {
+      logSupabaseError("Error fetching video:", error);
+      return undefined;
+    }
+    return data || undefined;
+  } catch (err) {
+    logSupabaseError("Error fetching video:", err);
+    return undefined;
+  }
+};
+
 export const fetchSongs = async () => {
   const { data, error } = await supabase
     .from("songs")
@@ -38,78 +69,24 @@ export const fetchSongs = async () => {
     .order("song_name", { ascending: true });
 
   if (error) {
-    console.log("Error fetching songs:", error);
-  } else if (data) {
-    return data;
+    logSupabaseError("Error fetching songs:", error);
+    return [];
   }
+  return data || [];
 };
 
-// グループの情報を取得
 export const fetchGroups = async () => {
   const { data, error } = await supabase
     .from("groups")
     .select("*")
     .not("display", "is", false)
     .not("display_order", "is", null)
+    .order("display_order", { ascending: true })
     .order("group_name", { ascending: true });
+
   if (error) {
-    console.log("Error fetching Groups:", error);
-  } else if (data) {
-    return data;
+    logSupabaseError("Error fetching Groups:", error);
+    return [];
   }
-};
-
-// 特定のグループまたは曲に関連する動画を取得
-export const getMatchedGroupId = async (id: string, buttonName: string) => {
-  if (buttonName === "songs") {
-    const { data, error } = await supabase
-      .from("videos")
-      .select(
-        `
-      *, 
-      video_groups!inner(groups(id, group_name)), 
-      video_songs!inner(songs(id, song_name))
-    `
-      )
-      .eq("video_songs.song_id", id);
-
-    if (error) {
-      console.log("Error fetching matched:", error);
-    } else if (data) {
-      return data;
-    }
-  } else if (buttonName === "groups") {
-    const { data: videoIds, error: videoError } = await supabase
-      .from("video_groups")
-      .select("video_id")
-      .eq("group_id", id);
-
-    if (videoError) {
-      console.log("Error fetching video IDs:", videoError);
-    }
-
-    if (!videoIds) {
-      console.log("No videos found for group ID:", videoIds);
-      return [];
-    }
-
-    const videoIdlist = videoIds.map((item) => item.video_id);
-    const { data, error } = await supabase
-      .from("videos")
-      .select(
-        `
-      *, 
-      video_groups(groups(id, group_name)), 
-      video_songs(songs(id, song_name))
-    `
-      )
-      .in("id", videoIdlist)
-      .not("display", "is", false);
-
-    if (error) {
-      console.log("Error fetching videos:", error);
-    } else if (data) {
-      return data;
-    }
-  }
+  return data || [];
 };

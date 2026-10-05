@@ -5,7 +5,8 @@ import VideoCard from "@/components/feature/VideoCard";
 import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
 import CarouselButton from "@/components/ui/CarouselButton";
-import { fetchGroups, fetchSongs, getAllVideos, getMatchedGroupId } from "@/lib/supabase/supabaseFunction";
+import { fetchGroups, fetchSongs, getAllVideos } from "@/lib/supabase/supabaseFunction";
+import { filterVideos } from "@/lib/search/filterVideos";
 import { Record, Videos } from "@/types";
 import useEmblaCarousel from "embla-carousel-react";
 import { Music, Users, X } from "lucide-react";
@@ -41,31 +42,19 @@ const Search = () => {
 
     const buttonType = queryType === "song" ? "songs" : "groups";
     setSelectedButton(buttonType);
+    setFilteredData(filterVideos(videos, buttonType, queryId));
 
-    // 自動的にフィルタリングを実行
-    const fetchData = async () => {
-      try {
-        const filteredData = await getMatchedGroupId(queryId, buttonType);
-        setFilteredData(filteredData ?? []);
-
-        if (queryType === "group" && groups) {
-          const group = groups.find((g) => g.id === queryId);
-          if (group) {
-            setSelectedItems([{ id: queryId, name: group.group_name }]);
-          }
-        } else if (queryType === "song" && songs) {
-          const song = songs.find((s) => s.id === queryId);
-          if (song) {
-            setSelectedItems([{ id: queryId, name: song.song_name }]);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching filtered data:", error);
-        setFilteredData([]);
+    if (queryType === "group") {
+      const group = groups.find((g) => g.id === queryId);
+      if (group) {
+        setSelectedItems([{ id: queryId, name: group.group_name }]);
       }
-    };
-
-    fetchData();
+    } else if (queryType === "song") {
+      const song = songs.find((s) => s.id === queryId);
+      if (song) {
+        setSelectedItems([{ id: queryId, name: song.song_name }]);
+      }
+    }
   }, [queryType, queryId, videos, groups, songs]);
 
   const chankArray = <T,>(array: T[], chunkSize: number): T[][] => {
@@ -85,26 +74,17 @@ const Search = () => {
     return [];
   }, [groups, songs, selectedButton]);
 
-  const onclickButton = async (id: string, select: string, event: React.MouseEvent<HTMLButtonElement>) => {
-    const buttonName = event.currentTarget.name;
-    setSelectedItems((prev) => {
-      const isSelected = prev.some((item) => item.id === id);
-      if (isSelected) {
-        // 既に選択されている場合は削除
-        return prev.filter((item) => item.id !== id);
-      } else {
-        // 新たに選択する場合は追加
-        return [{ id, name: select }];
-      }
-    });
-
-    try {
-      const filteredData = await getMatchedGroupId(id, buttonName);
-      setFilteredData(filteredData ?? []);
-    } catch (error) {
-      console.error("Error fetching filtered data:", error);
-      setFilteredData([]);
+  const onclickButton = (id: string, select: string, event: React.MouseEvent<HTMLButtonElement>) => {
+    const buttonName = event.currentTarget.name === "songs" ? "songs" : "groups";
+    const isSelected = selectedItems.some((item) => item.id === id);
+    if (isSelected) {
+      setSelectedItems([]);
+      setFilteredData(videos || []);
+      return;
     }
+
+    setSelectedItems([{ id, name: select }]);
+    setFilteredData(filterVideos(videos || [], buttonName, id));
   };
 
   const onClickSelectButton = (type: string) => {
