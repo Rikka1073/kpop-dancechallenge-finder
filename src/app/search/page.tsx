@@ -114,7 +114,19 @@ const Search = () => {
     "bg-error!",
   ];
 
-  if (isError) return <div>Error loading data</div>;
+  if (isError) {
+    return (
+      <div className="text-black">
+        <Header />
+        <Layout>
+          <div className="rounded-3xl bg-white p-8 text-center shadow-lg">
+            <h2 className="mb-3 text-2xl font-bold text-purple-600">データを読み込めませんでした</h2>
+            <p className="text-gray-600">時間をおいてから、もう一度お試しください。</p>
+          </div>
+        </Layout>
+      </div>
+    );
+  }
 
   return (
     <div className="text-black">

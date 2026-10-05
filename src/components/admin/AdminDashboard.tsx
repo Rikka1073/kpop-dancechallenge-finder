@@ -717,6 +717,9 @@ const CheckboxList = ({
   onToggle: (id: string) => void;
 }) => (
   <div className="grid max-h-56 grid-cols-2 gap-2 overflow-y-auto rounded-xl border border-gray-100 p-3">
+    {items.length === 0 && (
+      <p className="col-span-2 text-sm text-gray-500">まだ登録がありません。下の欄から追加できます。</p>
+    )}
     {items.map((item) => (
       <label key={item.id} className="flex cursor-pointer items-center gap-2 text-sm">
         <input

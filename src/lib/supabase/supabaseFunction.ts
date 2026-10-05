@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabaseClient } from "./supabase";
 
 const VIDEO_RELATIONS = `*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`;
 
@@ -24,7 +24,7 @@ function logSupabaseError(context: string, error: unknown) {
 
 export const getAllVideos = async () => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from("videos")
       .select(VIDEO_RELATIONS)
       .not("display", "is", false)
@@ -32,18 +32,18 @@ export const getAllVideos = async () => {
 
     if (error) {
       logSupabaseError("Error fetching videos:", error);
-      return [];
+      throw error;
     }
     return data || [];
   } catch (err) {
     logSupabaseError("Error fetching videos:", err);
-    return [];
+    throw err;
   }
 };
 
 export const getVideoById = async (id: string) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from("videos")
       .select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`)
       .eq("id", id)
@@ -62,31 +62,41 @@ export const getVideoById = async (id: string) => {
 };
 
 export const fetchSongs = async () => {
-  const { data, error } = await supabase
-    .from("songs")
-    .select("*")
-    .not("display", "is", false)
-    .order("song_name", { ascending: true });
+  try {
+    const { data, error } = await getSupabaseClient()
+      .from("songs")
+      .select("*")
+      .not("display", "is", false)
+      .order("song_name", { ascending: true });
 
-  if (error) {
-    logSupabaseError("Error fetching songs:", error);
-    return [];
+    if (error) {
+      logSupabaseError("Error fetching songs:", error);
+      throw error;
+    }
+    return data || [];
+  } catch (err) {
+    logSupabaseError("Error fetching songs:", err);
+    throw err;
   }
-  return data || [];
 };
 
 export const fetchGroups = async () => {
-  const { data, error } = await supabase
-    .from("groups")
-    .select("*")
-    .not("display", "is", false)
-    .not("display_order", "is", null)
-    .order("display_order", { ascending: true })
-    .order("group_name", { ascending: true });
+  try {
+    const { data, error } = await getSupabaseClient()
+      .from("groups")
+      .select("*")
+      .not("display", "is", false)
+      .not("display_order", "is", null)
+      .order("display_order", { ascending: true })
+      .order("group_name", { ascending: true });
 
-  if (error) {
-    logSupabaseError("Error fetching Groups:", error);
-    return [];
+    if (error) {
+      logSupabaseError("Error fetching Groups:", error);
+      throw error;
+    }
+    return data || [];
+  } catch (err) {
+    logSupabaseError("Error fetching Groups:", err);
+    throw err;
   }
-  return data || [];
 };
