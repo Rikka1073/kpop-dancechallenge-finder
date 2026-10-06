@@ -7,9 +7,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="text-center md:text-left">
-            <p className="text-sm text-gray-600">
-              &copy; {new Date().getFullYear()} SeeKPOP. All rights reserved.
-            </p>
+            <p className="text-sm text-gray-600">&copy; {new Date().getFullYear()} SeeKPOP. All rights reserved.</p>
           </div>
           <div className="flex gap-6">
             <Link

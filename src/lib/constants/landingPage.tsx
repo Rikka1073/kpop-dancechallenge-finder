@@ -65,11 +65,11 @@ export const painPoints = [
 export const solutions = [
   {
     icon: <Check className="text-green-500" />,
-    text: "アイドルのダンスチャレンジだけを厳選収録",
+    text: "アイドル公式のダンスチャレンジだけを厳選収録",
   },
   {
     icon: <Check className="text-green-500" />,
-    text: "アイドルの公式ダンスチャレンジだけを厳選収録",
+    text: "一般人の踊ってみた動画は混ざらない",
   },
   {
     icon: <Check className="text-green-500" />,

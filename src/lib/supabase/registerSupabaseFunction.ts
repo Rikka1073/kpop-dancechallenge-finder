@@ -1,85 +1,268 @@
-import { VideoData, VideoGroupData, VideoSongData } from "@/types";
-import { supabase } from "./supabase";
-import { fetchGroups, fetchSongs } from "./supabaseFunction";
+import { VideoData } from "@/types";
+import { createAdminSupabaseClient } from "./adminClient";
+import { isVideoMissingTags } from "@/lib/search/filterVideos";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-// 動画の登録
-export const registerVideo = async (videoData: VideoData) => {
-  const { id, title, thumbnailUrl, viewCount } = videoData;
-  const { data, error } = await supabase
+const VIDEO_RELATIONS = `*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`;
+
+type AdminClient = SupabaseClient;
+
+const getClient = (client?: AdminClient) => client ?? createAdminSupabaseClient();
+
+export type RegisteredVideoRecord = {
+  id: string;
+  youtube_id: string;
+  title: string;
+  thumbnail_url: string;
+  view_count: number;
+  display?: boolean | null;
+  video_groups: { groups: { id: string; group_name: string } | null }[] | null;
+  video_songs: { songs: { id: string; song_name: string } | null }[] | null;
+};
+
+export async function upsertVideoWithTags(
+  videoData: VideoData,
+  groupIds: string[],
+  songIds: string[],
+  client?: AdminClient
+) {
+  const db = getClient(client);
+  const uniqueGroupIds = [...new Set(groupIds.filter(Boolean))];
+  const uniqueSongIds = [...new Set(songIds.filter(Boolean))];
+
+  if (uniqueGroupIds.length === 0 || uniqueSongIds.length === 0) {
+    throw new Error("グループと楽曲をそれぞれ1件以上選択してください");
+  }
+
+  const { data: existing, error: existingError } = await db
     .from("videos")
-    .insert({
-      youtube_id: id,
-      title: title,
-      thumbnail_url: thumbnailUrl,
-      view_count: viewCount,
+    .select("id")
+    .eq("youtube_id", videoData.id)
+    .maybeSingle();
+
+  if (existingError) {
+    throw new Error(existingError.message);
+  }
+
+  let videoId = existing?.id as string | undefined;
+
+  if (videoId) {
+    const { error: updateError } = await db
+      .from("videos")
+      .update({
+        title: videoData.title,
+        thumbnail_url: videoData.thumbnailUrl,
+        view_count: videoData.viewCount,
+        display: true,
+      })
+      .eq("id", videoId);
+
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+  } else {
+    const { data: inserted, error: insertError } = await db
+      .from("videos")
+      .insert({
+        youtube_id: videoData.id,
+        title: videoData.title,
+        thumbnail_url: videoData.thumbnailUrl,
+        view_count: videoData.viewCount,
+        display: true,
+      })
+      .select("id")
+      .single();
+
+    if (insertError || !inserted) {
+      throw new Error(insertError?.message || "動画の登録に失敗しました");
+    }
+    videoId = inserted.id as string;
+  }
+
+  if (!videoId) {
+    throw new Error("動画IDの取得に失敗しました");
+  }
+
+  await replaceVideoTags(videoId, uniqueGroupIds, uniqueSongIds, db);
+  return getAdminVideoById(videoId, db);
+}
+
+export async function replaceVideoTags(videoId: string, groupIds: string[], songIds: string[], client?: AdminClient) {
+  const db = getClient(client);
+
+  const { error: deleteGroupsError } = await db.from("video_groups").delete().eq("video_id", videoId);
+  if (deleteGroupsError) {
+    throw new Error(deleteGroupsError.message);
+  }
+
+  const { error: deleteSongsError } = await db.from("video_songs").delete().eq("video_id", videoId);
+  if (deleteSongsError) {
+    throw new Error(deleteSongsError.message);
+  }
+
+  if (groupIds.length > 0) {
+    const { error } = await db
+      .from("video_groups")
+      .insert(groupIds.map((groupId) => ({ video_id: videoId, group_id: groupId })));
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  if (songIds.length > 0) {
+    const { error } = await db
+      .from("video_songs")
+      .insert(songIds.map((songId) => ({ video_id: videoId, song_id: songId })));
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+}
+
+export async function getAdminVideos(client?: AdminClient): Promise<RegisteredVideoRecord[]> {
+  const db = getClient(client);
+  const { data, error } = await db.from("videos").select(VIDEO_RELATIONS).order("view_count", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data || []) as RegisteredVideoRecord[];
+}
+
+export async function getAdminVideoById(id: string, client?: AdminClient): Promise<RegisteredVideoRecord> {
+  const db = getClient(client);
+  const { data, error } = await db.from("videos").select(VIDEO_RELATIONS).eq("id", id).single();
+
+  if (error || !data) {
+    throw new Error(error?.message || "動画が見つかりませんでした");
+  }
+
+  return data as RegisteredVideoRecord;
+}
+
+export async function getUntaggedVideos(client?: AdminClient) {
+  const videos = await getAdminVideos(client);
+  return videos.filter(isVideoMissingTags);
+}
+
+export async function setVideoDisplay(videoId: string, display: boolean, client?: AdminClient) {
+  const db = getClient(client);
+  const { error } = await db.from("videos").update({ display }).eq("id", videoId);
+  if (error) {
+    throw new Error(error.message);
+  }
+  return getAdminVideoById(videoId, db);
+}
+
+export async function updateVideoStats(
+  videoId: string,
+  stats: { title: string; thumbnailUrl: string; viewCount: number },
+  client?: AdminClient
+) {
+  const db = getClient(client);
+  const { error } = await db
+    .from("videos")
+    .update({
+      title: stats.title,
+      thumbnail_url: stats.thumbnailUrl,
+      view_count: stats.viewCount,
     })
-    .select("*");
+    .eq("id", videoId);
 
   if (error) {
-    console.log("Error fetching videos:", error);
-  } else if (data) {
-    return data || [];
+    throw new Error(error.message);
   }
-};
 
-// 動画のグループ詳細を登録
-export const registerVideoGroup = async (detailsGroupDate: VideoGroupData) => {
-  const { videoId } = detailsGroupDate;
-  const groupDataId = await fetchGroups();
-  const firstGroupId = groupDataId?.find((group) => group.group_name === detailsGroupDate.firstGroupId);
-  const secondGroupId = groupDataId?.find((group) => group.group_name === detailsGroupDate.secondGroupId);
-  const insertData = [
-    {
-      video_id: videoId,
-      group_id: firstGroupId.id,
-    },
-    {
-      video_id: videoId,
-      group_id: secondGroupId.id,
-    },
-  ];
+  return getAdminVideoById(videoId, db);
+}
 
-  const { data, error } = await supabase.from("video_groups").insert(insertData).select("*");
+export async function deleteVideo(videoId: string, client?: AdminClient) {
+  const db = getClient(client);
+  await db.from("video_groups").delete().eq("video_id", videoId);
+  await db.from("video_songs").delete().eq("video_id", videoId);
+  const { error } = await db.from("videos").delete().eq("id", videoId);
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function getAdminGroups(client?: AdminClient) {
+  const db = getClient(client);
+  const { data, error } = await db
+    .from("groups")
+    .select("*")
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("group_name", { ascending: true });
 
   if (error) {
-    console.log("Error registering video details:", error);
-  } else if (data) {
-    return data || [];
+    throw new Error(error.message);
   }
-};
+  return data || [];
+}
 
-// 動画の曲詳細を登録
-export const registerVideoSong = async (detailsSongDate: VideoSongData) => {
-  const { videoId } = detailsSongDate;
-  const songDataId = await fetchSongs();
-  const songId = songDataId?.find((song) => song.song_name === detailsSongDate.songId);
-  const { data, error } = await supabase
-    .from("video_songs")
-    .insert([
-      {
-        video_id: videoId,
-        song_id: songId.id,
-      },
-    ])
-    .select("*");
-
+export async function getAdminSongs(client?: AdminClient) {
+  const db = getClient(client);
+  const { data, error } = await db.from("songs").select("*").order("song_name", { ascending: true });
   if (error) {
-    console.log("Error registering video details:", error);
-  } else if (data) {
-    return data || [];
+    throw new Error(error.message);
   }
-};
+  return data || [];
+}
 
-// 登録済みの動画を取得
-export const getAllRegisteredVideos = async () => {
-  const { data, error } = await supabase
-    .from("videos")
-    .select(`*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`)
-    .or("video_groups.is.null,video_songs.is.null");
+export async function createGroup(groupName: string, displayOrder: number | null, client?: AdminClient) {
+  const db = getClient(client);
+  const { data, error } = await db
+    .from("groups")
+    .insert({
+      group_name: groupName,
+      display: true,
+      display_order: displayOrder,
+    })
+    .select("*")
+    .single();
 
-  if (error) {
-    console.log("Error fetching videos:", error);
-  } else if (data) {
-    return data || [];
+  if (error || !data) {
+    throw new Error(error?.message || "グループの追加に失敗しました");
   }
-};
+  return data;
+}
+
+export async function createSong(songName: string, client?: AdminClient) {
+  const db = getClient(client);
+  const { data, error } = await db
+    .from("songs")
+    .insert({
+      song_name: songName,
+      display: true,
+    })
+    .select("*")
+    .single();
+
+  if (error || !data) {
+    throw new Error(error?.message || "楽曲の追加に失敗しました");
+  }
+  return data;
+}
+
+export async function updateGroup(
+  id: string,
+  values: { group_name?: string; display?: boolean; display_order?: number | null },
+  client?: AdminClient
+) {
+  const db = getClient(client);
+  const { data, error } = await db.from("groups").update(values).eq("id", id).select("*").single();
+  if (error || !data) {
+    throw new Error(error?.message || "グループの更新に失敗しました");
+  }
+  return data;
+}
+
+export async function updateSong(id: string, values: { song_name?: string; display?: boolean }, client?: AdminClient) {
+  const db = getClient(client);
+  const { data, error } = await db.from("songs").update(values).eq("id", id).select("*").single();
+  if (error || !data) {
+    throw new Error(error?.message || "楽曲の更新に失敗しました");
+  }
+  return data;
+}

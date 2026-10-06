@@ -1,20 +1,19 @@
 import Header from "@/components/feature/Header";
 import formatViewCount from "@/lib/formatViewCount";
-import { getAllVideos } from "@/lib/supabase/supabaseFunction";
+import { getVideoById } from "@/lib/supabase/supabaseFunction";
 import { GroupDetail, SongDetail } from "@/types";
 import { ArrowLeft, Youtube } from "lucide-react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export const runtime = "edge";
 
 const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
-  const data = await getAllVideos().then((data) => (data ? data.find((video) => video.id === id) : undefined));
+  const data = await getVideoById(id);
 
   if (!data) {
-    return <div>Loading...</div>;
-  } else if (data.error) {
-    return <div>Error loading video</div>;
+    notFound();
   }
 
   return (
@@ -57,7 +56,7 @@ const Videos = async ({ params }: { params: Promise<{ id: string }> }) => {
                 ))}
               </div>
               <div className="mb-3 border-b-2 border-b-gray-300 pb-3 text-gray-600">
-                {formatViewCount(data.view_count)} viwes
+                {formatViewCount(data.view_count)} views
               </div>
               <div>
                 このダンスチャレンジ動画は、
