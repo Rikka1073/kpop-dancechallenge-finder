@@ -37,3 +37,15 @@ ADMIN_SESSION_SECRET=
 4. 参加グループと楽曲を選んで登録する
 
 公開サイトには、グループと楽曲が付いた動画だけが表示されます。
+
+## 課題と作業ログ
+
+kpop-trend（トレンド日韓）と同じ分担。
+
+- 課題: Linear プロジェクト [SeeKPOP](https://linear.app/masafumi/project/seekpop-d3444f6bdcd0)
+- 運用ルール: [Linear ドキュメント](https://linear.app/masafumi/document/運用ルール-61dcac6eef12)
+- 手順の正本: [`ops/README.md`](ops/README.md)
+- 作業ログ: Obsidian `SeeKPOP/報告/MAS-n 種類-日付.md`
+
+データの鮮度は AI が候補を抽出し、公式かどうかは人が YouTube を開いて判定する。Linear の完了では代用しない。
+
