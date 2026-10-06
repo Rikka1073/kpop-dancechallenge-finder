@@ -5,6 +5,7 @@ import {
   assertCandidateDraft,
   createPendingCandidate,
   listReviewUrls,
+  parseCandidateDraftFileJson,
 } from "@/lib/extraction/candidateDraft";
 import { guessOfficial } from "@/lib/extraction/guessOfficial";
 
@@ -68,6 +69,19 @@ describe("candidateDraft", () => {
     const reviewed = applyCandidateReviews(file, { abcdefghijk: "approved" });
     expect(reviewed.candidates[0].official).toBe(true);
     expect(file.candidates[0].official).toBeNull();
+  });
+
+  test("貼り付け用の JSON 文字列を検証する", () => {
+    const json = JSON.stringify({
+      extractedAt: "2026-10-06T00:00:00.000Z",
+      linearIssue: "MAS-19",
+      queryNotes: "test",
+      candidates: [pending],
+    });
+
+    expect(parseCandidateDraftFileJson(json).candidates).toHaveLength(1);
+    expect(() => parseCandidateDraftFileJson("{")).toThrow("JSON として読めません");
+    expect(() => parseCandidateDraftFileJson("{}")).toThrow("候補ドラフトの形式が不正です");
   });
 });
 

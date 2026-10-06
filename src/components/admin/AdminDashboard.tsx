@@ -10,8 +10,9 @@ import { GroupRecord, SongRecord } from "@/types";
 import { RegisteredVideoRecord } from "@/lib/supabase/registerSupabaseFunction";
 import formatViewCount from "@/lib/formatViewCount";
 import type { YouTubeVideoSnapshot } from "@/lib/youtube/fetchYouTubeVideo";
+import CandidateReviewPanel from "@/components/admin/CandidateReviewPanel";
 
-type Tab = "register" | "videos" | "catalog";
+type Tab = "register" | "videos" | "catalog" | "candidates";
 type VideoFilter = "all" | "untagged" | "hidden";
 
 const AdminDashboard = () => {
@@ -66,7 +67,7 @@ const AdminDashboard = () => {
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-purple-600 md:text-4xl">データ管理</h1>
-          <p className="text-gray-600">YouTube URLから動画を登録し、グループと楽曲をまとめて管理します</p>
+          <p className="text-gray-600">YouTube URLから動画を登録し、グループと楽曲、週次抽出の候補一覧を管理します</p>
         </div>
         <button type="button" onClick={logout} className="btn rounded-2xl bg-white">
           ログアウト
@@ -83,11 +84,14 @@ const AdminDashboard = () => {
         <TabButton active={tab === "catalog"} onClick={() => setTab("catalog")}>
           グループ / 楽曲
         </TabButton>
+        <TabButton active={tab === "candidates"} onClick={() => setTab("candidates")}>
+          候補一覧
+        </TabButton>
       </div>
 
-      {message && <p className="mb-4 rounded-xl bg-green-50 p-3 text-green-700">{message}</p>}
-      {error && <p className="mb-4 rounded-xl bg-red-50 p-3 text-red-600">{error}</p>}
-      {loading && (
+      {tab !== "candidates" && message && <p className="mb-4 rounded-xl bg-green-50 p-3 text-green-700">{message}</p>}
+      {tab !== "candidates" && error && <p className="mb-4 rounded-xl bg-red-50 p-3 text-red-600">{error}</p>}
+      {tab !== "candidates" && loading && (
         <div className="mb-4 flex justify-center">
           <span className="loading loading-spinner loading-lg text-primary"></span>
         </div>
@@ -134,6 +138,8 @@ const AdminDashboard = () => {
           onNotice={notify}
         />
       )}
+
+      {tab === "candidates" && <CandidateReviewPanel />}
     </div>
   );
 };

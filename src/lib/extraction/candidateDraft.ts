@@ -101,9 +101,17 @@ export function assertCandidateDraftFile(value: unknown): CandidateDraftFile {
   };
 }
 
-export function createPendingCandidate(
-  input: Omit<CandidateDraft, "status" | "official">
-): CandidateDraft {
+export function parseCandidateDraftFileJson(text: string): CandidateDraftFile {
+  let value: unknown;
+  try {
+    value = JSON.parse(text);
+  } catch {
+    throw new Error("JSON として読めません");
+  }
+  return assertCandidateDraftFile(value);
+}
+
+export function createPendingCandidate(input: Omit<CandidateDraft, "status" | "official">): CandidateDraft {
   return {
     ...input,
     status: "pending",
@@ -111,10 +119,7 @@ export function createPendingCandidate(
   };
 }
 
-export function applyCandidateReview(
-  candidate: CandidateDraft,
-  decision: "approved" | "rejected"
-): CandidateDraft {
+export function applyCandidateReview(candidate: CandidateDraft, decision: "approved" | "rejected"): CandidateDraft {
   return {
     ...candidate,
     status: decision,
