@@ -1,0 +1,23 @@
+{
+  "extractedAt": "2026-10-06T00:00:00.000Z",
+  "linearIssue": "MAS-n",
+  "queryNotes": "extraction-targets.json のクエリで集めた",
+  "candidates": [
+    {
+      "youtubeId": "xxxxxxxxxxx",
+      "url": "https://www.youtube.com/shorts/xxxxxxxxxxx",
+      "title": "例: ダンスチャレンジ",
+      "channelTitle": "例: IVE",
+      "channelId": "UCxxxxxxxxxxxxxxxxxxxxxx",
+      "publishedAt": "2026-10-01T00:00:00Z",
+      "viewCount": 0,
+      "suggestedGroups": ["IVE"],
+      "suggestedSong": "ELEVEN",
+      "officialGuess": true,
+      "officialGuessReason": "公式チャンネル同士のコラボに見える。確定ではない。",
+      "status": "pending",
+      "official": null,
+      "reviewNote": ""
+    }
+  ]
+}

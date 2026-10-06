@@ -44,3 +44,6 @@ next-env.d.ts
 .wrangler
 
 /docs
+
+# 週次抽出の実データ（形式は ops/templates/ に置く）
+/data/raw/
