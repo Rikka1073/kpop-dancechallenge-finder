@@ -45,5 +45,5 @@ next-env.d.ts
 
 /docs
 
-# 週次抽出の実データ（形式は ops/templates/ に置く）
+# 週次抽出の手元ドラフト（運用ファイル。git に入れない）
 /data/raw/
