@@ -125,8 +125,10 @@ const CandidateReviewPanel = () => {
       <div className="mb-6 rounded-3xl bg-white p-6 shadow-lg">
         <h2 className="mb-2 text-xl font-bold">候補JSONを読み込む</h2>
         <p className="mb-4 text-sm text-gray-600">
-          週次抽出の <code>candidate-drafts.json</code> をファイルまたは貼り付けで開きます。Cloudflare Pages
-          から手元のファイルは読めないので、ここで一覧します。承認しても DB には入れません。
+          この JSON は同じリポジトリの抽出コマンド（
+          <code>npm run extract:candidates</code>
+          ）が手元の <code>data/raw/</code> に書きます。別システムはありません。Cloudflare Pages
+          からそのファイルは読めないので、ここで開いて判定します。承認しても DB には入れません。
         </p>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center">
           <label className="btn rounded-2xl bg-purple-50 text-purple-700">
