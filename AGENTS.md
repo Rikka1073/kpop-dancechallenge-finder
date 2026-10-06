@@ -23,7 +23,16 @@ AI は候補を集めるだけ。公式かどうかは人が YouTube を開い�
 6. 公開は人が「公開して」と言うまでしない
 7. Linear の Done を公式判定の代用にしない
 
+## git
+
+- 作業ブランチは必ず `main` から切る
+- Linear 課題ごとにブランチを分ける。ブランチ名に課題番号を入れる（例: `cursor/mas-20-branch-from-main-6bc5`）
+- PR の作成は承認不要。エージェントが作ってよい。base は `main`
+- `main` へのマージは人が手動で行う。エージェントはマージしない
+- 1つの PR に複数課題を混ぜない
+
 ## Obsidian
 
 人が vault を使えるとき、報告は `SeeKPOP/報告/MAS-n 種類-日付.md`。
 テンプレは `ops/templates/obsidian-report.md`。Slack には送らない。
+

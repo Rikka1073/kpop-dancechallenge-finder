@@ -46,6 +46,7 @@ kpop-trend（トレンド日韓）と同じ分担。
 - 運用ルール: [Linear ドキュメント](https://linear.app/masafumi/document/運用ルール-61dcac6eef12)
 - 手順の正本: [`ops/README.md`](ops/README.md)
 - 作業ログ: Obsidian `SeeKPOP/報告/MAS-n 種類-日付.md`
+- git: `main` から課題ごとにブランチ。PR 作成は承認不要。マージは手動
 
 データの鮮度は AI が候補を抽出し、公式かどうかは人が YouTube を開いて判定する。Linear の完了では代用しない。
 

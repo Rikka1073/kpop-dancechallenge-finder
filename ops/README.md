@@ -28,3 +28,11 @@
 2. **判定** `data/raw/YYYY-MM-DD/candidate-drafts.json`
 
 承認前に `official: true` を付けない。公開は人が「公開して」と言うまでしない。
+
+## git
+
+- 作業ブランチは必ず `main` から切る
+- Linear 課題ごとにブランチを分ける。名前に `mas-n` を入れる
+- PR 作成は承認不要。エージェントが作ってよい。base は `main`
+- マージは人が手動で行う。エージェントはマージしない
+

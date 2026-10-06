@@ -5,4 +5,6 @@ alwaysApply: true
 
 SeeKPOP の課題は Linear プロジェクト SeeKPOP に置く。作業ログは Obsidian `SeeKPOP/報告/MAS-n 種類-日付.md`。
 
+git は `main` から課題ごとにブランチを切る。PR 作成は承認不要。`main` へのマージは人が手動で行い、エージェントはマージしない。1つの PR に複数課題を混ぜない。
+
 データの鮮度は AI が YouTube 候補を抽出し、公式かどうかは人が根拠 URL を開いて判定する。`ops/extraction-targets.json` の確認前に抽出しない。`data/raw/` のドラフトは git に入れない。人が承認するまで `official` を true にせず、DB にも入れない。Linear の Done は公式判定の代用にしない。公開は人が「公開して」と言うまでしない。
