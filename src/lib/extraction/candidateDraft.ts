@@ -23,6 +23,13 @@ export type CandidateDraftFile = {
   candidates: CandidateDraft[];
 };
 
+export type CandidateDraftBundle = {
+  dates: string[];
+  date: string;
+  path: string;
+  draft: CandidateDraftFile;
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
@@ -101,9 +108,7 @@ export function assertCandidateDraftFile(value: unknown): CandidateDraftFile {
   };
 }
 
-export function createPendingCandidate(
-  input: Omit<CandidateDraft, "status" | "official">
-): CandidateDraft {
+export function createPendingCandidate(input: Omit<CandidateDraft, "status" | "official">): CandidateDraft {
   return {
     ...input,
     status: "pending",
@@ -111,10 +116,7 @@ export function createPendingCandidate(
   };
 }
 
-export function applyCandidateReview(
-  candidate: CandidateDraft,
-  decision: "approved" | "rejected"
-): CandidateDraft {
+export function applyCandidateReview(candidate: CandidateDraft, decision: "approved" | "rejected"): CandidateDraft {
   return {
     ...candidate,
     status: decision,

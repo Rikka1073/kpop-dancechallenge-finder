@@ -47,3 +47,6 @@ next-env.d.ts
 
 # 週次抽出の手元ドラフト（運用ファイル。git に入れない）
 /data/raw/
+
+# pages:build 中に退避するローカル専用 admin
+/src/.pages-build-stash/
