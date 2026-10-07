@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className="scroll-smooth">
-      <body className="font-sans antialiased">
+    <html lang="ja" className="scroll-smooth" data-theme="light">
+      <body className="bg-white font-sans text-black antialiased">
         <Suspense fallback={<Loading />}>
           <main
             className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50"
