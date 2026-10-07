@@ -13,7 +13,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## 環境変数
 
-`.env` または `.env.local` に以下を設定します。`npm run dev` が読みます。
+`.env` または `.env.local` に以下を設定します。`npm run dev` と `npm run extract:candidates` が読みます。
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
