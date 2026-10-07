@@ -40,3 +40,16 @@ ADMIN_SESSION_SECRET=
 5. 手作業の登録も、同じ画面の「動画を登録」からできる
 
 公開サイトには、グループと楽曲が付いた動画だけが表示されます。
+
+## 公開
+
+公開は Cloudflare の `cf deploy` です。GitHub への push では出ません。初回だけ Cloudflare にログインします。
+
+```bash
+npx cf auth login
+npm run deploy
+```
+
+`npm run deploy` は静的エクスポートしてから `cf deploy --prebuilt` します。`cf deploy` 単体は使いません。本番ビルドから `/admin` は除きます。
+
+Cloudflare Pages の Git 連携は使いません。ダッシュボードに残っている場合は切ってください。
