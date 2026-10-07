@@ -45,6 +45,7 @@ process.on("SIGTERM", () => {
 
 let code = 1;
 try {
+  rmSync(".next", { recursive: true, force: true });
   const result = spawnSync("npx", ["next", "build"], {
     stdio: "inherit",
     env: { ...process.env, CF_STATIC: "1" },

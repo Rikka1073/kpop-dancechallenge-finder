@@ -52,4 +52,4 @@ npm run deploy
 
 `npm run deploy` は静的エクスポートしてから `cf deploy --prebuilt` します。`cf deploy` 単体は使いません。本番ビルドから `/admin` は除きます。
 
-Cloudflare Pages の Git 連携は使いません。ダッシュボードに残っている場合は切ってください。
+公開ドメインは `https://seekpop.jp` です。`cloudflare.config.ts` の `domains` にあります。Cloudflare Pages は使いません。Worker の `cf deploy` だけです。
