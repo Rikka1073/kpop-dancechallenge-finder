@@ -8,6 +8,7 @@ export default defineConfig({
     assets: {
       notFoundHandling: "404-page",
     },
+    domains: ["seekpop.jp", "www.seekpop.jp"],
     workersDev: true,
   },
 });

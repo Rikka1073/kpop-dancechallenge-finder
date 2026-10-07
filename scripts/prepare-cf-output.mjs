@@ -23,6 +23,7 @@ writeFileSync(
     name: "kpop-dancechallenge-finder",
     compatibilityDate: "2026-10-07",
     assets: { notFoundHandling: "404-page" },
+    domains: ["seekpop.jp", "www.seekpop.jp"],
     workersDev: true,
   })}\n`,
 );
