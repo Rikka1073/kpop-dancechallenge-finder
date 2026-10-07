@@ -9,8 +9,6 @@ import {
   updateSong,
 } from "@/lib/supabase/registerSupabaseFunction";
 
-export const runtime = "edge";
-
 export async function GET(request: NextRequest) {
   const unauthorized = await requireAdmin(request);
   if (unauthorized) {

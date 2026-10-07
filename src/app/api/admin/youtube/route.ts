@@ -2,8 +2,6 @@ import { NextRequest } from "next/server";
 import { jsonError, jsonOk, requireAdmin, getErrorMessage } from "@/lib/admin/http";
 import { fetchYouTubeVideoSnapshot } from "@/lib/youtube/fetchYouTubeVideo";
 
-export const runtime = "edge";
-
 export async function GET(request: NextRequest) {
   const unauthorized = await requireAdmin(request);
   if (unauthorized) {

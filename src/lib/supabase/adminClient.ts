@@ -8,6 +8,10 @@ export function createAdminSupabaseClient(): SupabaseClient {
     throw new Error("Supabase environment variables are not configured");
   }
 
+  if (!/^https?:\/\//.test(url)) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL は https://xxxx.supabase.co の形式です");
+  }
+
   return createClient(url, key, {
     auth: {
       persistSession: false,
