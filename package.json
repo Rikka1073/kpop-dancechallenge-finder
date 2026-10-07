@@ -10,6 +10,7 @@
     "pages:build": "npx @cloudflare/next-on-pages",
     "preview": "npm run pages:build && wrangler pages dev",
     "deploy": "npm run pages:build && wrangler pages deploy",
+    "extract:candidates": "npx --yes tsx scripts/extract-candidates.ts",
     "test": "vitest",
     "format": "prettier --write 'src/**/*.tsx'",
     "coverage": "vitest run --coverage"
