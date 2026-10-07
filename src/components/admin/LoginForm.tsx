@@ -46,7 +46,7 @@ const LoginForm = () => {
         </div>
       </div>
       <h1 className="mb-2 text-center text-2xl font-bold">管理者ログイン</h1>
-      <p className="mb-6 text-center text-gray-600">動画・グループ・楽曲の登録と管理を行います</p>
+      <p className="mb-6 text-center text-gray-600">ローカルの npm run dev 専用です。本番には出しません</p>
       {configured === false && (
         <p className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-600">
           ADMIN_PASSWORD がサーバーに設定されていません。環境変数を追加してください。

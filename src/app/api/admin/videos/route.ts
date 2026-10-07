@@ -11,8 +11,6 @@ import {
 } from "@/lib/supabase/registerSupabaseFunction";
 import { fetchYouTubeVideoSnapshot } from "@/lib/youtube/fetchYouTubeVideo";
 
-export const runtime = "edge";
-
 export async function GET(request: NextRequest) {
   const unauthorized = await requireAdmin(request);
   if (unauthorized) {

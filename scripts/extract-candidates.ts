@@ -1,6 +1,9 @@
 import { extractCandidateDrafts } from "../src/lib/extraction/extractCandidateDrafts";
 import { listReviewUrls } from "../src/lib/extraction/candidateDraft";
+import { loadLocalEnv } from "../src/lib/extraction/loadLocalEnv";
 import { writeCandidateDraftFile } from "../src/lib/extraction/writeCandidateDrafts";
+
+loadLocalEnv();
 
 function readArg(argv: string[], flag: string): string | undefined {
   const index = argv.indexOf(flag);

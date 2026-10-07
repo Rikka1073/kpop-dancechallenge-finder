@@ -8,8 +8,6 @@ import {
 } from "@/lib/admin/session";
 import { jsonError, jsonOk } from "@/lib/admin/http";
 
-export const runtime = "edge";
-
 export async function GET() {
   return jsonOk({ configured: isAdminConfigured() });
 }
