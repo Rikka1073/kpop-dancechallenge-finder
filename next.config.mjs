@@ -1,8 +1,10 @@
-import { setupDevPlatform } from "@cloudflare/next-on-pages/next-dev";
-
 /** @type {import('next').NextConfig} */
+const isCfStatic = process.env.CF_STATIC === "1";
+
 const nextConfig = {
+  ...(isCfStatic ? { output: "export" } : {}),
   images: {
+    unoptimized: isCfStatic,
     remotePatterns: [
       {
         protocol: "https",
@@ -29,9 +31,5 @@ const nextConfig = {
     return config;
   },
 };
-
-if (process.env.NODE_ENV === "development") {
-  await setupDevPlatform();
-}
 
 export default nextConfig;

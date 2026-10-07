@@ -40,8 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# wrangler
+# wrangler / cf
 .wrangler
+.cloudflare
+
+# cf 本番ビルド中に退避する admin
+/src/.cf-build-stash/
 
 /docs
 
