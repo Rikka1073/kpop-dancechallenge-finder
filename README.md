@@ -24,7 +24,7 @@ ADMIN_PASSWORD=
 ADMIN_SESSION_SECRET=
 ```
 
-- `SUPABASE_SERVICE_ROLE_KEY` はローカル管理画面からの書き込み用です。本番の公開サイトには載せません。
+- `SUPABASE_SERVICE_ROLE_KEY` はローカル管理画面からの書き込み用です。未設定だとグループ更新が0件で終わります。本番の公開サイトには載せません。
 - `YOUTUBE_API_KEY` はサーバー側だけで使います。ブラウザに出さないでください。
 - `ADMIN_PASSWORD` は `npm run dev` の `/admin` 用です。本番では `/admin` を出しません。
 - `ADMIN_SESSION_SECRET` はセッション署名用です。未設定時は `ADMIN_PASSWORD` を使います。
@@ -35,9 +35,12 @@ ADMIN_SESSION_SECRET=
 
 1. `npm run dev` して [http://localhost:3000/admin/login](http://localhost:3000/admin/login) にアクセスする
 2. `ADMIN_PASSWORD` でログインする
-3. 週次抽出の候補は「候補一覧」が `data/raw/YYYY-MM-DD/candidate-drafts.json` を自動で開く
-4. YouTube を開いて承認 / 却下する。判定は同じ JSON へ書き戻す
-5. 手作業の登録も、同じ画面の「動画を登録」からできる
+3. 公式チャンネルは YouTube で自分で確認してから、「グループ / 楽曲」に URL を貼る。API はチャンネルIDを取るだけで、公式とは判定しない
+4. 確認したチャンネルを保存したあとに、「動画を登録」から公式チャンネルの動画だけを載せる
+5. 週次抽出の候補は「候補一覧」が `data/raw/YYYY-MM-DD/candidate-drafts.json` を自動で開く
+6. YouTube を開いて承認 / 却下する。判定は同じ JSON へ書き戻す
+
+`groups.youtube_channel_id` を足す SQL は `supabase/migrations/` にあります。Supabase に適用してから公式チャンネルを保存してください。
 
 公開サイトには、グループと楽曲が付いた動画だけが表示されます。
 

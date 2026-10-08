@@ -10,6 +10,8 @@ import { isVideoMissingTags } from "@/lib/search/filterVideos";
 import { GroupRecord, SongRecord } from "@/types";
 import { RegisteredVideoRecord } from "@/lib/supabase/registerSupabaseFunction";
 import formatViewCount from "@/lib/formatViewCount";
+import type { YouTubeChannelSnapshot } from "@/lib/youtube/fetchYouTubeChannel";
+import { findOfficialGroupByChannelId } from "@/lib/youtube/officialGroup";
 import type { YouTubeVideoSnapshot } from "@/lib/youtube/fetchYouTubeVideo";
 
 type Tab = "register" | "videos" | "catalog" | "candidates";
@@ -191,10 +193,14 @@ const VideoRegisterPanel = ({
   const [newSong, setNewSong] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  const officialGroup = findOfficialGroupByChannelId(groups, preview?.channelId);
+
   const previewVideo = async () => {
     try {
       const data = await adminRequest<YouTubeVideoSnapshot>(`/api/admin/youtube?url=${encodeURIComponent(url)}`);
       setPreview(data);
+      const matched = findOfficialGroupByChannelId(groups, data.channelId);
+      setGroupIds(matched ? [matched.id] : []);
     } catch (error) {
       onError(error);
     }
@@ -239,6 +245,12 @@ const VideoRegisterPanel = ({
   const submit = async () => {
     if (!preview) {
       onError(new Error("先に動画プレビューを取得してください"));
+      return;
+    }
+    if (!officialGroup) {
+      onError(
+        new Error("確認済みの公式チャンネルの動画ではありません。先にグループへ公式チャンネルを保存してください。")
+      );
       return;
     }
     setSubmitting(true);
@@ -290,7 +302,15 @@ const VideoRegisterPanel = ({
             />
             <div className="p-4">
               <p className="font-bold">{preview.title}</p>
+              <p className="text-sm text-gray-500">{preview.channelTitle}</p>
               <p className="text-sm text-gray-500">{formatViewCount(preview.viewCount)} views</p>
+              {officialGroup ? (
+                <p className="mt-2 text-sm text-green-700">確認済み公式チャンネル: {officialGroup.group_name}</p>
+              ) : (
+                <p className="mt-2 text-sm text-red-600">
+                  確認済みの公式チャンネルではありません。先にグループへ公式チャンネルを保存してください。
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -346,7 +366,7 @@ const VideoRegisterPanel = ({
         <button
           type="button"
           onClick={submit}
-          disabled={submitting}
+          disabled={submitting || !officialGroup}
           className="btn-lg w-full rounded-2xl border-none bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-lg text-white disabled:opacity-60"
         >
           {submitting ? "登録中..." : "動画を登録"}
@@ -601,19 +621,76 @@ const CatalogPanel = ({
   onNotice: (message: string) => void;
 }) => {
   const [groupName, setGroupName] = useState("");
+  const [channelUrl, setChannelUrl] = useState("");
+  const [channelPreview, setChannelPreview] = useState<YouTubeChannelSnapshot | null>(null);
+  const [loadingChannel, setLoadingChannel] = useState(false);
+  const [savingOfficial, setSavingOfficial] = useState(false);
   const [songName, setSongName] = useState("");
 
-  const addGroup = async () => {
+  const addGroupWithoutChannel = async () => {
+    const name = groupName.trim();
+    if (!name) return;
     try {
       const created = await adminRequest<GroupRecord>("/api/admin/catalog", {
         method: "POST",
-        body: JSON.stringify({ type: "group", name: groupName, displayOrder: groups.length + 1 }),
+        body: JSON.stringify({ type: "group", name, displayOrder: groups.length + 1 }),
       });
       setGroupName("");
+      setChannelUrl("");
+      setChannelPreview(null);
       onGroupsChange([...groups, created]);
-      onNotice("グループを追加しました");
+      onNotice("グループを追加しました。公式チャンネルは未設定です。");
     } catch (error) {
       onError(error);
+    }
+  };
+
+  const previewChannel = async () => {
+    setLoadingChannel(true);
+    try {
+      const data = await adminRequest<YouTubeChannelSnapshot>(
+        `/api/admin/youtube/channel?url=${encodeURIComponent(channelUrl)}`
+      );
+      setChannelPreview(data);
+    } catch (error) {
+      setChannelPreview(null);
+      onError(error);
+    } finally {
+      setLoadingChannel(false);
+    }
+  };
+
+  const saveOfficialChannel = async () => {
+    const name = groupName.trim();
+    if (!name) {
+      onError(new Error("グループ名を入力してください"));
+      return;
+    }
+    if (!channelPreview) {
+      onError(new Error("先にチャンネル情報を取得してください"));
+      return;
+    }
+    setSavingOfficial(true);
+    try {
+      const created = await adminRequest<GroupRecord>("/api/admin/catalog", {
+        method: "POST",
+        body: JSON.stringify({
+          type: "group",
+          name,
+          displayOrder: groups.length + 1,
+          channelUrl,
+          confirmOfficial: true,
+        }),
+      });
+      setGroupName("");
+      setChannelUrl("");
+      setChannelPreview(null);
+      onGroupsChange([...groups, created]);
+      onNotice("確認済みの公式チャンネルをグループに保存しました");
+    } catch (error) {
+      onError(error);
+    } finally {
+      setSavingOfficial(false);
     }
   };
 
@@ -658,28 +735,88 @@ const CatalogPanel = ({
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-bold">グループ</h2>
-        <div className="mb-4 flex gap-2">
-          <input
-            value={groupName}
-            onChange={(event) => setGroupName(event.target.value)}
-            placeholder="グループ名"
-            className="input w-full"
-          />
-          <button type="button" className="btn" onClick={addGroup}>
-            追加
+        <h2 className="mb-2 text-xl font-bold">グループ</h2>
+        <p className="mb-4 text-sm text-gray-600">
+          公式チャンネルかどうかは、先に YouTube
+          で自分で確認してください。取得はチャンネルIDを取るだけで、公式とは判定しません。確認したURLを貼ってから保存します。
+        </p>
+        <div className="mb-4 flex flex-col gap-3">
+          <label className="flex flex-col gap-1 text-sm text-gray-600">
+            グループ名
+            <input
+              value={groupName}
+              onChange={(event) => setGroupName(event.target.value)}
+              placeholder="グループ名"
+              className="input w-full"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-gray-600">
+            確認済みチャンネルURL
+            <input
+              value={channelUrl}
+              onChange={(event) => {
+                setChannelUrl(event.target.value);
+                setChannelPreview(null);
+              }}
+              placeholder="https://www.youtube.com/@..."
+              className="input w-full"
+            />
+          </label>
+          <button
+            type="button"
+            className="btn rounded-xl"
+            onClick={() => void previewChannel()}
+            disabled={loadingChannel}
+          >
+            {loadingChannel ? "取得中..." : "チャンネル情報を取得"}
+          </button>
+          {channelPreview && (
+            <div className="rounded-xl bg-purple-50 p-3 text-sm">
+              <p className="font-bold">{channelPreview.title}</p>
+              <p className="mt-1 font-mono text-gray-600">{channelPreview.channelId}</p>
+              <p className="mt-2 text-gray-600">表示用です。公式かどうかは人が確認したものだけ保存します。</p>
+            </div>
+          )}
+          <button
+            type="button"
+            className="btn rounded-xl bg-purple-600 text-white"
+            onClick={() => void saveOfficialChannel()}
+            disabled={savingOfficial || !channelPreview}
+          >
+            {savingOfficial ? "保存中..." : "このチャンネルを公式として保存"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost rounded-xl text-sm"
+            onClick={() => void addGroupWithoutChannel()}
+          >
+            チャンネル未設定のまま追加
           </button>
         </div>
         <ul className="space-y-2">
           {groups.map((group) => (
-            <li key={group.id} className="flex items-center justify-between rounded-xl bg-purple-50 px-3 py-2">
-              <span>
-                {group.group_name}
-                {group.display === false && <span className="ml-2 text-xs text-gray-500">非表示</span>}
-              </span>
-              <button type="button" className="btn btn-xs" onClick={() => toggleGroup(group)}>
-                {group.display === false ? "表示" : "非表示"}
-              </button>
+            <li key={group.id} className="rounded-xl bg-purple-50 px-3 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <span>
+                  {group.group_name}
+                  {group.display === false && <span className="ml-2 text-xs text-gray-500">非表示</span>}
+                </span>
+                <button type="button" className="btn btn-xs min-h-11" onClick={() => toggleGroup(group)}>
+                  {group.display === false ? "表示" : "非表示"}
+                </button>
+              </div>
+              {group.youtube_channel_id ? (
+                <p className="mt-2 text-xs text-gray-600">
+                  確認済み: {group.youtube_channel_title || group.youtube_channel_id}
+                </p>
+              ) : (
+                <AttachOfficialChannel
+                  group={group}
+                  onSaved={(updated) => onGroupsChange(groups.map((item) => (item.id === updated.id ? updated : item)))}
+                  onError={onError}
+                  onNotice={onNotice}
+                />
+              )}
             </li>
           ))}
         </ul>
@@ -692,6 +829,7 @@ const CatalogPanel = ({
             onChange={(event) => setSongName(event.target.value)}
             placeholder="楽曲名"
             className="input w-full"
+            aria-label="楽曲名"
           />
           <button type="button" className="btn" onClick={addSong}>
             追加
@@ -704,13 +842,114 @@ const CatalogPanel = ({
                 {song.song_name}
                 {song.display === false && <span className="ml-2 text-xs text-gray-500">非表示</span>}
               </span>
-              <button type="button" className="btn btn-xs" onClick={() => toggleSong(song)}>
+              <button type="button" className="btn btn-xs min-h-11" onClick={() => toggleSong(song)}>
                 {song.display === false ? "表示" : "非表示"}
               </button>
             </li>
           ))}
         </ul>
       </div>
+    </div>
+  );
+};
+
+const AttachOfficialChannel = ({
+  group,
+  onSaved,
+  onError,
+  onNotice,
+}: {
+  group: GroupRecord;
+  onSaved: (group: GroupRecord) => void;
+  onError: (error: unknown) => void;
+  onNotice: (message: string) => void;
+}) => {
+  const [channelUrl, setChannelUrl] = useState("");
+  const [channelPreview, setChannelPreview] = useState<YouTubeChannelSnapshot | null>(null);
+  const [loadingChannel, setLoadingChannel] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const previewChannel = async () => {
+    setLoadingChannel(true);
+    try {
+      const data = await adminRequest<YouTubeChannelSnapshot>(
+        `/api/admin/youtube/channel?url=${encodeURIComponent(channelUrl)}`
+      );
+      setChannelPreview(data);
+    } catch (error) {
+      setChannelPreview(null);
+      onError(error);
+    } finally {
+      setLoadingChannel(false);
+    }
+  };
+
+  const save = async () => {
+    if (!channelPreview) {
+      onError(new Error("先にチャンネル情報を取得してください"));
+      return;
+    }
+    setSaving(true);
+    try {
+      const updated = await adminRequest<GroupRecord>("/api/admin/catalog", {
+        method: "PATCH",
+        body: JSON.stringify({
+          type: "group",
+          id: group.id,
+          channelUrl,
+          confirmOfficial: true,
+        }),
+      });
+      onSaved(updated);
+      onNotice("確認済みの公式チャンネルをグループに保存しました");
+    } catch (error) {
+      onError(error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mt-3 flex flex-col gap-2">
+      <p className="text-xs text-gray-500">公式チャンネル未設定</p>
+      <label className="flex flex-col gap-1 text-xs text-gray-600">
+        確認済みチャンネルURL
+        <input
+          value={channelUrl}
+          onChange={(event) => {
+            setChannelUrl(event.target.value);
+            setChannelPreview(null);
+          }}
+          placeholder="@handle またはチャンネルURL"
+          className="input input-sm w-full"
+          aria-label={`${group.group_name}の確認済みチャンネルURL`}
+        />
+      </label>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="btn btn-xs min-h-11 rounded-xl"
+          onClick={() => void previewChannel()}
+          disabled={loadingChannel}
+          aria-label={`${group.group_name}のチャンネル情報を取得`}
+        >
+          {loadingChannel ? "取得中..." : "チャンネル情報を取得"}
+        </button>
+        <button
+          type="button"
+          className="btn btn-xs min-h-11 rounded-xl bg-purple-600 text-white"
+          onClick={() => void save()}
+          disabled={saving || !channelPreview}
+          aria-label={`${group.group_name}の公式チャンネルとして保存`}
+        >
+          {saving ? "保存中..." : "このチャンネルを公式として保存"}
+        </button>
+      </div>
+      {channelPreview && (
+        <p className="text-xs text-gray-600">
+          表示用: {channelPreview.title}（{channelPreview.channelId}）
+        </p>
+      )}
     </div>
   );
 };
