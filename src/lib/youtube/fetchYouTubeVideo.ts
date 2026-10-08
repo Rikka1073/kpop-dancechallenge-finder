@@ -5,6 +5,8 @@ export type YouTubeVideoSnapshot = {
   title: string;
   thumbnailUrl: string;
   viewCount: number;
+  channelId: string;
+  channelTitle: string;
 };
 
 type YouTubeThumbnail = {
@@ -23,6 +25,8 @@ type YouTubeVideoItem = {
   id?: string;
   snippet?: {
     title?: string;
+    channelId?: string;
+    channelTitle?: string;
     thumbnails?: YouTubeThumbnails;
   };
   statistics?: {
@@ -69,9 +73,14 @@ export async function fetchYouTubeVideoSnapshot(input: string): Promise<YouTubeV
   }
 
   const title = item.snippet?.title?.trim();
+  const channelId = item.snippet?.channelId?.trim();
+  const channelTitle = item.snippet?.channelTitle?.trim();
   const thumbnailUrl = pickThumbnailUrl(item.snippet?.thumbnails);
   if (!title || !thumbnailUrl) {
     throw new Error("動画タイトルまたはサムネイルを取得できませんでした");
+  }
+  if (!channelId || !channelTitle) {
+    throw new Error("動画のチャンネル情報を取得できませんでした");
   }
 
   return {
@@ -79,5 +88,7 @@ export async function fetchYouTubeVideoSnapshot(input: string): Promise<YouTubeV
     title,
     thumbnailUrl,
     viewCount: Number.parseInt(item.statistics?.viewCount || "0", 10) || 0,
+    channelId,
+    channelTitle,
   };
 }

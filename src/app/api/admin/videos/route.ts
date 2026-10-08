@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { jsonError, jsonOk, requireAdmin, getErrorMessage } from "@/lib/admin/http";
 import {
   deleteVideo,
+  findGroupByYoutubeChannelId,
   getAdminVideoById,
   getAdminVideos,
   replaceVideoTags,
@@ -9,6 +10,7 @@ import {
   updateVideoStats,
   upsertVideoWithTags,
 } from "@/lib/supabase/registerSupabaseFunction";
+import { assertOfficialGroupByChannelId } from "@/lib/youtube/officialGroup";
 import { fetchYouTubeVideoSnapshot } from "@/lib/youtube/fetchYouTubeVideo";
 
 export async function GET(request: NextRequest) {
@@ -39,6 +41,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const snapshot = await fetchYouTubeVideoSnapshot(body?.youtubeUrl || "");
+    const officialGroup = await findGroupByYoutubeChannelId(snapshot.channelId);
+    assertOfficialGroupByChannelId(officialGroup ? [officialGroup] : [], snapshot.channelId);
     const video = await upsertVideoWithTags(
       {
         id: snapshot.youtubeId,

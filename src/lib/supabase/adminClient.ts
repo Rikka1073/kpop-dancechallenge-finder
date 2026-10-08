@@ -2,10 +2,15 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 export function createAdminSupabaseClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!url || !key) {
-    throw new Error("Supabase environment variables are not configured");
+  if (!url) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL が設定されていません");
+  }
+  if (!key) {
+    throw new Error(
+      "SUPABASE_SERVICE_ROLE_KEY がありません。管理画面の書き込みは service role が必要です。Supabase の Settings → API から service_role をコピーして .env に足し、npm run dev を再起動してください。"
+    );
   }
 
   if (!/^https?:\/\//.test(url)) {

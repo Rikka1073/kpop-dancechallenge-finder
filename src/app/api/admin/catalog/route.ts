@@ -8,6 +8,7 @@ import {
   updateGroup,
   updateSong,
 } from "@/lib/supabase/registerSupabaseFunction";
+import { fetchYouTubeChannelSnapshot } from "@/lib/youtube/fetchYouTubeChannel";
 
 export async function GET(request: NextRequest) {
   const unauthorized = await requireAdmin(request);
@@ -33,6 +34,8 @@ export async function POST(request: NextRequest) {
     type?: "group" | "song";
     name?: string;
     displayOrder?: number | null;
+    channelUrl?: string;
+    confirmOfficial?: boolean;
   } | null;
 
   const name = body?.name?.trim();
@@ -42,7 +45,8 @@ export async function POST(request: NextRequest) {
 
   try {
     if (body?.type === "group") {
-      const group = await createGroup(name, body.displayOrder ?? null);
+      const officialChannel = body.confirmOfficial ? await fetchYouTubeChannelSnapshot(body.channelUrl || "") : null;
+      const group = await createGroup(name, body.displayOrder ?? null, officialChannel);
       return jsonOk(group);
     }
     if (body?.type === "song") {
@@ -67,6 +71,8 @@ export async function PATCH(request: NextRequest) {
     name?: string;
     display?: boolean;
     displayOrder?: number | null;
+    channelUrl?: string;
+    confirmOfficial?: boolean;
   } | null;
 
   if (!body?.id || !body.type) {
@@ -75,10 +81,17 @@ export async function PATCH(request: NextRequest) {
 
   try {
     if (body.type === "group") {
+      const officialChannel = body.confirmOfficial ? await fetchYouTubeChannelSnapshot(body.channelUrl || "") : null;
       const group = await updateGroup(body.id, {
         ...(body.name ? { group_name: body.name.trim() } : {}),
         ...(typeof body.display === "boolean" ? { display: body.display } : {}),
         ...(body.displayOrder !== undefined ? { display_order: body.displayOrder } : {}),
+        ...(officialChannel
+          ? {
+              youtube_channel_id: officialChannel.channelId,
+              youtube_channel_title: officialChannel.title,
+            }
+          : {}),
       });
       return jsonOk(group);
     }

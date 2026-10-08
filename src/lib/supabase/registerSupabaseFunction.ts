@@ -9,6 +9,27 @@ type AdminClient = SupabaseClient;
 
 const getClient = (client?: AdminClient) => client ?? createAdminSupabaseClient();
 
+function isMissingOrMultipleRowsError(error: { code?: string; message?: string } | null): boolean {
+  return error?.code === "PGRST116" || Boolean(error?.message?.includes("JSON object requested"));
+}
+
+function throwGroupWriteError(error: { code?: string; message?: string } | null, fallback: string): never {
+  if (error?.code === "23505") {
+    throw new Error("このチャンネルは別のグループに保存済みです");
+  }
+  if (isMissingOrMultipleRowsError(error)) {
+    throw new Error("グループを1件として保存できませんでした。同じ条件の行が0件か複数件です。");
+  }
+  throw new Error(error?.message || fallback);
+}
+
+function firstRow<T>(data: T[] | T | null | undefined): T | null {
+  if (Array.isArray(data)) {
+    return data[0] ?? null;
+  }
+  return data ?? null;
+}
+
 export type RegisteredVideoRecord = {
   id: string;
   youtube_id: string;
@@ -34,17 +55,18 @@ export async function upsertVideoWithTags(
     throw new Error("グループと楽曲をそれぞれ1件以上選択してください");
   }
 
-  const { data: existing, error: existingError } = await db
+  const { data: existingRows, error: existingError } = await db
     .from("videos")
     .select("id")
     .eq("youtube_id", videoData.id)
-    .maybeSingle();
+    .order("id")
+    .limit(1);
 
   if (existingError) {
     throw new Error(existingError.message);
   }
 
-  let videoId = existing?.id as string | undefined;
+  let videoId = existingRows?.[0]?.id as string | undefined;
 
   if (videoId) {
     const { error: updateError } = await db
@@ -70,13 +92,13 @@ export async function upsertVideoWithTags(
         view_count: videoData.viewCount,
         display: true,
       })
-      .select("id")
-      .single();
+      .select("id");
 
-    if (insertError || !inserted) {
+    const insertedRow = firstRow(inserted);
+    if (insertError || !insertedRow) {
       throw new Error(insertError?.message || "動画の登録に失敗しました");
     }
-    videoId = inserted.id as string;
+    videoId = insertedRow.id as string;
   }
 
   if (!videoId) {
@@ -132,13 +154,14 @@ export async function getAdminVideos(client?: AdminClient): Promise<RegisteredVi
 
 export async function getAdminVideoById(id: string, client?: AdminClient): Promise<RegisteredVideoRecord> {
   const db = getClient(client);
-  const { data, error } = await db.from("videos").select(VIDEO_RELATIONS).eq("id", id).single();
+  const { data, error } = await db.from("videos").select(VIDEO_RELATIONS).eq("id", id);
 
-  if (error || !data) {
+  const video = firstRow(data);
+  if (error || !video) {
     throw new Error(error?.message || "動画が見つかりませんでした");
   }
 
-  return data as RegisteredVideoRecord;
+  return video as RegisteredVideoRecord;
 }
 
 export async function getUntaggedVideos(client?: AdminClient) {
@@ -210,7 +233,12 @@ export async function getAdminSongs(client?: AdminClient) {
   return data || [];
 }
 
-export async function createGroup(groupName: string, displayOrder: number | null, client?: AdminClient) {
+export async function createGroup(
+  groupName: string,
+  displayOrder: number | null,
+  officialChannel?: { channelId: string; title: string } | null,
+  client?: AdminClient
+) {
   const db = getClient(client);
   const { data, error } = await db
     .from("groups")
@@ -218,14 +246,20 @@ export async function createGroup(groupName: string, displayOrder: number | null
       group_name: groupName,
       display: true,
       display_order: displayOrder,
+      ...(officialChannel
+        ? {
+            youtube_channel_id: officialChannel.channelId,
+            youtube_channel_title: officialChannel.title,
+          }
+        : {}),
     })
-    .select("*")
-    .single();
+    .select("*");
 
-  if (error || !data) {
-    throw new Error(error?.message || "グループの追加に失敗しました");
+  const group = firstRow(data);
+  if (error || !group) {
+    throwGroupWriteError(error, "グループの追加に失敗しました");
   }
-  return data;
+  return group;
 }
 
 export async function createSong(songName: string, client?: AdminClient) {
@@ -236,33 +270,58 @@ export async function createSong(songName: string, client?: AdminClient) {
       song_name: songName,
       display: true,
     })
-    .select("*")
-    .single();
+    .select("*");
 
-  if (error || !data) {
+  const song = firstRow(data);
+  if (error || !song) {
     throw new Error(error?.message || "楽曲の追加に失敗しました");
   }
-  return data;
+  return song;
 }
 
 export async function updateGroup(
   id: string,
-  values: { group_name?: string; display?: boolean; display_order?: number | null },
+  values: {
+    group_name?: string;
+    display?: boolean;
+    display_order?: number | null;
+    youtube_channel_id?: string | null;
+    youtube_channel_title?: string | null;
+  },
   client?: AdminClient
 ) {
   const db = getClient(client);
-  const { data, error } = await db.from("groups").update(values).eq("id", id).select("*").single();
-  if (error || !data) {
-    throw new Error(error?.message || "グループの更新に失敗しました");
+  const { data, error } = await db.from("groups").update(values).eq("id", id).select("*");
+  const group = firstRow(data);
+  if (error || !group) {
+    throwGroupWriteError(error, "グループの更新に失敗しました");
   }
-  return data;
+  return group;
+}
+
+export async function findGroupByYoutubeChannelId(channelId: string, client?: AdminClient) {
+  const id = channelId.trim();
+  if (!id) {
+    return null;
+  }
+
+  const db = getClient(client);
+  const { data, error } = await db.from("groups").select("*").eq("youtube_channel_id", id).order("id").limit(1);
+  if (error) {
+    if (isMissingOrMultipleRowsError(error)) {
+      return firstRow(data);
+    }
+    throw new Error(error.message);
+  }
+  return firstRow(data);
 }
 
 export async function updateSong(id: string, values: { song_name?: string; display?: boolean }, client?: AdminClient) {
   const db = getClient(client);
-  const { data, error } = await db.from("songs").update(values).eq("id", id).select("*").single();
-  if (error || !data) {
+  const { data, error } = await db.from("songs").update(values).eq("id", id).select("*");
+  const song = firstRow(data);
+  if (error || !song) {
     throw new Error(error?.message || "楽曲の更新に失敗しました");
   }
-  return data;
+  return song;
 }
