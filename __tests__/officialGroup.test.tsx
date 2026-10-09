@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { assertOfficialGroupByChannelId, findOfficialGroupByChannelId } from "@/lib/youtube/officialGroup";
+import {
+  assertOfficialGroupByChannelId,
+  findOfficialGroupByChannelId,
+  requireOfficialChannelId,
+} from "@/lib/youtube/officialGroup";
 
 const ive = {
   id: "group-ive",
@@ -27,6 +31,16 @@ describe("officialGroup", () => {
   test("一致しなければ登録できない", () => {
     expect(() => assertOfficialGroupByChannelId([unconfirmed], "UCxxxxxxxxxxxxxxxxxxxxxx")).toThrow(
       "確認済みの公式チャンネルの動画ではありません"
+    );
+  });
+
+  test("抽出は確認済み公式チャンネルがあるグループだけ", () => {
+    expect(requireOfficialChannelId([ive, unconfirmed], "IVE")).toEqual({
+      groupName: "IVE",
+      channelId: "UCxxxxxxxxxxxxxxxxxxxxxx",
+    });
+    expect(() => requireOfficialChannelId([unconfirmed], "NewJeans")).toThrow(
+      "NewJeans の確認済み公式チャンネルがありません"
     );
   });
 });
