@@ -1,19 +1,31 @@
+import { OfficialChannelGroup, requireOfficialChannelId } from "../youtube/officialGroup";
 import { CandidateDraftFile, createPendingCandidate } from "./candidateDraft";
-import { guessOfficial } from "./guessOfficial";
 import { searchYouTubeCandidates } from "./searchYouTubeCandidates";
 
 export const DEFAULT_QUERY_TEMPLATES = ["{group} dance challenge shorts", "{group} 댄스 챌린지"];
 
 export type ExtractionTargets = {
   groups: string[];
+  officialGroups: OfficialChannelGroup[];
   queries?: string[];
   linearIssue: string;
   extractedAt?: string;
   maxResultsPerQuery?: number;
 };
 
-function expandQueries(groups: string[], templates: string[]): { group: string; query: string }[] {
-  return groups.flatMap((group) => templates.map((template) => ({ group, query: template.replaceAll("{group}", group) })));
+function expandQueries(
+  groups: string[],
+  officialGroups: OfficialChannelGroup[],
+  templates: string[]
+): { group: string; channelId: string; query: string }[] {
+  return groups.flatMap((groupName) => {
+    const official = requireOfficialChannelId(officialGroups, groupName);
+    return templates.map((template) => ({
+      group: official.groupName,
+      channelId: official.channelId,
+      query: template.replaceAll("{group}", official.groupName),
+    }));
+  });
 }
 
 export async function extractCandidateDrafts(
@@ -34,13 +46,14 @@ export async function extractCandidateDrafts(
   }
 
   const templates = targets.queries?.length ? targets.queries : DEFAULT_QUERY_TEMPLATES;
-  const searches = expandQueries(groups, templates);
+  const searches = expandQueries(groups, targets.officialGroups, templates);
   const seen = new Set<string>();
   const candidates: CandidateDraftFile["candidates"] = [];
 
-  for (const { group, query } of searches) {
+  for (const { group, channelId, query } of searches) {
     const hits = await searchYouTubeCandidates({
       query,
+      channelId,
       apiKey,
       maxResults: targets.maxResultsPerQuery,
       fetchImpl: options?.fetchImpl,
@@ -52,13 +65,6 @@ export async function extractCandidateDrafts(
       }
       seen.add(hit.youtubeId);
 
-      const suggestedGroups = [group];
-      const guess = guessOfficial({
-        title: hit.title,
-        channelTitle: hit.channelTitle,
-        suggestedGroups,
-      });
-
       candidates.push(
         createPendingCandidate({
           youtubeId: hit.youtubeId,
@@ -67,10 +73,10 @@ export async function extractCandidateDrafts(
           channelTitle: hit.channelTitle,
           publishedAt: hit.publishedAt,
           viewCount: hit.viewCount,
-          suggestedGroups,
+          suggestedGroups: [group],
           suggestedSong: null,
-          officialGuess: guess.officialGuess,
-          officialGuessReason: guess.officialGuessReason,
+          officialGuess: true,
+          officialGuessReason: "確認済み公式チャンネルの動画。ダンスチャレンジかどうかは人が判定する。",
         })
       );
     }
@@ -79,7 +85,7 @@ export async function extractCandidateDrafts(
   return {
     extractedAt: targets.extractedAt || new Date().toISOString(),
     linearIssue: targets.linearIssue,
-    queryNotes: searches.map((item) => item.query).join(" / "),
+    queryNotes: searches.map((item) => `${item.query} (${item.channelId})`).join(" / "),
     candidates,
   };
 }

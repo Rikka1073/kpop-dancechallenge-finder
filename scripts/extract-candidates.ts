@@ -2,6 +2,7 @@ import { extractCandidateDrafts } from "../src/lib/extraction/extractCandidateDr
 import { listReviewUrls } from "../src/lib/extraction/candidateDraft";
 import { loadLocalEnv } from "../src/lib/extraction/loadLocalEnv";
 import { writeCandidateDraftFile } from "../src/lib/extraction/writeCandidateDrafts";
+import { getAdminGroups } from "../src/lib/supabase/registerSupabaseFunction";
 
 loadLocalEnv();
 
@@ -42,6 +43,7 @@ async function main() {
 
   const file = await extractCandidateDrafts({
     groups,
+    officialGroups: await getAdminGroups(),
     linearIssue: issue,
   });
   const draftPath = await writeCandidateDraftFile(file, date);

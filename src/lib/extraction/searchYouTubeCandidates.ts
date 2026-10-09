@@ -11,6 +11,7 @@ type SearchItem = {
   id?: { videoId?: string };
   snippet?: {
     title?: string;
+    channelId?: string;
     channelTitle?: string;
     publishedAt?: string;
   };
@@ -20,6 +21,7 @@ type VideoItem = {
   id?: string;
   snippet?: {
     title?: string;
+    channelId?: string;
     channelTitle?: string;
     publishedAt?: string;
   };
@@ -65,10 +67,16 @@ async function readYoutubeJson(url: URL, fetchImpl: typeof fetch): Promise<unkno
 
 export async function searchYouTubeCandidates(options: {
   query: string;
+  channelId: string;
   apiKey: string;
   maxResults?: number;
   fetchImpl?: typeof fetch;
 }): Promise<YouTubeSearchHit[]> {
+  const channelId = options.channelId.trim();
+  if (!channelId) {
+    throw new Error("確認済みの公式チャンネルがありません。先にグループへ公式チャンネルを保存してください。");
+  }
+
   const fetchImpl = options.fetchImpl ?? fetch;
   const maxResults = Math.min(Math.max(options.maxResults ?? 5, 1), 10);
 
@@ -78,6 +86,7 @@ export async function searchYouTubeCandidates(options: {
   searchUrl.searchParams.set("videoDuration", "short");
   searchUrl.searchParams.set("maxResults", String(maxResults));
   searchUrl.searchParams.set("order", "date");
+  searchUrl.searchParams.set("channelId", channelId);
   searchUrl.searchParams.set("q", options.query);
   searchUrl.searchParams.set("key", options.apiKey);
 
@@ -99,9 +108,13 @@ export async function searchYouTubeCandidates(options: {
     .map((item) => {
       const youtubeId = item.id?.trim();
       const title = item.snippet?.title?.trim();
+      const itemChannelId = item.snippet?.channelId?.trim();
       const channelTitle = item.snippet?.channelTitle?.trim();
       const publishedAt = item.snippet?.publishedAt?.trim();
       if (!youtubeId || !title || !channelTitle || !publishedAt) {
+        return null;
+      }
+      if (itemChannelId !== channelId) {
         return null;
       }
 
