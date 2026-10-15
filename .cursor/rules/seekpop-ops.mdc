@@ -1,0 +1,12 @@
+---
+description: SeeKPOP は Linear + git + Obsidian。PR は Ready。報告は人が言わなくても書く。公式判定は人。
+alwaysApply: true
+---
+
+SeeKPOP の課題は Linear プロジェクト SeeKPOP。運用手順の正本は Linear の運用ルール。このルールと `AGENTS.md` は git 管理。
+
+git は `main` から課題ごとにブランチを切る。名前は課題番号だけ（例: `mas-14`）。1課題1PR。PR は draft にしない。Ready で作る。作成は承認不要。`main` へのマージは人が手動で行い、エージェントはマージしない。
+
+報告は人が「報告して」と言わなくても書く。マージ待ちにしない。単発改修は PR を出して実装が終わったとき。パスは `/Users/masafumi/Documents/Obsidian Vault/SeeKPOP/報告/【MAS-n】種類-日付.md`。書き方は同 vault の `置き方.md`。Linear にはパスだけ残す。Slack には送らない。
+
+データの鮮度は AI が YouTube 候補を抽出し、公式かどうかは人が根拠 URL を開いて判定する。抽出前の対象確認前に取らない。`data/raw/` のドラフトは git に入れない。人が承認するまで `official` を true にせず、DB にも入れない。Linear の Done は公式判定の代用にしない。公開は人が「公開して」と言うまでしない。
