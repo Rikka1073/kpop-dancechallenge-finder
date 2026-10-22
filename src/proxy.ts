@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isLocalAdminEnabled, LOCAL_ADMIN_ONLY_MESSAGE } from "@/lib/admin/localOnly";
 import { ADMIN_COOKIE_NAME, verifySessionToken } from "@/lib/admin/session";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!isLocalAdminEnabled()) {

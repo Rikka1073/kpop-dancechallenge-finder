@@ -6,7 +6,7 @@ const stashRoot = path.join("src", ".cf-build-stash");
 const moves = [
   ["src/app/admin", path.join(stashRoot, "admin")],
   ["src/app/api", path.join(stashRoot, "api")],
-  ["src/middleware.ts", path.join(stashRoot, "middleware.ts")],
+  ["src/proxy.ts", path.join(stashRoot, "proxy.ts")],
 ];
 
 function restore() {

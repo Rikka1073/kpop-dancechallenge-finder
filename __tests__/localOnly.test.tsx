@@ -1,18 +1,16 @@
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { isLocalAdminEnabled } from "@/lib/admin/localOnly";
 
 describe("isLocalAdminEnabled", () => {
-  const original = process.env.NODE_ENV;
-
   afterEach(() => {
-    process.env.NODE_ENV = original;
+    vi.unstubAllEnvs();
   });
 
   test("development だけ管理画面を開く", () => {
-    process.env.NODE_ENV = "development";
+    vi.stubEnv("NODE_ENV", "development");
     expect(isLocalAdminEnabled()).toBe(true);
 
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     expect(isLocalAdminEnabled()).toBe(false);
   });
 });
