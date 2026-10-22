@@ -1,7 +1,6 @@
-"use client";
+import { isLocalAdminEnabled } from "@/lib/admin/localOnly";
 import { House, Search, Settings } from "lucide-react";
 import Link from "next/link";
-import { isLocalAdminEnabled } from "@/lib/admin/localOnly";
 
 const Header = () => {
   const showAdmin = isLocalAdminEnabled();

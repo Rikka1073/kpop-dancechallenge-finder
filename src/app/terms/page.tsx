@@ -1,13 +1,10 @@
-import Header from "@/components/feature/Header";
 import { FileText, Home } from "lucide-react";
 import Link from "next/link";
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-gray-50 text-black">
-      <Header />
-
-      <main className="container mx-auto px-4 py-12">
+    <div className="text-black">
+      <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-4xl">
           {/* ヘッダーセクション */}
           <div className="mb-12 text-center">
@@ -151,7 +148,7 @@ export default function TermsOfService() {
             </Link>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -30,8 +30,9 @@ describe("ページコンポーネントのテスト", () => {
     render(
       <RootLayout>
         <div>テスト</div>
-      </RootLayout>
+      </RootLayout>,
     );
     expect(screen.getByTestId("main-content")).toBeInTheDocument();
+    expect(screen.getByTestId("header-main-title")).toBeInTheDocument();
   });
 });

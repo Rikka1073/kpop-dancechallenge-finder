@@ -1,6 +1,7 @@
+import Header from "@/components/feature/Header";
+import { GoogleTagManager } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import "./globals.css";
-import { GoogleTagManager } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
   title: "SeeKPOP | K-POPダンスチャレンジ検索",
@@ -16,10 +17,13 @@ export default function RootLayout({
   return (
     <html lang="ja" className="scroll-smooth" data-theme="light">
       <body className="bg-white font-sans text-black antialiased">
-        <main className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50" data-testid="main-content">
-          {children}
-          <GoogleTagManager gtmId="GTM-K55M4XSJ" />
-        </main>
+        <div className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+          <Header />
+          <main className="relative" data-testid="main-content">
+            {children}
+          </main>
+        </div>
+        <GoogleTagManager gtmId="GTM-K55M4XSJ" />
       </body>
     </html>
   );

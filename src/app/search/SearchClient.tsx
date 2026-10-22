@@ -1,6 +1,5 @@
 "use client";
 
-import Header from "@/components/feature/Header";
 import VideoCard from "@/components/feature/VideoCard";
 import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
@@ -78,7 +77,6 @@ export default function SearchClient({
 
   return (
     <div className="text-black">
-      <Header />
       <Layout>
         <div className="mb-8 text-center">
           <h2 className="mb-3 text-2xl font-bold text-purple-600 md:text-4xl" data-testid="title">

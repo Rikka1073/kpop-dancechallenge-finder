@@ -1,5 +1,4 @@
 import Footer from "@/components/feature/Footer";
-import Header from "@/components/feature/Header";
 import { featureCards, painPoints, solutions, steps } from "@/lib/constants/landingPage";
 import { ArrowRight, Check, Play, Search, Star, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
@@ -7,7 +6,6 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="text-black">
-      <Header />
       <section>
         <div className="sparkle-bg py-10 md:py-20">
           <div className="container mx-auto px-4">
