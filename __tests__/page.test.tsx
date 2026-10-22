@@ -34,5 +34,6 @@ describe("ページコンポーネントのテスト", () => {
     );
     expect(screen.getByTestId("main-content")).toBeInTheDocument();
     expect(screen.getByTestId("header-main-title")).toBeInTheDocument();
+    expect(document.documentElement.className).toMatch(/variable/);
   });
 });

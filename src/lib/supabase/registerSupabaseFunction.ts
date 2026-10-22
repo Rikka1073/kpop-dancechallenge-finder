@@ -1,4 +1,4 @@
-import { VideoData } from "@/types";
+import { RegisteredVideoRecord, VideoData } from "@/types";
 import { createAdminSupabaseClient } from "./adminClient";
 import { isVideoMissingTags } from "@/lib/search/filterVideos";
 import { SupabaseClient } from "@supabase/supabase-js";
@@ -30,16 +30,7 @@ function firstRow<T>(data: T[] | T | null | undefined): T | null {
   return data ?? null;
 }
 
-export type RegisteredVideoRecord = {
-  id: string;
-  youtube_id: string;
-  title: string;
-  thumbnail_url: string;
-  view_count: number;
-  display?: boolean | null;
-  video_groups: { groups: { id: string; group_name: string } | null }[] | null;
-  video_songs: { songs: { id: string; song_name: string } | null }[] | null;
-};
+export type { RegisteredVideoRecord };
 
 export async function upsertVideoWithTags(
   videoData: VideoData,

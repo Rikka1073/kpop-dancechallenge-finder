@@ -7,8 +7,7 @@ import { Eye, EyeOff, Music, Plus, RefreshCw, Search, Trash2, Users, Youtube } f
 import CandidateReviewPanel from "@/components/admin/CandidateReviewPanel";
 import { adminRequest } from "@/lib/admin/client";
 import { isVideoMissingTags } from "@/lib/search/filterVideos";
-import { GroupRecord, SongRecord } from "@/types";
-import { RegisteredVideoRecord } from "@/lib/supabase/registerSupabaseFunction";
+import { GroupRecord, RegisteredVideoRecord, SongRecord } from "@/types";
 import formatViewCount from "@/lib/formatViewCount";
 import type { YouTubeChannelSnapshot } from "@/lib/youtube/fetchYouTubeChannel";
 import { findOfficialGroupByChannelId } from "@/lib/youtube/officialGroup";

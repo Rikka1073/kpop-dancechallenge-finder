@@ -1,3 +1,4 @@
+import "server-only";
 import { getSupabaseClient } from "./supabase";
 
 const VIDEO_RELATIONS = `*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`;

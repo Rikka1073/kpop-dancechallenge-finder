@@ -1,12 +1,11 @@
 import formatViewCount from "@/lib/formatViewCount";
 import { videoJsonLd } from "@/lib/seo/site";
-import { getVideoById } from "@/lib/supabase/supabaseFunction";
-import { GroupDetail, SongDetail } from "@/types";
+import { GroupDetail, SongDetail, Videos } from "@/types";
 import { ArrowLeft, Youtube } from "lucide-react";
 import Link from "next/link";
 
 type VideoDetailProps = {
-  video: NonNullable<Awaited<ReturnType<typeof getVideoById>>>;
+  video: Videos;
 };
 
 export default function VideoDetail({ video }: VideoDetailProps) {
