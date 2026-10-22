@@ -1,8 +1,11 @@
 "use client";
-import { House, Search } from "lucide-react";
+import { House, Search, Settings } from "lucide-react";
 import Link from "next/link";
+import { isLocalAdminEnabled } from "@/lib/admin/localOnly";
 
 const Header = () => {
+  const showAdmin = isLocalAdminEnabled();
+
   return (
     <div className="navbar w-full justify-between px-4 shadow-sm">
       <div>
@@ -26,6 +29,18 @@ const Header = () => {
                   検索
                 </Link>
               </li>
+              {showAdmin ? (
+                <li>
+                  <Link
+                    href="/admin"
+                    className="link no-underline hover:bg-transparent hover:text-purple-400"
+                    data-testid="header-admin-link"
+                  >
+                    <Settings />
+                    管理
+                  </Link>
+                </li>
+              ) : null}
             </ul>
           </div>
         </div>
