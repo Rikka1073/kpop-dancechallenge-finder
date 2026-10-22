@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "preview": "node scripts/cf-build.mjs && npx --yes serve out -p 3000 -c ../scripts/serve.json",
+    "preview": "node scripts/cf-build.mjs && opennextjs-cloudflare preview",
     "deploy": "node scripts/cf-build.mjs && node scripts/prepare-cf-output.mjs && cf deploy --prebuilt",
     "extract:candidates": "npx --yes tsx scripts/extract-candidates.ts",
     "test": "vitest",
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@next/third-parties": "^16.4.2",
+    "@opennextjs/cloudflare": "^1.20.13",
     "@supabase/supabase-js": "^2.50.4",
     "daisyui": "^5.0.46",
     "embla-carousel-react": "^8.6.0",
@@ -45,6 +46,7 @@
     "tailwindcss": "^4.1.11",
     "typescript": "^5",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "wrangler": "^4.151.3"
   }
 }

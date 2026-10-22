@@ -23,6 +23,6 @@ npm test
 npm run deploy
 ```
 
-`npm run deploy` は静的エクスポートのあと `cf deploy --prebuilt` する。Git 連携は足さない。管理画面 `/admin` は本番に載せない。
+`npm run deploy` は OpenNext で Next のサーバを Worker に載せたあと `cf deploy --prebuilt` する。Git 連携は足さない。管理画面 `/admin` は本番に載せない。
 
 成功したら公開 URL を開いて確認する。ドメイン設定の正は `cloudflare.config.ts`。
