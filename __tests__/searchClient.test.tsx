@@ -30,9 +30,28 @@ const videos: Videos[] = [
 const groups = [{ id: "g1", group_name: "IVE" }];
 const songs = [{ id: "s1", song_name: "ATTITUDE" }];
 
-function renderSearch(queryType?: string, queryId?: string) {
-  const initial = getInitialSearchState({ videos, groups, songs, queryType, queryId });
-  return render(<SearchClient groups={groups} songs={songs} {...initial} />);
+function renderSearch(
+  queryType?: string,
+  queryId?: string,
+  extras?: { total?: number; page?: number; pageSize?: number; pageVideos?: Videos[] },
+) {
+  const initial = getInitialSearchState({
+    videos: extras?.pageVideos ?? videos,
+    groups,
+    songs,
+    queryType,
+    queryId,
+  });
+  return render(
+    <SearchClient
+      groups={groups}
+      songs={songs}
+      total={extras?.total ?? videos.length}
+      page={extras?.page ?? 1}
+      pageSize={extras?.pageSize ?? 20}
+      {...initial}
+    />,
+  );
 }
 
 describe("SearchClient", () => {
@@ -68,5 +87,11 @@ describe("SearchClient", () => {
     renderSearch("group", "g1");
     screen.getByRole("button", { name: "クリア" }).click();
     expect(replace).toHaveBeenCalledWith("/search", { scroll: false });
+  });
+
+  test("次へで page を URL に載せる", () => {
+    renderSearch("group", "g1", { total: 40, page: 1, pageSize: 20 });
+    screen.getByRole("button", { name: "次へ" }).click();
+    expect(replace).toHaveBeenCalledWith("/search?type=group&id=g1&page=2", { scroll: false });
   });
 });

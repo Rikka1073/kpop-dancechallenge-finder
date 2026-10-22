@@ -1,6 +1,6 @@
 import Layout from "@/components/layout/Layout";
-import { getInitialSearchState } from "@/lib/search/initialSearchState";
-import { fetchGroups, fetchSongs, getAllVideos } from "@/lib/supabase/supabaseFunction";
+import { getInitialSearchState, parseSearchPage } from "@/lib/search/initialSearchState";
+import { fetchGroups, fetchSongs, searchPublicVideos } from "@/lib/supabase/supabaseFunction";
 import { Videos } from "@/types";
 import type { Metadata } from "next";
 import SearchClient from "./SearchClient";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 type SearchPageProps = {
-  searchParams: Promise<{ type?: string; id?: string }>;
+  searchParams: Promise<{ type?: string; id?: string; page?: string }>;
 };
 
 function SearchError() {
@@ -34,15 +34,28 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
 
   let videos: Videos[];
+  let total: number;
+  let page: number;
+  let pageSize: number;
   let groups: Awaited<ReturnType<typeof fetchGroups>>;
   let songs: Awaited<ReturnType<typeof fetchSongs>>;
 
   try {
-    [videos, groups, songs] = await Promise.all([
-      getAllVideos() as Promise<Videos[]>,
+    const [result, fetchedGroups, fetchedSongs] = await Promise.all([
+      searchPublicVideos({
+        queryType: params.type,
+        queryId: params.id,
+        page: parseSearchPage(params.page),
+      }),
       fetchGroups(),
       fetchSongs(),
     ]);
+    videos = result.videos as Videos[];
+    total = result.total;
+    page = result.page;
+    pageSize = result.pageSize;
+    groups = fetchedGroups;
+    songs = fetchedSongs;
   } catch {
     return <SearchError />;
   }
@@ -55,5 +68,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     queryId: params.id,
   });
 
-  return <SearchClient groups={groups} songs={songs} {...initial} />;
+  return (
+    <SearchClient groups={groups} songs={songs} total={total} page={page} pageSize={pageSize} {...initial} />
+  );
 }

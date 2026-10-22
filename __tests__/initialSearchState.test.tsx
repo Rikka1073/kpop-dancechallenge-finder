@@ -1,4 +1,4 @@
-import { getInitialSearchState, searchPath } from "@/lib/search/initialSearchState";
+import { getInitialSearchState, parseSearchPage, searchPath } from "@/lib/search/initialSearchState";
 import { Videos } from "@/types";
 import { describe, expect, test } from "vitest";
 
@@ -42,9 +42,9 @@ describe("getInitialSearchState", () => {
     });
   });
 
-  test("グループクエリで絞り込む", () => {
+  test("グループクエリで選択状態を出す", () => {
     const state = getInitialSearchState({
-      videos,
+      videos: [videos[0]],
       groups,
       songs,
       queryType: "group",
@@ -73,6 +73,9 @@ describe("getInitialSearchState", () => {
     expect(searchPath("groups", "g1")).toBe("/search?type=group&id=g1");
     expect(searchPath("songs")).toBe("/search?type=song");
     expect(searchPath("songs", "s2")).toBe("/search?type=song&id=s2");
+    expect(searchPath("groups", "g1", 2)).toBe("/search?type=group&id=g1&page=2");
+    expect(parseSearchPage("2")).toBe(2);
+    expect(parseSearchPage("nope")).toBe(1);
   });
 
   test("楽曲クエリで絞り込む", () => {
@@ -85,6 +88,6 @@ describe("getInitialSearchState", () => {
     });
     expect(state.selectedButton).toBe("songs");
     expect(state.selectedItems).toEqual([{ id: "s2", name: "Whiplash" }]);
-    expect(state.filteredData.map((video) => video.id)).toEqual(["v2"]);
+    expect(state.filteredData).toEqual(videos);
   });
 });
