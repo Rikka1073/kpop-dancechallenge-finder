@@ -45,10 +45,11 @@ process.on("SIGTERM", () => {
 
 let code = 1;
 try {
-  rmSync(".next", { recursive: true, force: true });
-  const result = spawnSync("npx", ["next", "build"], {
+  rmSync(".next", { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  rmSync(".open-next", { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  const result = spawnSync("npx", ["opennextjs-cloudflare", "build"], {
     stdio: "inherit",
-    env: { ...process.env, CF_STATIC: "1" },
+    env: { ...process.env },
   });
   code = result.status ?? 1;
 } finally {

@@ -1,11 +1,10 @@
-/** @type {import('next').NextConfig} */
-const isCfStatic = process.env.CF_STATIC === "1";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   agentRules: false,
-  ...(isCfStatic ? { output: "export" } : {}),
   images: {
-    unoptimized: isCfStatic,
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -16,3 +15,5 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
+initOpenNextCloudflareForDev();
