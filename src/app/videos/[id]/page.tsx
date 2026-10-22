@@ -1,12 +1,21 @@
-import { VIDEO_STATIC_PLACEHOLDER_ID } from "@/lib/video/videoIdFromPath";
+import { getVideoById } from "@/lib/supabase/supabaseFunction";
+import { notFound } from "next/navigation";
 import VideoDetail from "./VideoDetail";
 
+export const revalidate = 60;
 export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return [{ id: VIDEO_STATIC_PLACEHOLDER_ID }];
-}
+type VideoPageProps = {
+  params: Promise<{ id: string }>;
+};
 
-export default function Videos() {
-  return <VideoDetail />;
+export default async function Videos({ params }: VideoPageProps) {
+  const { id } = await params;
+  const video = await getVideoById(id);
+
+  if (!video) {
+    notFound();
+  }
+
+  return <VideoDetail video={video} />;
 }
