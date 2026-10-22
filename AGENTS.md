@@ -52,4 +52,4 @@ AI は確認済み公式チャンネルの中から候補を集めるだけ。�
 | 依頼の例 | スキル |
 |---|---|
 | 「週次抽出して」「候補を集めて」 | `.cursor/skills/weekly-extract` |
-| 「公開して」 | `.cursor/skills/publish` |
+| 「公開して」 | `.cursor/skills/publish`（`main` の先端だけ。作業ブランチからは出さない） |

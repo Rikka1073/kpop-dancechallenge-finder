@@ -46,9 +46,11 @@ ADMIN_SESSION_SECRET=
 
 ## 公開
 
-公開は Cloudflare の `cf deploy` です。GitHub への push では出ません。初回だけ Cloudflare にログインします。
+公開は Cloudflare の `cf deploy` です。GitHub への push では出ません。出すのは人がマージした `main` の先端だけです。作業ブランチからは出しません。初回だけ Cloudflare にログインします。
 
 ```bash
+git checkout main
+git pull --ff-only origin main
 npx cf auth login
 npm run deploy
 ```
