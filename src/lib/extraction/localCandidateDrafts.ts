@@ -13,7 +13,7 @@ export function assertDraftDate(value: string): string {
 
 export async function listCandidateDraftDates(root = "data/raw"): Promise<string[]> {
   try {
-    const entries = await readdir(root, { withFileTypes: true });
+    const entries = await readdir(/* turbopackIgnore: true */ root, { withFileTypes: true });
     const dates = await Promise.all(
       entries
         .filter((entry) => entry.isDirectory() && DATE_PATTERN.test(entry.name))
