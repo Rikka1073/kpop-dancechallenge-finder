@@ -73,6 +73,7 @@ export default function SearchClient({
         <div className="mb-8 flex justify-center">
           <div className="flex w-full flex-col gap-2 rounded-lg bg-white p-4 md:w-auto md:flex-row">
             <Button
+              id="groups-button"
               className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 ${selectedButton === "groups" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white"}`}
               onClick={() => go("groups")}
             >

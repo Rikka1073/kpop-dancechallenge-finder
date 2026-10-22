@@ -13,8 +13,8 @@ export function searchPath(type?: SearchButton | null, id?: string | null): stri
   if (type === "songs") {
     return id ? `/search?type=song&id=${encodeURIComponent(id)}` : "/search?type=song";
   }
-  if (type === "groups" && id) {
-    return `/search?type=group&id=${encodeURIComponent(id)}`;
+  if (type === "groups") {
+    return id ? `/search?type=group&id=${encodeURIComponent(id)}` : "/search?type=group";
   }
   return "/search";
 }

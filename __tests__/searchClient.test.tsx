@@ -46,10 +46,16 @@ describe("SearchClient", () => {
     expect(replace).toHaveBeenCalledWith("/search?type=group&id=g1", { scroll: false });
   });
 
-  test("選択中のグループをもう一度押すとクエリが消える", () => {
+  test("選択中のグループをもう一度押すと id が外れてタブだけ残る", () => {
     renderSearch("group", "g1");
     screen.getByRole("button", { name: "#IVE" }).click();
-    expect(replace).toHaveBeenCalledWith("/search", { scroll: false });
+    expect(replace).toHaveBeenCalledWith("/search?type=group", { scroll: false });
+  });
+
+  test("グループタブで URL を更新する", () => {
+    renderSearch("song");
+    screen.getByRole("button", { name: "グループで検索" }).click();
+    expect(replace).toHaveBeenCalledWith("/search?type=group", { scroll: false });
   });
 
   test("楽曲タブで URL を更新する", () => {

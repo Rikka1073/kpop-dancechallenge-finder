@@ -69,7 +69,7 @@ describe("getInitialSearchState", () => {
 
   test("searchPath がクエリを組む", () => {
     expect(searchPath()).toBe("/search");
-    expect(searchPath("groups")).toBe("/search");
+    expect(searchPath("groups")).toBe("/search?type=group");
     expect(searchPath("groups", "g1")).toBe("/search?type=group&id=g1");
     expect(searchPath("songs")).toBe("/search?type=song");
     expect(searchPath("songs", "s2")).toBe("/search?type=song&id=s2");
