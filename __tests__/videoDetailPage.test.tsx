@@ -14,7 +14,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => notFound(),
 }));
 
-import Videos from "@/app/videos/[id]/page";
+import Videos, { generateMetadata } from "@/app/videos/[id]/page";
 
 const video = {
   id: "video-1",
@@ -46,6 +46,17 @@ describe("動画詳細ページ", () => {
     );
     expect(screen.getByText("IVE")).toBeInTheDocument();
     expect(screen.getByText("ATTITUDE")).toBeInTheDocument();
+    const jsonLd = document.querySelector('script[type="application/ld+json"]');
+    expect(jsonLd?.textContent).toContain("VideoObject");
+    expect(jsonLd?.textContent).toContain("公式ダンスチャレンジ");
+  });
+
+  test("metadata の title が動画タイトルになる", async () => {
+    getVideoById.mockResolvedValue(video);
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ id: "video-1" }) });
+    expect(metadata.title).toEqual({ absolute: "公式ダンスチャレンジ | SeeKPOP" });
+    expect(metadata.alternates?.canonical).toBe("/videos/video-1");
   });
 
   test("無い ID は notFound する", async () => {

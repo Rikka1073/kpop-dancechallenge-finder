@@ -1,7 +1,15 @@
 import Footer from "@/components/feature/Footer";
 import { featureCards, painPoints, solutions, steps } from "@/lib/constants/landingPage";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/seo/site";
+import type { Metadata } from "next";
 import { ArrowRight, Check, Play, Search, Star, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: { absolute: SITE_TITLE },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   return (
