@@ -7,7 +7,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
-      // Existing fetch-on-mount effects. Rewrite in MAS-29 / MAS-32.
+      // Remaining fetch-on-mount is admin-only.
       "react-hooks/set-state-in-effect": "warn",
     },
   },
