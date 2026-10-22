@@ -9,6 +9,16 @@ export type InitialSearchState = {
   filteredData: Videos[];
 };
 
+export function searchPath(type?: SearchButton | null, id?: string | null): string {
+  if (type === "songs") {
+    return id ? `/search?type=song&id=${encodeURIComponent(id)}` : "/search?type=song";
+  }
+  if (type === "groups") {
+    return id ? `/search?type=group&id=${encodeURIComponent(id)}` : "/search?type=group";
+  }
+  return "/search";
+}
+
 export function getInitialSearchState({
   videos,
   groups,
@@ -22,21 +32,21 @@ export function getInitialSearchState({
   queryType?: string | null;
   queryId?: string | null;
 }): InitialSearchState {
-  if (queryType === "song" && queryId) {
-    const song = songs.find((item) => item.id === queryId);
+  if (queryType === "song") {
+    const song = queryId ? songs.find((item) => item.id === queryId) : undefined;
     return {
       selectedButton: "songs",
-      selectedItems: song ? [{ id: queryId, name: song.song_name }] : [],
-      filteredData: filterVideos(videos, "songs", queryId),
+      selectedItems: song && queryId ? [{ id: queryId, name: song.song_name }] : [],
+      filteredData: queryId ? filterVideos(videos, "songs", queryId) : videos,
     };
   }
 
-  if (queryType === "group" && queryId) {
-    const group = groups.find((item) => item.id === queryId);
+  if (queryType === "group") {
+    const group = queryId ? groups.find((item) => item.id === queryId) : undefined;
     return {
       selectedButton: "groups",
-      selectedItems: group ? [{ id: queryId, name: group.group_name }] : [],
-      filteredData: filterVideos(videos, "groups", queryId),
+      selectedItems: group && queryId ? [{ id: queryId, name: group.group_name }] : [],
+      filteredData: queryId ? filterVideos(videos, "groups", queryId) : videos,
     };
   }
 
