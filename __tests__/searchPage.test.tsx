@@ -2,12 +2,12 @@ import { render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const getAllVideos = vi.fn();
+const searchPublicVideos = vi.fn();
 const fetchGroups = vi.fn();
 const fetchSongs = vi.fn();
 
 vi.mock("@/lib/supabase/supabaseFunction", () => ({
-  getAllVideos: (...args: unknown[]) => getAllVideos(...args),
+  searchPublicVideos: (...args: unknown[]) => searchPublicVideos(...args),
   fetchGroups: (...args: unknown[]) => fetchGroups(...args),
   fetchSongs: (...args: unknown[]) => fetchSongs(...args),
 }));
@@ -30,13 +30,13 @@ const video = {
 
 describe("検索ページ", () => {
   beforeEach(() => {
-    getAllVideos.mockReset();
+    searchPublicVideos.mockReset();
     fetchGroups.mockReset();
     fetchSongs.mockReset();
   });
 
   test("初回 HTML に動画カードが入る", async () => {
-    getAllVideos.mockResolvedValue([video]);
+    searchPublicVideos.mockResolvedValue({ videos: [video], total: 1, page: 1, pageSize: 20 });
     fetchGroups.mockResolvedValue([{ id: "g1", group_name: "IVE" }]);
     fetchSongs.mockResolvedValue([{ id: "s1", song_name: "ATTITUDE" }]);
 
@@ -48,16 +48,8 @@ describe("検索ページ", () => {
     expect(html).toContain("公式ダンスチャレンジ");
   });
 
-  test("グループクエリなら絞り込んだカードを出す", async () => {
-    getAllVideos.mockResolvedValue([
-      video,
-      {
-        ...video,
-        id: "video-2",
-        title: "別グループ",
-        video_groups: [{ groups: { id: "g2", group_name: "aespa" } }],
-      },
-    ]);
+  test("グループクエリならサーバ絞り込みのカードを出す", async () => {
+    searchPublicVideos.mockResolvedValue({ videos: [video], total: 1, page: 1, pageSize: 20 });
     fetchGroups.mockResolvedValue([
       { id: "g1", group_name: "IVE" },
       { id: "g2", group_name: "aespa" },
@@ -70,13 +62,18 @@ describe("検索ページ", () => {
     const html = renderToString(ui);
 
     const readable = html.replace(/<!-- -->/g, "");
+    expect(searchPublicVideos).toHaveBeenCalledWith({
+      queryType: "group",
+      queryId: "g1",
+      page: 1,
+    });
     expect(readable).toContain("公式ダンスチャレンジ");
     expect(readable).not.toContain("別グループ");
     expect(readable).toContain("#IVE");
   });
 
   test("type=song なら楽曲タブの HTML になる", async () => {
-    getAllVideos.mockResolvedValue([video]);
+    searchPublicVideos.mockResolvedValue({ videos: [video], total: 1, page: 1, pageSize: 20 });
     fetchGroups.mockResolvedValue([{ id: "g1", group_name: "IVE" }]);
     fetchSongs.mockResolvedValue([{ id: "s1", song_name: "ATTITUDE" }]);
 
@@ -90,7 +87,7 @@ describe("検索ページ", () => {
   });
 
   test("取得に失敗したらエラーを出す", async () => {
-    getAllVideos.mockRejectedValue(new Error("network"));
+    searchPublicVideos.mockRejectedValue(new Error("network"));
     fetchGroups.mockResolvedValue([]);
     fetchSongs.mockResolvedValue([]);
 

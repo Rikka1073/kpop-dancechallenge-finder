@@ -22,6 +22,8 @@ function logSupabaseError(context: string, error: unknown) {
   });
 }
 
+export const SEARCH_PAGE_SIZE = 20;
+
 export const getAllVideos = async () => {
   try {
     const { data, error } = await getSupabaseClient()
@@ -40,6 +42,51 @@ export const getAllVideos = async () => {
     throw err;
   }
 };
+
+export async function searchPublicVideos({
+  queryType,
+  queryId,
+  page = 1,
+}: {
+  queryType?: string | null;
+  queryId?: string | null;
+  page?: number;
+}) {
+  const currentPage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+  const from = (currentPage - 1) * SEARCH_PAGE_SIZE;
+  const to = from + SEARCH_PAGE_SIZE - 1;
+
+  try {
+    let query = getSupabaseClient()
+      .from("videos")
+      .select(VIDEO_RELATIONS, { count: "exact" })
+      .not("display", "is", false)
+      .order("view_count", { ascending: false })
+      .range(from, to);
+
+    if (queryType === "group" && queryId) {
+      query = query.eq("video_groups.group_id", queryId);
+    } else if (queryType === "song" && queryId) {
+      query = query.eq("video_songs.song_id", queryId);
+    }
+
+    const { data, error, count } = await query;
+    if (error) {
+      logSupabaseError("Error searching videos:", error);
+      throw error;
+    }
+
+    return {
+      videos: data || [],
+      total: count ?? 0,
+      page: currentPage,
+      pageSize: SEARCH_PAGE_SIZE,
+    };
+  } catch (err) {
+    logSupabaseError("Error searching videos:", err);
+    throw err;
+  }
+}
 
 export const getVideoById = async (id: string) => {
   try {

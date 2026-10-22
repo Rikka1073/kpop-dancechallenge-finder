@@ -22,6 +22,9 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 type SearchClientProps = InitialSearchState & {
   groups: Pick<GroupRecord, "id" | "group_name">[];
   songs: Pick<SongRecord, "id" | "song_name">[];
+  total: number;
+  page: number;
+  pageSize: number;
 };
 
 export default function SearchClient({
@@ -30,15 +33,20 @@ export default function SearchClient({
   selectedButton,
   selectedItems,
   filteredData,
+  total,
+  page,
+  pageSize,
 }: SearchClientProps) {
   const router = useRouter();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
 
   const groupChunks = useMemo(() => chunkArray(groups, 10), [groups]);
   const songChunks = useMemo(() => chunkArray(songs, 10), [songs]);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const selectedId = selectedItems[0]?.id ?? null;
 
-  const go = (type?: SearchButton | null, id?: string | null) => {
-    router.replace(searchPath(type, id), { scroll: false });
+  const go = (type?: SearchButton | null, id?: string | null, nextPage?: number | null) => {
+    router.replace(searchPath(type, id, nextPage), { scroll: false });
   };
 
   const onclickItem = (type: SearchButton, id: string) => {
@@ -188,18 +196,34 @@ export default function SearchClient({
         <div>
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-xl font-bold md:text-2xl">
-              {selectedItems.length > 0 ? "検索結果" : "すべての動画"}（{filteredData.length}件）
+              {selectedItems.length > 0 ? "検索結果" : "すべての動画"}（{total}件）
             </h3>
           </div>
 
           {filteredData.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-y-10 lg:grid-cols-4 xl:grid-cols-5">
-              {filteredData.map((video: Videos) => (
-                <div key={video.id}>
-                  <VideoCard video={video} />
+            <>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-y-10 lg:grid-cols-4 xl:grid-cols-5">
+                {filteredData.map((video: Videos) => (
+                  <div key={video.id}>
+                    <VideoCard video={video} />
+                  </div>
+                ))}
+              </div>
+              {totalPages > 1 && (
+                <div className="mt-8 flex justify-center gap-3">
+                  {page > 1 && (
+                    <Button id="prev-page" onClick={() => go(selectedButton, selectedId, page - 1)}>
+                      前へ
+                    </Button>
+                  )}
+                  {page < totalPages && (
+                    <Button id="next-page" onClick={() => go(selectedButton, selectedId, page + 1)}>
+                      次へ
+                    </Button>
+                  )}
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <div className="py-10">
               <p className="mb-4 text-center text-xl font-bold">条件に一致する動画が見つかりませんでした</p>

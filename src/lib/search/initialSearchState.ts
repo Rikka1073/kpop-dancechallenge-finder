@@ -1,4 +1,3 @@
-import { filterVideos } from "@/lib/search/filterVideos";
 import { GroupRecord, Record, SongRecord, Videos } from "@/types";
 
 export type SearchButton = "groups" | "songs";
@@ -9,14 +8,26 @@ export type InitialSearchState = {
   filteredData: Videos[];
 };
 
-export function searchPath(type?: SearchButton | null, id?: string | null): string {
+export function parseSearchPage(value?: string | null): number {
+  const page = Number.parseInt(value ?? "1", 10);
+  return Number.isFinite(page) && page > 0 ? page : 1;
+}
+
+export function searchPath(type?: SearchButton | null, id?: string | null, page?: number | null): string {
+  const params = new URLSearchParams();
   if (type === "songs") {
-    return id ? `/search?type=song&id=${encodeURIComponent(id)}` : "/search?type=song";
+    params.set("type", "song");
+  } else if (type === "groups") {
+    params.set("type", "group");
   }
-  if (type === "groups") {
-    return id ? `/search?type=group&id=${encodeURIComponent(id)}` : "/search?type=group";
+  if (id && (type === "songs" || type === "groups")) {
+    params.set("id", id);
   }
-  return "/search";
+  if (page && page > 1) {
+    params.set("page", String(page));
+  }
+  const query = params.toString();
+  return query ? `/search?${query}` : "/search";
 }
 
 export function getInitialSearchState({
@@ -37,7 +48,7 @@ export function getInitialSearchState({
     return {
       selectedButton: "songs",
       selectedItems: song && queryId ? [{ id: queryId, name: song.song_name }] : [],
-      filteredData: queryId ? filterVideos(videos, "songs", queryId) : videos,
+      filteredData: videos,
     };
   }
 
@@ -46,7 +57,7 @@ export function getInitialSearchState({
     return {
       selectedButton: "groups",
       selectedItems: group && queryId ? [{ id: queryId, name: group.group_name }] : [],
-      filteredData: queryId ? filterVideos(videos, "groups", queryId) : videos,
+      filteredData: videos,
     };
   }
 
