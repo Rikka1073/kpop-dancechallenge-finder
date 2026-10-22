@@ -2,6 +2,7 @@
 const isCfStatic = process.env.CF_STATIC === "1";
 
 const nextConfig = {
+  agentRules: false,
   ...(isCfStatic ? { output: "export" } : {}),
   images: {
     unoptimized: isCfStatic,
