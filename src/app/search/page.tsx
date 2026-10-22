@@ -2,9 +2,16 @@ import Layout from "@/components/layout/Layout";
 import { getInitialSearchState } from "@/lib/search/initialSearchState";
 import { fetchGroups, fetchSongs, getAllVideos } from "@/lib/supabase/supabaseFunction";
 import { Videos } from "@/types";
+import type { Metadata } from "next";
 import SearchClient from "./SearchClient";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "ダンスチャレンジ検索",
+  description: "グループ名や楽曲名を選んで、K-POPアイドル公式のダンスチャレンジ動画を検索できます。",
+  alternates: { canonical: "/search" },
+};
 
 type SearchPageProps = {
   searchParams: Promise<{ type?: string; id?: string }>;

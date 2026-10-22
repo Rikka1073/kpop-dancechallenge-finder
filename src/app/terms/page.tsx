@@ -1,5 +1,12 @@
 import { FileText, Home } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "利用規約",
+  description: "SeeKPOP の利用規約です。",
+  alternates: { canonical: "/terms" },
+};
 
 export default function TermsOfService() {
   return (
