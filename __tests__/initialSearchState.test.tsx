@@ -1,4 +1,4 @@
-import { getInitialSearchState } from "@/lib/search/initialSearchState";
+import { getInitialSearchState, searchPath } from "@/lib/search/initialSearchState";
 import { Videos } from "@/types";
 import { describe, expect, test } from "vitest";
 
@@ -53,6 +53,26 @@ describe("getInitialSearchState", () => {
     expect(state.selectedButton).toBe("groups");
     expect(state.selectedItems).toEqual([{ id: "g1", name: "IVE" }]);
     expect(state.filteredData.map((video) => video.id)).toEqual(["v1"]);
+  });
+
+  test("楽曲タブだけなら全件のまま", () => {
+    const state = getInitialSearchState({
+      videos,
+      groups,
+      songs,
+      queryType: "song",
+    });
+    expect(state.selectedButton).toBe("songs");
+    expect(state.selectedItems).toEqual([]);
+    expect(state.filteredData).toEqual(videos);
+  });
+
+  test("searchPath がクエリを組む", () => {
+    expect(searchPath()).toBe("/search");
+    expect(searchPath("groups")).toBe("/search");
+    expect(searchPath("groups", "g1")).toBe("/search?type=group&id=g1");
+    expect(searchPath("songs")).toBe("/search?type=song");
+    expect(searchPath("songs", "s2")).toBe("/search?type=song&id=s2");
   });
 
   test("楽曲クエリで絞り込む", () => {

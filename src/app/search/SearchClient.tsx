@@ -4,12 +4,12 @@ import VideoCard from "@/components/feature/VideoCard";
 import Layout from "@/components/layout/Layout";
 import Button from "@/components/ui/Button";
 import CarouselButton from "@/components/ui/CarouselButton";
-import { filterVideos } from "@/lib/search/filterVideos";
-import { InitialSearchState, SearchButton } from "@/lib/search/initialSearchState";
-import { GroupRecord, Record, SongRecord, Videos } from "@/types";
+import { InitialSearchState, SearchButton, searchPath } from "@/lib/search/initialSearchState";
+import { GroupRecord, SongRecord, Videos } from "@/types";
 import useEmblaCarousel from "embla-carousel-react";
 import { Music, Users, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 function chunkArray<T>(array: T[], chunkSize: number): T[][] {
   const result: T[][] = [];
@@ -20,49 +20,30 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 }
 
 type SearchClientProps = InitialSearchState & {
-  videos: Videos[];
   groups: Pick<GroupRecord, "id" | "group_name">[];
   songs: Pick<SongRecord, "id" | "song_name">[];
 };
 
 export default function SearchClient({
-  videos,
   groups,
   songs,
-  selectedButton: initialButton,
-  selectedItems: initialItems,
-  filteredData: initialFiltered,
+  selectedButton,
+  selectedItems,
+  filteredData,
 }: SearchClientProps) {
-  const [selectedItems, setSelectedItems] = useState<Record[]>(initialItems);
-  const [selectedButton, setSelectedButton] = useState<SearchButton>(initialButton);
-  const [filteredData, setFilteredData] = useState<Videos[]>(initialFiltered);
+  const router = useRouter();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
 
   const groupChunks = useMemo(() => chunkArray(groups, 10), [groups]);
   const songChunks = useMemo(() => chunkArray(songs, 10), [songs]);
 
-  const onclickButton = (id: string, select: string, event: React.MouseEvent<HTMLButtonElement>) => {
-    const buttonName = event.currentTarget.name === "songs" ? "songs" : "groups";
+  const go = (type?: SearchButton | null, id?: string | null) => {
+    router.replace(searchPath(type, id), { scroll: false });
+  };
+
+  const onclickItem = (type: SearchButton, id: string) => {
     const isSelected = selectedItems.some((item) => item.id === id);
-    if (isSelected) {
-      setSelectedItems([]);
-      setFilteredData(videos);
-      return;
-    }
-
-    setSelectedItems([{ id, name: select }]);
-    setFilteredData(filterVideos(videos, buttonName, id));
-  };
-
-  const onClickSelectButton = (type: SearchButton) => {
-    setSelectedButton(type);
-    setSelectedItems([]);
-    setFilteredData(videos);
-  };
-
-  const onclickClear = () => {
-    setSelectedItems([]);
-    setFilteredData(videos);
+    go(type, isSelected ? null : id);
   };
 
   const buttonStyles = [
@@ -93,7 +74,7 @@ export default function SearchClient({
           <div className="flex w-full flex-col gap-2 rounded-lg bg-white p-4 md:w-auto md:flex-row">
             <Button
               className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 ${selectedButton === "groups" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white"}`}
-              onClick={() => onClickSelectButton("groups")}
+              onClick={() => go("groups")}
             >
               <Users />
               グループで検索
@@ -101,7 +82,7 @@ export default function SearchClient({
             <Button
               id="songs-button"
               className={`btn-lg border-none hover:bg-purple-50 hover:text-purple-400 ${selectedButton === "songs" && "bg-gradient-to-r from-purple-600 to-pink-600 text-white transition-all hover:text-white"} `}
-              onClick={() => onClickSelectButton("songs")}
+              onClick={() => go("songs")}
             >
               <Music />
               楽曲で検索
@@ -125,7 +106,7 @@ export default function SearchClient({
                           <Button
                             id={item.id}
                             name="groups"
-                            onClick={(event) => onclickButton(item.id, item.group_name, event)}
+                            onClick={() => onclickItem("groups", item.id)}
                             className={`${selectedItems.some((selected) => selected.id === item.id) && `border-none text-white shadow-none ${buttonStyles[index % buttonStyles.length]}`}`}
                           >
                             #{item.group_name}
@@ -157,7 +138,7 @@ export default function SearchClient({
                             key={item.id}
                             id={item.id}
                             name="songs"
-                            onClick={(event) => onclickButton(item.id, item.song_name, event)}
+                            onClick={() => onclickItem("songs", item.id)}
                             className={`${selectedItems.some((selected) => selected.id === item.id) && `border-none text-white shadow-none hover:text-white active:text-white ${buttonStyles[index % buttonStyles.length]}`}`}
                           >
                             #{item.song_name}
@@ -184,7 +165,7 @@ export default function SearchClient({
                 <h4 className="text-xl font-bold">選択中の{selectedButton === "songs" ? "楽曲" : "グループ"}</h4>
               </div>
               <Button
-                onClick={onclickClear}
+                onClick={() => go()}
                 className="rounded-2xl border bg-white font-bold text-black hover:bg-purple-50 hover:text-red-500 md:border-none"
                 id="clear-button"
                 name="clear"

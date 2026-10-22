@@ -48,5 +48,5 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     queryId: params.id,
   });
 
-  return <SearchClient videos={videos} groups={groups} songs={songs} {...initial} />;
+  return <SearchClient groups={groups} songs={songs} {...initial} />;
 }

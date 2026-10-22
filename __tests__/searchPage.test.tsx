@@ -12,6 +12,10 @@ vi.mock("@/lib/supabase/supabaseFunction", () => ({
   fetchSongs: (...args: unknown[]) => fetchSongs(...args),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn() }),
+}));
+
 import SearchPage from "@/app/search/page";
 
 const video = {
@@ -69,6 +73,20 @@ describe("検索ページ", () => {
     expect(readable).toContain("公式ダンスチャレンジ");
     expect(readable).not.toContain("別グループ");
     expect(readable).toContain("#IVE");
+  });
+
+  test("type=song なら楽曲タブの HTML になる", async () => {
+    getAllVideos.mockResolvedValue([video]);
+    fetchGroups.mockResolvedValue([{ id: "g1", group_name: "IVE" }]);
+    fetchSongs.mockResolvedValue([{ id: "s1", song_name: "ATTITUDE" }]);
+
+    const ui = await SearchPage({
+      searchParams: Promise.resolve({ type: "song" }),
+    });
+    const html = renderToString(ui).replace(/<!-- -->/g, "");
+
+    expect(html).toContain("楽曲で検索");
+    expect(html).toContain("#ATTITUDE");
   });
 
   test("取得に失敗したらエラーを出す", async () => {
