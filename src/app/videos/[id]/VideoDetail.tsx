@@ -1,4 +1,3 @@
-import Header from "@/components/feature/Header";
 import formatViewCount from "@/lib/formatViewCount";
 import { getVideoById } from "@/lib/supabase/supabaseFunction";
 import { GroupDetail, SongDetail } from "@/types";
@@ -12,7 +11,6 @@ type VideoDetailProps = {
 export default function VideoDetail({ video }: VideoDetailProps) {
   return (
     <div className="text-black">
-      <Header />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Link href="/search" className="link mb-4 flex gap-2 font-bold no-underline hover:text-purple-400">
           <ArrowLeft />

@@ -1,4 +1,3 @@
-import Header from "@/components/feature/Header";
 import Layout from "@/components/layout/Layout";
 import { getInitialSearchState } from "@/lib/search/initialSearchState";
 import { fetchGroups, fetchSongs, getAllVideos } from "@/lib/supabase/supabaseFunction";
@@ -14,7 +13,6 @@ type SearchPageProps = {
 function SearchError() {
   return (
     <div className="text-black">
-      <Header />
       <Layout>
         <div className="rounded-3xl bg-white p-8 text-center shadow-lg">
           <h2 className="mb-3 text-2xl font-bold text-purple-600">データを読み込めませんでした</h2>
