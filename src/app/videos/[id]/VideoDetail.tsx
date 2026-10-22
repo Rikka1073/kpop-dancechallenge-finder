@@ -1,46 +1,15 @@
-"use client";
-
 import Header from "@/components/feature/Header";
-import Loading from "@/components/feature/loading";
 import formatViewCount from "@/lib/formatViewCount";
 import { getVideoById } from "@/lib/supabase/supabaseFunction";
-import { videoIdFromPath } from "@/lib/video/videoIdFromPath";
 import { GroupDetail, SongDetail } from "@/types";
 import { ArrowLeft, Youtube } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import useSWR from "swr";
 
-export default function VideoDetail() {
-  const params = useParams<{ id: string }>();
-  const [id, setId] = useState("");
+type VideoDetailProps = {
+  video: NonNullable<Awaited<ReturnType<typeof getVideoById>>>;
+};
 
-  useEffect(() => {
-    setId(videoIdFromPath(window.location.pathname, params?.id));
-  }, [params?.id]);
-
-  const { data, error, isLoading } = useSWR(id ? ["video", id] : null, () => getVideoById(id));
-
-  if (!id || isLoading) {
-    return <Loading />;
-  }
-
-  if (error || !data) {
-    return (
-      <div className="text-black">
-        <Header />
-        <div className="container mx-auto max-w-6xl px-4 py-8">
-          <Link href="/search" className="link mb-4 flex gap-2 font-bold no-underline hover:text-purple-400">
-            <ArrowLeft />
-            検索に戻る
-          </Link>
-          <p>動画が見つかりませんでした。</p>
-        </div>
-      </div>
-    );
-  }
-
+export default function VideoDetail({ video }: VideoDetailProps) {
   return (
     <div className="text-black">
       <Header />
@@ -52,8 +21,8 @@ export default function VideoDetail() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="flex justify-center lg:col-span-2">
             <iframe
-              src={`https://www.youtube.com/embed/${data.youtube_id}?autoplay=1&mute=1`}
-              title={data.title}
+              src={`https://www.youtube.com/embed/${video.youtube_id}?autoplay=1&mute=1`}
+              title={video.title}
               frameBorder="0"
               allow="accelerometer; autoplay 1; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
@@ -66,7 +35,7 @@ export default function VideoDetail() {
               <h2 className="mb-4 text-lg font-bold">動画情報</h2>
               <h3 className="text-md mb-3 font-bold text-gray-600">参加アーティスト</h3>
               <div className="mb-2 flex flex-wrap gap-2">
-                {data.video_groups.map((group: GroupDetail) => (
+                {video.video_groups.map((group: GroupDetail) => (
                   <div key={group.groups.id} className="badge border-none bg-fuchsia-100 font-bold text-purple-600">
                     <Link href={`/search?type=group&id=${group.groups.id}`}>{group.groups.group_name}</Link>
                   </div>
@@ -74,25 +43,25 @@ export default function VideoDetail() {
               </div>
               <h3 className="text-md mb-3 font-bold text-gray-600">楽曲</h3>
               <div className="mb-2">
-                {data.video_songs.map((song: SongDetail) => (
+                {video.video_songs.map((song: SongDetail) => (
                   <div key={song.songs.id} className="badge border-none bg-red-100 font-bold text-red-600">
                     <Link href={`/search?type=song&id=${song.songs.id}`}>{song.songs.song_name}</Link>
                   </div>
                 ))}
               </div>
               <div className="mb-3 border-b-2 border-b-gray-300 pb-3 text-gray-600">
-                {formatViewCount(data.view_count)} views
+                {formatViewCount(video.view_count)} views
               </div>
               <div>
                 このダンスチャレンジ動画は、
-                {data.video_groups.map((group: GroupDetail) => group.groups.group_name).join("と")}
+                {video.video_groups.map((group: GroupDetail) => group.groups.group_name).join("と")}
                 によるコラボレーション作品です。 楽曲「
-                {data.video_songs.map((song: SongDetail) => song.songs.song_name)}
+                {video.video_songs.map((song: SongDetail) => song.songs.song_name)}
                 」に合わせた素晴らしいパフォーマンスをお楽しみください。
               </div>
               <div>
                 <Link
-                  href={`https://www.youtube.com/shorts/${data.youtube_id}/`}
+                  href={`https://www.youtube.com/shorts/${video.youtube_id}/`}
                   target="_blank"
                   className="btn mt-4 w-full bg-red-600 font-bold text-white"
                 >
