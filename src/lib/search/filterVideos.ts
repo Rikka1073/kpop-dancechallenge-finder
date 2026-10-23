@@ -5,9 +5,11 @@ export function filterVideos(
   { groupIds = [], songIds = [] }: { groupIds?: string[]; songIds?: string[] } = {}
 ): Videos[] {
   return videos.filter((video) => {
-    const matchesGroup = groupIds.length === 0 || video.video_groups.some((item) => groupIds.includes(item.groups.id));
-    const matchesSong = songIds.length === 0 || video.video_songs.some((item) => songIds.includes(item.songs.id));
-    return matchesGroup && matchesSong;
+    const videoGroupIds = video.video_groups.map((item) => item.groups.id);
+    const videoSongIds = video.video_songs.map((item) => item.songs.id);
+    const matchesGroups = groupIds.every((id) => videoGroupIds.includes(id));
+    const matchesSongs = songIds.every((id) => videoSongIds.includes(id));
+    return matchesGroups && matchesSongs;
   });
 }
 

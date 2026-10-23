@@ -91,7 +91,7 @@ describe("検索ページ", () => {
     expect(html).toContain("楽曲で検索");
     expect(html).toContain("#IVE");
     expect(html).toContain("#ATTITUDE");
-    expect(html).toContain("両方に合う動画");
+    expect(html).toContain("すべてに合う動画");
   });
 
   test("旧 type=song でも楽曲の HTML になる", async () => {

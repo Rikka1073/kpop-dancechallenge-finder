@@ -85,9 +85,7 @@ export default function SearchClient({
             <br className="md:hidden" />
             検索しよう！
           </div>
-          <p className="mt-2 text-sm text-gray-600 md:text-base">
-            同じ種類はいずれか（OR）、グループと楽曲は両方（AND）
-          </p>
+          <p className="mt-2 text-sm text-gray-600 md:text-base">選んだ条件のすべてに合う動画だけ出ます</p>
         </div>
 
         <TagCarousel
@@ -131,18 +129,18 @@ export default function SearchClient({
             {selectedGroups.length > 0 && (
               <SelectedRow
                 icon={<Users className="text-purple-400" />}
-                label={selectedGroups.length > 1 ? "グループ（いずれか）" : "グループ"}
+                label="グループ"
                 items={selectedGroups}
                 onRemove={(id) => go({ groupIds: groupIds.filter((item) => item !== id) })}
               />
             )}
             {selectedGroups.length > 0 && selectedSongs.length > 0 && (
-              <p className="mb-3 text-sm font-bold text-purple-600">× 両方に合う動画</p>
+              <p className="mb-3 text-sm font-bold text-purple-600">× すべてに合う動画</p>
             )}
             {selectedSongs.length > 0 && (
               <SelectedRow
                 icon={<Music className="text-purple-400" />}
-                label={selectedSongs.length > 1 ? "楽曲（いずれか）" : "楽曲"}
+                label="楽曲"
                 items={selectedSongs}
                 onRemove={(id) => go({ songIds: songIds.filter((item) => item !== id) })}
               />
@@ -267,18 +265,24 @@ function SelectedRow({
         {icon}
         <span className="font-bold">{label}</span>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => onRemove(item.id)}
-            className="flex items-center gap-1 rounded-full bg-pink-100 px-3 py-1 text-sm text-pink-700 hover:bg-pink-200"
-            aria-label={`${item.name}を外す`}
-          >
-            #{item.name}
-            <X className="size-3" />
-          </button>
+      <div className="flex flex-wrap items-center gap-2">
+        {items.map((item, index) => (
+          <span key={item.id} className="flex items-center gap-2">
+            {index > 0 && (
+              <span className="font-bold text-purple-600" aria-hidden="true">
+                ×
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => onRemove(item.id)}
+              className="flex items-center gap-1 rounded-full bg-pink-100 px-3 py-1 text-sm text-pink-700 hover:bg-pink-200"
+              aria-label={`${item.name}を外す`}
+            >
+              #{item.name}
+              <X className="size-3" />
+            </button>
+          </span>
         ))}
       </div>
     </div>

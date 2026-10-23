@@ -76,10 +76,16 @@ describe("SearchClient", () => {
     expect(replace).toHaveBeenCalledWith("/search", { scroll: false });
   });
 
-  test("同じ種類を複数選ぶと OR の URL になる", () => {
+  test("同じ種類を複数選ぶと URL に両方載る", () => {
     renderSearch({ groupIds: ["g1"] });
     screen.getByRole("button", { name: "#aespa" }).click();
     expect(replace).toHaveBeenCalledWith("/search?group=g1&group=g2", { scroll: false });
+  });
+
+  test("複数グループの選択中は × でつなぐ", () => {
+    renderSearch({ groupIds: ["g1", "g2"] });
+    expect(screen.getByText("×")).toBeInTheDocument();
+    expect(screen.getByText("選んだ条件のすべてに合う動画だけ出ます")).toBeInTheDocument();
   });
 
   test("楽曲を足してもグループが残る", () => {
