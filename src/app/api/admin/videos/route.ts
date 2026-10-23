@@ -6,6 +6,7 @@ import {
   getAdminVideoById,
   getAdminVideos,
   replaceVideoTags,
+  setAllVideoDisplay,
   setVideoDisplay,
   updateVideoStats,
   upsertVideoWithTags,
@@ -71,7 +72,20 @@ export async function PATCH(request: NextRequest) {
     groupIds?: string[];
     songIds?: string[];
     refreshStats?: boolean;
+    all?: boolean;
   } | null;
+
+  if (body?.all) {
+    if (typeof body.display !== "boolean") {
+      return jsonError("display が必要です");
+    }
+    try {
+      await setAllVideoDisplay(body.display);
+      return jsonOk(await getAdminVideos());
+    } catch (error) {
+      return jsonError(getErrorMessage(error, "動画の更新に失敗しました"));
+    }
+  }
 
   if (!body?.id) {
     return jsonError("動画IDが必要です");
