@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 
@@ -27,6 +27,18 @@ const unconfirmed = {
   display: true,
   youtube_channel_id: null,
   youtube_channel_title: null,
+};
+
+const hiddenSong = {
+  id: "song-eleven",
+  song_name: "ELEVEN",
+  display: false,
+};
+
+const visibleSong = {
+  id: "song-love-dive",
+  song_name: "LOVE DIVE",
+  display: true,
 };
 
 afterEach(() => {
@@ -99,16 +111,37 @@ describe("管理画面の公式チャンネル", () => {
           } as Response;
         }
         if (url.includes("/api/admin/catalog") && init?.method === "PATCH") {
-          const body = JSON.parse(String(init.body)) as { id?: string; confirmOfficial?: boolean };
+          const body = JSON.parse(String(init.body)) as {
+            id?: string;
+            type?: string;
+            confirmOfficial?: boolean;
+            display?: boolean;
+          };
+          if (body.type === "song") {
+            const source = body.id === visibleSong.id ? visibleSong : hiddenSong;
+            return {
+              ok: true,
+              json: async () => ({
+                ok: true,
+                data: {
+                  ...source,
+                  id: body.id,
+                  ...(typeof body.display === "boolean" ? { display: body.display } : {}),
+                },
+              }),
+            } as Response;
+          }
+          const source = body.id === ive.id ? ive : unconfirmed;
           return {
             ok: true,
             json: async () => ({
               ok: true,
               data: {
-                ...unconfirmed,
+                ...source,
                 id: body.id,
-                youtube_channel_id: body.confirmOfficial ? "UCxxxxxxxxxxxxxxxxxxxxxx" : null,
-                youtube_channel_title: body.confirmOfficial ? "IVE" : null,
+                ...(typeof body.display === "boolean" ? { display: body.display } : {}),
+                youtube_channel_id: body.confirmOfficial ? "UCxxxxxxxxxxxxxxxxxxxxxx" : source.youtube_channel_id,
+                youtube_channel_title: body.confirmOfficial ? "IVE" : source.youtube_channel_title,
               },
             }),
           } as Response;
@@ -116,7 +149,10 @@ describe("管理画面の公式チャンネル", () => {
         if (url.includes("/api/admin/catalog")) {
           return {
             ok: true,
-            json: async () => ({ ok: true, data: { groups: [ive, unconfirmed], songs: [] } }),
+            json: async () => ({
+              ok: true,
+              data: { groups: [ive, unconfirmed], songs: [visibleSong, hiddenSong] },
+            }),
           } as Response;
         }
         return { ok: false, json: async () => ({ ok: false, error: "unknown" }) } as Response;
@@ -181,9 +217,34 @@ describe("管理画面の公式チャンネル", () => {
     expect(missingRow).not.toBeNull();
     expect(within(iveRow as HTMLElement).getByText("設定済み")).toBeInTheDocument();
     expect(within(missingRow as HTMLElement).getByText("未設定")).toBeInTheDocument();
-    expect(within(iveRow as HTMLElement).getByRole("button", { name: "IVEを非表示" })).toBeInTheDocument();
+    expect(within(iveRow as HTMLElement).getByRole("checkbox", { name: "IVEを表示" })).toBeChecked();
     expect(screen.queryByPlaceholderText("https://www.youtube.com/@...")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "このチャンネルを公式として保存" })).not.toBeInTheDocument();
+  });
+
+  test("表示中の項目はチェック済み、非表示は未チェック", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    expect(await screen.findByRole("checkbox", { name: "IVEを表示" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "NewJeansを表示" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "LOVE DIVEを表示" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "ELEVENを表示" })).not.toBeChecked();
+  });
+
+  test("チェックを外すと非表示になる", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: "IVEを表示" }));
+    await waitFor(() => {
+      const patches = vi.mocked(fetch).mock.calls.filter(([, init]) => init?.method === "PATCH");
+      const displayPatch = patches.find(([url, init]) => {
+        if (!String(url).includes("/api/admin/catalog")) return false;
+        const body = JSON.parse(String(init?.body)) as { type?: string; display?: boolean };
+        return body.type === "group" && body.display === false;
+      });
+      expect(displayPatch).toBeDefined();
+    });
+    expect(screen.getByRole("checkbox", { name: "IVEを表示" })).not.toBeChecked();
   });
 
   test("未設定フィルタは公式チャンネルがあるグループを隠す", async () => {
