@@ -316,3 +316,19 @@ export async function updateSong(id: string, values: { song_name?: string; displ
   }
   return song;
 }
+
+export async function setAllGroupDisplay(display: boolean, client?: AdminClient) {
+  const db = getClient(client);
+  const { error } = await db.from("groups").update({ display }).not("id", "is", null);
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function setAllSongDisplay(display: boolean, client?: AdminClient) {
+  const db = getClient(client);
+  const { error } = await db.from("songs").update({ display }).not("id", "is", null);
+  if (error) {
+    throw new Error(error.message);
+  }
+}
