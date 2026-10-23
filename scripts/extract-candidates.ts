@@ -1,6 +1,7 @@
 import { extractCandidateDrafts } from "../src/lib/extraction/extractCandidateDrafts";
-import { listReviewUrls } from "../src/lib/extraction/candidateDraft";
+import { listReviewUrls, mergeDecidedCandidates } from "../src/lib/extraction/candidateDraft";
 import { loadLocalEnv } from "../src/lib/extraction/loadLocalEnv";
+import { listDecidedYoutubeIds, readExistingCandidateDraftFile } from "../src/lib/extraction/localCandidateDrafts";
 import { writeCandidateDraftFile } from "../src/lib/extraction/writeCandidateDrafts";
 import { getAdminGroups } from "../src/lib/supabase/registerSupabaseFunction";
 
@@ -41,11 +42,14 @@ async function main() {
     process.exit(1);
   }
 
-  const file = await extractCandidateDrafts({
+  const skipYoutubeIds = await listDecidedYoutubeIds();
+  const extracted = await extractCandidateDrafts({
     groups,
     officialGroups: await getAdminGroups(),
     linearIssue: issue,
+    skipYoutubeIds,
   });
+  const file = mergeDecidedCandidates(await readExistingCandidateDraftFile(date), extracted);
   const draftPath = await writeCandidateDraftFile(file, date);
   const urls = listReviewUrls(file);
 
@@ -53,7 +57,8 @@ async function main() {
     JSON.stringify(
       {
         path: draftPath,
-        count: file.candidates.length,
+        count: urls.length,
+        skipped: skipYoutubeIds.size,
         urls,
       },
       null,

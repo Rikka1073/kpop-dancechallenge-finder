@@ -1,5 +1,10 @@
 import { readdir, readFile } from "node:fs/promises";
-import { CandidateDraftBundle, CandidateDraftFile, assertCandidateDraftFile } from "./candidateDraft";
+import {
+  CandidateDraftBundle,
+  CandidateDraftFile,
+  assertCandidateDraftFile,
+  decidedYoutubeIds,
+} from "./candidateDraft";
 import { candidateDraftsPath, writeCandidateDraftFile } from "./writeCandidateDrafts";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -68,6 +73,24 @@ export async function loadCandidateDraftBundle(date?: string, root = "data/raw")
     path: candidateDraftsPath(selected, root),
     draft: await readCandidateDraftFile(selected, root),
   };
+}
+
+export async function listDecidedYoutubeIds(root = "data/raw"): Promise<Set<string>> {
+  const dates = await listCandidateDraftDates(root);
+  const files = await Promise.all(dates.map((date) => readCandidateDraftFile(date, root)));
+  return decidedYoutubeIds(files);
+}
+
+export async function readExistingCandidateDraftFile(
+  date: string,
+  root = "data/raw"
+): Promise<CandidateDraftFile | null> {
+  const selected = assertDraftDate(date);
+  const dates = await listCandidateDraftDates(root);
+  if (!dates.includes(selected)) {
+    return null;
+  }
+  return readCandidateDraftFile(selected, root);
 }
 
 export async function saveCandidateDraftFile(

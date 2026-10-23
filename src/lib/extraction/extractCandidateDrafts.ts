@@ -11,6 +11,7 @@ export type ExtractionTargets = {
   linearIssue: string;
   extractedAt?: string;
   maxResultsPerQuery?: number;
+  skipYoutubeIds?: Iterable<string>;
 };
 
 function expandQueries(
@@ -47,6 +48,7 @@ export async function extractCandidateDrafts(
 
   const templates = targets.queries?.length ? targets.queries : DEFAULT_QUERY_TEMPLATES;
   const searches = expandQueries(groups, targets.officialGroups, templates);
+  const skipYoutubeIds = new Set([...(targets.skipYoutubeIds ?? [])].map((id) => id.trim()).filter(Boolean));
   const seen = new Set<string>();
   const candidates: CandidateDraftFile["candidates"] = [];
 
@@ -60,7 +62,7 @@ export async function extractCandidateDrafts(
     });
 
     for (const hit of hits) {
-      if (seen.has(hit.youtubeId)) {
+      if (seen.has(hit.youtubeId) || skipYoutubeIds.has(hit.youtubeId)) {
         continue;
       }
       seen.add(hit.youtubeId);

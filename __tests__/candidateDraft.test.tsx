@@ -4,7 +4,9 @@ import {
   applyCandidateReviews,
   assertCandidateDraft,
   createPendingCandidate,
+  decidedYoutubeIds,
   listReviewUrls,
+  mergeDecidedCandidates,
 } from "@/lib/extraction/candidateDraft";
 import { guessOfficial } from "@/lib/extraction/guessOfficial";
 
@@ -68,6 +70,49 @@ describe("candidateDraft", () => {
     const reviewed = applyCandidateReviews(file, { abcdefghijk: "approved" });
     expect(reviewed.candidates[0].official).toBe(true);
     expect(file.candidates[0].official).toBeNull();
+  });
+
+  test("却下と承認の youtubeId を再抽出対象から外す", () => {
+    const rejected = applyCandidateReview({ ...pending, youtubeId: "rejected0001" }, "rejected");
+    const approved = applyCandidateReview({ ...pending, youtubeId: "approved0001" }, "approved");
+    const ids = decidedYoutubeIds([
+      {
+        extractedAt: "2026-10-23T00:00:00.000Z",
+        linearIssue: "MAS-54",
+        queryNotes: "test",
+        candidates: [pending, rejected, approved],
+      },
+    ]);
+
+    expect(ids).toEqual(new Set(["rejected0001", "approved0001"]));
+    expect(ids.has(pending.youtubeId)).toBe(false);
+  });
+
+  test("同じ日付へ書くときは却下・承認を残す", () => {
+    const rejected = applyCandidateReview(pending, "rejected");
+    const incomingPending = createPendingCandidate({
+      ...pending,
+      youtubeId: "newvideo0001",
+      url: "https://www.youtube.com/shorts/newvideo0001",
+    });
+    const merged = mergeDecidedCandidates(
+      {
+        extractedAt: "2026-10-23T00:00:00.000Z",
+        linearIssue: "MAS-52",
+        queryNotes: "old",
+        candidates: [rejected, pending],
+      },
+      {
+        extractedAt: "2026-10-23T01:00:00.000Z",
+        linearIssue: "MAS-54",
+        queryNotes: "new",
+        candidates: [incomingPending, createPendingCandidate(pending)],
+      }
+    );
+
+    expect(merged.candidates.map((candidate) => candidate.youtubeId)).toEqual(["abcdefghijk", "newvideo0001"]);
+    expect(merged.candidates[0].status).toBe("rejected");
+    expect(merged.candidates[1].status).toBe("pending");
   });
 });
 
