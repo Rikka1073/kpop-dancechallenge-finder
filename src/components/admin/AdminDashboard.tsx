@@ -878,7 +878,7 @@ const VisibilityPanel = ({
   onNotice: (message: string) => void;
 }) => {
   const [songName, setSongName] = useState("");
-  const [videoBulkBusy, setVideoBulkBusy] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState<"group" | "song" | "video" | null>(null);
 
   const addSong = async () => {
     try {
@@ -930,8 +930,40 @@ const VisibilityPanel = ({
     }
   };
 
+  const setAllGroups = async (display: boolean) => {
+    setBulkBusy("group");
+    try {
+      const updated = await adminRequest<GroupRecord[]>("/api/admin/catalog", {
+        method: "PATCH",
+        body: JSON.stringify({ type: "group", display, all: true }),
+      });
+      onGroupsChange(updated);
+      onNotice(display ? "グループをすべて表示にしました" : "グループをすべて非表示にしました");
+    } catch (error) {
+      onError(error);
+    } finally {
+      setBulkBusy(null);
+    }
+  };
+
+  const setAllSongs = async (display: boolean) => {
+    setBulkBusy("song");
+    try {
+      const updated = await adminRequest<SongRecord[]>("/api/admin/catalog", {
+        method: "PATCH",
+        body: JSON.stringify({ type: "song", display, all: true }),
+      });
+      onSongsChange(updated);
+      onNotice(display ? "楽曲をすべて表示にしました" : "楽曲をすべて非表示にしました");
+    } catch (error) {
+      onError(error);
+    } finally {
+      setBulkBusy(null);
+    }
+  };
+
   const setAllVideos = async (display: boolean) => {
-    setVideoBulkBusy(true);
+    setBulkBusy("video");
     try {
       const updated = await adminRequest<RegisteredVideoRecord[]>("/api/admin/videos", {
         method: "PATCH",
@@ -942,10 +974,14 @@ const VisibilityPanel = ({
     } catch (error) {
       onError(error);
     } finally {
-      setVideoBulkBusy(false);
+      setBulkBusy(null);
     }
   };
 
+  const allGroupsShown = groups.length > 0 && groups.every((group) => group.display !== false);
+  const allGroupsHidden = groups.length > 0 && groups.every((group) => group.display === false);
+  const allSongsShown = songs.length > 0 && songs.every((song) => song.display !== false);
+  const allSongsHidden = songs.length > 0 && songs.every((song) => song.display === false);
   const allVideosShown = videos.length > 0 && videos.every((video) => video.display !== false);
   const allVideosHidden = videos.length > 0 && videos.every((video) => video.display === false);
 
@@ -957,6 +993,14 @@ const VisibilityPanel = ({
         <p className="mb-4 text-sm text-gray-600">
           チェックが入っているものが公開サイトに出ます。公式チャンネルの保存は「公式チャンネル」メニューです。
         </p>
+        <BulkDisplayButtons
+          kind="グループ"
+          busy={bulkBusy === "group"}
+          disableShowAll={allGroupsShown || groups.length === 0}
+          disableHideAll={allGroupsHidden || groups.length === 0}
+          onShowAll={() => void setAllGroups(true)}
+          onHideAll={() => void setAllGroups(false)}
+        />
         <ul className="space-y-2">
           {groups.map((group) => {
             const displayed = group.display !== false;
@@ -984,7 +1028,15 @@ const VisibilityPanel = ({
         </ul>
       </div>
       <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-bold">楽曲の表示</h2>
+        <h2 className="mb-2 text-xl font-bold">楽曲の表示</h2>
+        <BulkDisplayButtons
+          kind="楽曲"
+          busy={bulkBusy === "song"}
+          disableShowAll={allSongsShown || songs.length === 0}
+          disableHideAll={allSongsHidden || songs.length === 0}
+          onShowAll={() => void setAllSongs(true)}
+          onHideAll={() => void setAllSongs(false)}
+        />
         <div className="mb-4 flex gap-2">
           <input
             value={songName}
@@ -1024,26 +1076,14 @@ const VisibilityPanel = ({
         <p className="mb-4 text-sm text-gray-600">
           チェックが入っているものが公開サイトに出ます。タグ編集は「動画一覧」です。
         </p>
-        <div className="mb-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="btn btn-sm min-h-11 rounded-xl"
-            disabled={allVideosShown || videos.length === 0 || videoBulkBusy}
-            onClick={() => void setAllVideos(true)}
-            aria-label="動画をすべて表示"
-          >
-            全表示
-          </button>
-          <button
-            type="button"
-            className="btn btn-sm min-h-11 rounded-xl"
-            disabled={allVideosHidden || videos.length === 0 || videoBulkBusy}
-            onClick={() => void setAllVideos(false)}
-            aria-label="動画をすべて非表示"
-          >
-            全非表示
-          </button>
-        </div>
+        <BulkDisplayButtons
+          kind="動画"
+          busy={bulkBusy === "video"}
+          disableShowAll={allVideosShown || videos.length === 0}
+          disableHideAll={allVideosHidden || videos.length === 0}
+          onShowAll={() => void setAllVideos(true)}
+          onHideAll={() => void setAllVideos(false)}
+        />
         <ul className="max-h-[32rem] space-y-2 overflow-y-auto">
           {videos.length === 0 && <li className="text-sm text-gray-500">まだ登録がありません。</li>}
           {videos.map((video) => {
@@ -1073,6 +1113,43 @@ const VisibilityPanel = ({
     </div>
   );
 };
+
+const BulkDisplayButtons = ({
+  kind,
+  busy,
+  disableShowAll,
+  disableHideAll,
+  onShowAll,
+  onHideAll,
+}: {
+  kind: "グループ" | "楽曲" | "動画";
+  busy: boolean;
+  disableShowAll: boolean;
+  disableHideAll: boolean;
+  onShowAll: () => void;
+  onHideAll: () => void;
+}) => (
+  <div className="mb-4 flex flex-wrap gap-2">
+    <button
+      type="button"
+      className="btn btn-sm min-h-11 rounded-xl"
+      disabled={disableShowAll || busy}
+      onClick={onShowAll}
+      aria-label={`${kind}をすべて表示`}
+    >
+      全表示
+    </button>
+    <button
+      type="button"
+      className="btn btn-sm min-h-11 rounded-xl"
+      disabled={disableHideAll || busy}
+      onClick={onHideAll}
+      aria-label={`${kind}をすべて非表示`}
+    >
+      全非表示
+    </button>
+  </div>
+);
 
 const FilterChip = ({
   active,

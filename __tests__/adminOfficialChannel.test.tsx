@@ -165,7 +165,26 @@ describe("管理画面の公式チャンネル", () => {
             type?: string;
             confirmOfficial?: boolean;
             display?: boolean;
+            all?: boolean;
           };
+          if (body.all) {
+            if (body.type === "song") {
+              return {
+                ok: true,
+                json: async () => ({
+                  ok: true,
+                  data: [visibleSong, hiddenSong].map((song) => ({ ...song, display: body.display })),
+                }),
+              } as Response;
+            }
+            return {
+              ok: true,
+              json: async () => ({
+                ok: true,
+                data: [ive, unconfirmed].map((group) => ({ ...group, display: body.display })),
+              }),
+            } as Response;
+          }
           if (body.type === "song") {
             const source = body.id === visibleSong.id ? visibleSong : hiddenSong;
             return {
@@ -294,6 +313,41 @@ describe("管理画面の公式チャンネル", () => {
       expect(displayPatch).toBeDefined();
     });
     expect(screen.getByRole("checkbox", { name: "IVEを表示" })).not.toBeChecked();
+  });
+
+  test("全非表示でグループをまとめて隠す", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    fireEvent.click(await screen.findByRole("button", { name: "グループをすべて非表示" }));
+    await waitFor(() => {
+      const patches = vi.mocked(fetch).mock.calls.filter(([, init]) => init?.method === "PATCH");
+      const bulkPatch = patches.find(([url, init]) => {
+        if (!String(url).includes("/api/admin/catalog")) return false;
+        const body = JSON.parse(String(init?.body)) as { type?: string; display?: boolean; all?: boolean };
+        return body.type === "group" && body.all === true && body.display === false;
+      });
+      expect(bulkPatch).toBeDefined();
+    });
+    expect(screen.getByRole("checkbox", { name: "IVEを表示" })).not.toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "NewJeansを表示" })).not.toBeChecked();
+    expect(await screen.findByText("グループをすべて非表示にしました")).toBeInTheDocument();
+  });
+
+  test("全表示で楽曲をまとめて出す", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    fireEvent.click(await screen.findByRole("button", { name: "楽曲をすべて表示" }));
+    await waitFor(() => {
+      const patches = vi.mocked(fetch).mock.calls.filter(([, init]) => init?.method === "PATCH");
+      const bulkPatch = patches.find(([url, init]) => {
+        if (!String(url).includes("/api/admin/catalog")) return false;
+        const body = JSON.parse(String(init?.body)) as { type?: string; display?: boolean; all?: boolean };
+        return body.type === "song" && body.all === true && body.display === true;
+      });
+      expect(bulkPatch).toBeDefined();
+    });
+    expect(screen.getByRole("checkbox", { name: "LOVE DIVEを表示" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "ELEVENを表示" })).toBeChecked();
   });
 
   test("表示切替で動画の公開状態が分かる", async () => {
