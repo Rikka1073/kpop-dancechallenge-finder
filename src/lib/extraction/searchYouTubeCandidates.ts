@@ -73,6 +73,7 @@ export async function searchYouTubeCandidates(options: {
   channelId: string;
   apiKey: string;
   maxResults?: number;
+  publishedAfter?: string;
   fetchImpl?: typeof fetch;
 }): Promise<YouTubeSearchHit[]> {
   const channelId = options.channelId.trim();
@@ -81,7 +82,9 @@ export async function searchYouTubeCandidates(options: {
   }
 
   const fetchImpl = options.fetchImpl ?? fetch;
-  const maxResults = Math.min(Math.max(options.maxResults ?? 5, 1), 10);
+  const maxResults = Math.min(Math.max(options.maxResults ?? 25, 1), 50);
+  const publishedAfter = options.publishedAfter?.trim();
+  const publishedAfterMs = publishedAfter ? Date.parse(publishedAfter) : Number.NaN;
 
   const searchUrl = new URL("https://www.googleapis.com/youtube/v3/search");
   searchUrl.searchParams.set("part", "snippet");
@@ -92,6 +95,9 @@ export async function searchYouTubeCandidates(options: {
   searchUrl.searchParams.set("channelId", channelId);
   searchUrl.searchParams.set("q", options.query);
   searchUrl.searchParams.set("key", options.apiKey);
+  if (publishedAfter) {
+    searchUrl.searchParams.set("publishedAfter", publishedAfter);
+  }
 
   const searchPayload = (await readYoutubeJson(searchUrl, fetchImpl)) as { items?: SearchItem[] };
   const videoIds = [...new Set((searchPayload.items || []).map((item) => item.id?.videoId).filter(Boolean))] as string[];
@@ -121,6 +127,9 @@ export async function searchYouTubeCandidates(options: {
         return null;
       }
       if (!isYouTubeShort(item.contentDetails?.duration)) {
+        return null;
+      }
+      if (!Number.isNaN(publishedAfterMs) && Date.parse(publishedAt) < publishedAfterMs) {
         return null;
       }
 

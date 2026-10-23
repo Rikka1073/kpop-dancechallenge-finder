@@ -30,7 +30,7 @@ Linear プロジェクト: [SeeKPOP](https://linear.app/masafumi/project/seekpop
 タイミング:
 
 - 単発改修 / SEO改善 / 再生数同期 — PR を出して、その課題の実装が終わったとき。マージ前でよい
-- 週次抽出 — JSON を手元に書いて件数を課題に出したとき
+- 月次抽出 — JSON を手元に書いて件数を課題に出したとき
 - 公式判定 — 人が判定し、承認分の DB 反映まで終わったとき
 
 ### Obsidian（1日の終わり）
@@ -46,7 +46,7 @@ Linear プロジェクト: [SeeKPOP](https://linear.app/masafumi/project/seekpop
 
 ## データの鮮度
 
-AI は確認済み公式チャンネルのショート（60秒以内）から候補を集めるだけ。ダンスチャレンジとして載せるかは人が YouTube を開いて判定する。公式チャンネル未保存のグループは取らない。
+AI は確認済み公式チャンネルの直近1ヶ月のショート（60秒以内）から候補を集めるだけ。過去分は取らない。ダンスチャレンジとして載せるかは人が YouTube を開いて判定する。公式チャンネル未保存のグループは取らない。
 
 1. 抽出前に対象グループを Linear 課題へ書く。OK が出るまで取らない
 2. 候補は `data/raw/YYYY-MM-DD/candidate-drafts.json`（git 管理外）
@@ -59,5 +59,5 @@ AI は確認済み公式チャンネルのショート（60秒以内）から候
 
 | 依頼の例 | スキル |
 |---|---|
-| 「週次抽出して」「候補を集めて」 | `.cursor/skills/weekly-extract` |
+| 「月次抽出して」「候補を集めて」 | `.cursor/skills/monthly-extract` |
 | 「公開して」 | `.cursor/skills/publish`（`main` の先端だけ。作業ブランチからは出さない） |

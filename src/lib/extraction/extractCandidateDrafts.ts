@@ -3,6 +3,7 @@ import { CandidateDraftFile, createPendingCandidate } from "./candidateDraft";
 import { searchYouTubeCandidates } from "./searchYouTubeCandidates";
 
 export const DEFAULT_QUERY_TEMPLATES = ["{group} dance challenge shorts", "{group} 댄스 챌린지"];
+export const DEFAULT_LOOKBACK_MONTHS = 1;
 
 export type ExtractionTargets = {
   groups: string[];
@@ -10,8 +11,30 @@ export type ExtractionTargets = {
   queries?: string[];
   linearIssue: string;
   extractedAt?: string;
+  publishedAfter?: string;
   maxResultsPerQuery?: number;
 };
+
+export function monthsAgoIso(from: Date | string, months = DEFAULT_LOOKBACK_MONTHS): string {
+  const date = new Date(from);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("抽出日時が日付として読めません");
+  }
+  date.setUTCMonth(date.getUTCMonth() - months);
+  return date.toISOString();
+}
+
+export function parsePublishedAfter(value: string): string {
+  const trimmed = value.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return `${trimmed}T00:00:00.000Z`;
+  }
+  const date = new Date(trimmed);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("publishedAfter が日付として読めません");
+  }
+  return date.toISOString();
+}
 
 function expandQueries(
   groups: string[],
@@ -47,6 +70,8 @@ export async function extractCandidateDrafts(
 
   const templates = targets.queries?.length ? targets.queries : DEFAULT_QUERY_TEMPLATES;
   const searches = expandQueries(groups, targets.officialGroups, templates);
+  const extractedAt = targets.extractedAt || new Date().toISOString();
+  const publishedAfter = targets.publishedAfter?.trim() || monthsAgoIso(extractedAt);
   const seen = new Set<string>();
   const candidates: CandidateDraftFile["candidates"] = [];
 
@@ -56,6 +81,7 @@ export async function extractCandidateDrafts(
       channelId,
       apiKey,
       maxResults: targets.maxResultsPerQuery,
+      publishedAfter,
       fetchImpl: options?.fetchImpl,
     });
 
@@ -83,9 +109,9 @@ export async function extractCandidateDrafts(
   }
 
   return {
-    extractedAt: targets.extractedAt || new Date().toISOString(),
+    extractedAt,
     linearIssue: targets.linearIssue,
-    queryNotes: searches.map((item) => `${item.query} (${item.channelId})`).join(" / "),
+    queryNotes: `${searches.map((item) => `${item.query} (${item.channelId})`).join(" / ")} / since ${publishedAfter}`,
     candidates,
   };
 }

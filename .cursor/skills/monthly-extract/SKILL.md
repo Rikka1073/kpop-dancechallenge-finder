@@ -1,11 +1,11 @@
 ---
-name: weekly-extract
-description: Extracts YouTube dance-challenge candidates into a local JSON draft. Use when the user asks for 週次抽出, 候補を集めて, extract candidates, or weekly candidate drafts. Not for publishing or marking official.
+name: monthly-extract
+description: Extracts YouTube dance-challenge candidates from the last month into a local JSON draft. Use when the user asks for 月次抽出, 週次抽出, 候補を集めて, extract candidates, or monthly candidate drafts. Not for publishing or marking official.
 ---
 
-# 週次抽出
+# 月次抽出
 
-確認済み公式チャンネル（`groups.youtube_channel_id`）の中だけ、60秒以内のショートを YouTube から集め、手元 JSON に書いて止まる。長尺（MV・ダンスプラクティスなど）は取らない。公式チャンネル未保存のグループは取らない。公式判定も DB 投入も公開もしない。依頼に Linear の課題 ID があるときは開始時に読む。
+確認済み公式チャンネル（`groups.youtube_channel_id`）の中だけ、公開日が直近1ヶ月のショート（60秒以内）を YouTube から集め、手元 JSON に書いて止まる。過去分と長尺（MV・ダンスプラクティスなど）は取らない。公式チャンネル未保存のグループは取らない。公式判定も DB 投入も公開もしない。依頼に Linear の課題 ID があるときは開始時に読む。
 
 停止点では Linear を `In Review` にし、チャットに結論だけ書く。Obsidian 報告は1日の終わりに、許可を取ってからまとめて書く。
 
@@ -16,13 +16,15 @@ description: Extracts YouTube dance-challenge candidates into a local JSON draft
 
 ## 手順
 
-1. 課題が無ければ切る（タイトル `週次抽出 YYYY-MM-DD`）。プロジェクトは SeeKPOP。
+1. 課題が無ければ切る（タイトル `月次抽出 YYYY-MM-DD`）。プロジェクトは SeeKPOP。
 2. 対象グループを課題へ書く。OK 待ち。
 3. OK のあと:
 
 ```bash
 npm run extract:candidates -- --issue MAS-n --group グループ名 --date YYYY-MM-DD
 ```
+
+公開日の下限は実行日から1ヶ月前。変えるときは `--published-after YYYY-MM-DD`。
 
 候補は `data/raw/YYYY-MM-DD/candidate-drafts.json`。git に入れない。DB に入れない。JSON 全文はチャットに貼らない。
 
