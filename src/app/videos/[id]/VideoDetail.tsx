@@ -38,7 +38,7 @@ export default function VideoDetail({ video }: VideoDetailProps) {
               <div className="mb-2 flex flex-wrap gap-2">
                 {video.video_groups.map((group: GroupDetail) => (
                   <div key={group.groups.id} className="badge border-none bg-fuchsia-100 font-bold text-purple-600">
-                    <Link href={`/search?type=group&id=${group.groups.id}`}>{group.groups.group_name}</Link>
+                    <Link href={`/search?group=${group.groups.id}`}>{group.groups.group_name}</Link>
                   </div>
                 ))}
               </div>
@@ -46,7 +46,7 @@ export default function VideoDetail({ video }: VideoDetailProps) {
               <div className="mb-2">
                 {video.video_songs.map((song: SongDetail) => (
                   <div key={song.songs.id} className="badge border-none bg-red-100 font-bold text-red-600">
-                    <Link href={`/search?type=song&id=${song.songs.id}`}>{song.songs.song_name}</Link>
+                    <Link href={`/search?song=${song.songs.id}`}>{song.songs.song_name}</Link>
                   </div>
                 ))}
               </div>

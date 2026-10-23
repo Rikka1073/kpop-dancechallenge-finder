@@ -16,15 +16,23 @@ describe("filterVideos", () => {
   const videos = [createVideo("1", "g1", "s1"), createVideo("2", "g2", "s1"), createVideo("3", "g1", "s2")];
 
   test("未選択なら全件を返す", () => {
-    expect(filterVideos(videos, "groups")).toHaveLength(3);
+    expect(filterVideos(videos)).toHaveLength(3);
   });
 
   test("グループIDで絞り込む", () => {
-    expect(filterVideos(videos, "groups", "g1").map((video) => video.id)).toEqual(["1", "3"]);
+    expect(filterVideos(videos, { groupIds: ["g1"] }).map((video) => video.id)).toEqual(["1", "3"]);
   });
 
   test("楽曲IDで絞り込む", () => {
-    expect(filterVideos(videos, "songs", "s1").map((video) => video.id)).toEqual(["1", "2"]);
+    expect(filterVideos(videos, { songIds: ["s1"] }).map((video) => video.id)).toEqual(["1", "2"]);
+  });
+
+  test("同じ種類は OR", () => {
+    expect(filterVideos(videos, { groupIds: ["g1", "g2"] }).map((video) => video.id)).toEqual(["1", "2", "3"]);
+  });
+
+  test("グループと楽曲は AND", () => {
+    expect(filterVideos(videos, { groupIds: ["g1"], songIds: ["s1"] }).map((video) => video.id)).toEqual(["1"]);
   });
 });
 

@@ -63,8 +63,8 @@ describe("検索ページ", () => {
 
     const readable = html.replace(/<!-- -->/g, "");
     expect(searchPublicVideos).toHaveBeenCalledWith({
-      queryType: "group",
-      queryId: "g1",
+      groupIds: ["g1"],
+      songIds: [],
       page: 1,
     });
     expect(readable).toContain("公式ダンスチャレンジ");
@@ -72,7 +72,29 @@ describe("検索ページ", () => {
     expect(readable).toContain("#IVE");
   });
 
-  test("type=song なら楽曲タブの HTML になる", async () => {
+  test("グループと楽曲の AND なら両方をサーバに渡す", async () => {
+    searchPublicVideos.mockResolvedValue({ videos: [video], total: 1, page: 1, pageSize: 20 });
+    fetchGroups.mockResolvedValue([{ id: "g1", group_name: "IVE" }]);
+    fetchSongs.mockResolvedValue([{ id: "s1", song_name: "ATTITUDE" }]);
+
+    const ui = await SearchPage({
+      searchParams: Promise.resolve({ group: "g1", song: "s1" }),
+    });
+    const html = renderToString(ui).replace(/<!-- -->/g, "");
+
+    expect(searchPublicVideos).toHaveBeenCalledWith({
+      groupIds: ["g1"],
+      songIds: ["s1"],
+      page: 1,
+    });
+    expect(html).toContain("グループで検索");
+    expect(html).toContain("楽曲で検索");
+    expect(html).toContain("#IVE");
+    expect(html).toContain("#ATTITUDE");
+    expect(html).toContain("両方に合う動画");
+  });
+
+  test("旧 type=song でも楽曲の HTML になる", async () => {
     searchPublicVideos.mockResolvedValue({ videos: [video], total: 1, page: 1, pageSize: 20 });
     fetchGroups.mockResolvedValue([{ id: "g1", group_name: "IVE" }]);
     fetchSongs.mockResolvedValue([{ id: "s1", song_name: "ATTITUDE" }]);

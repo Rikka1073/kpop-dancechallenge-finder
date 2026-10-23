@@ -1,5 +1,5 @@
 import Layout from "@/components/layout/Layout";
-import { getInitialSearchState, parseSearchPage } from "@/lib/search/initialSearchState";
+import { getInitialSearchState, parseSearchQuery } from "@/lib/search/initialSearchState";
 import { fetchGroups, fetchSongs, searchPublicVideos } from "@/lib/supabase/supabaseFunction";
 import { Videos } from "@/types";
 import type { Metadata } from "next";
@@ -14,7 +14,13 @@ export const metadata: Metadata = {
 };
 
 type SearchPageProps = {
-  searchParams: Promise<{ type?: string; id?: string; page?: string }>;
+  searchParams: Promise<{
+    type?: string | string[];
+    id?: string | string[];
+    group?: string | string[];
+    song?: string | string[];
+    page?: string | string[];
+  }>;
 };
 
 function SearchError() {
@@ -32,6 +38,7 @@ function SearchError() {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
+  const query = parseSearchQuery(params);
 
   let videos: Videos[];
   let total: number;
@@ -43,9 +50,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   try {
     const [result, fetchedGroups, fetchedSongs] = await Promise.all([
       searchPublicVideos({
-        queryType: params.type,
-        queryId: params.id,
-        page: parseSearchPage(params.page),
+        groupIds: query.groupIds,
+        songIds: query.songIds,
+        page: query.page,
       }),
       fetchGroups(),
       fetchSongs(),
@@ -64,11 +71,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     videos,
     groups,
     songs,
-    queryType: params.type,
-    queryId: params.id,
+    groupIds: query.groupIds,
+    songIds: query.songIds,
   });
 
-  return (
-    <SearchClient groups={groups} songs={songs} total={total} page={page} pageSize={pageSize} {...initial} />
-  );
+  return <SearchClient groups={groups} songs={songs} total={total} page={page} pageSize={pageSize} {...initial} />;
 }

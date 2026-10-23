@@ -25,6 +25,10 @@ function logSupabaseError(context: string, error: unknown) {
 
 export const SEARCH_PAGE_SIZE = 20;
 
+function uniqueIds(ids?: string[] | null): string[] {
+  return [...new Set((ids ?? []).map((id) => id.trim()).filter(Boolean))];
+}
+
 export const getAllVideos = async () => {
   try {
     const { data, error } = await getSupabaseClient()
@@ -45,17 +49,19 @@ export const getAllVideos = async () => {
 };
 
 export async function searchPublicVideos({
-  queryType,
-  queryId,
+  groupIds,
+  songIds,
   page = 1,
 }: {
-  queryType?: string | null;
-  queryId?: string | null;
+  groupIds?: string[] | null;
+  songIds?: string[] | null;
   page?: number;
 }) {
   const currentPage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
   const from = (currentPage - 1) * SEARCH_PAGE_SIZE;
   const to = from + SEARCH_PAGE_SIZE - 1;
+  const groups = uniqueIds(groupIds);
+  const songs = uniqueIds(songIds);
 
   try {
     let query = getSupabaseClient()
@@ -65,10 +71,11 @@ export async function searchPublicVideos({
       .order("view_count", { ascending: false })
       .range(from, to);
 
-    if (queryType === "group" && queryId) {
-      query = query.eq("video_groups.group_id", queryId);
-    } else if (queryType === "song" && queryId) {
-      query = query.eq("video_songs.song_id", queryId);
+    if (groups.length) {
+      query = query.in("video_groups.group_id", groups);
+    }
+    if (songs.length) {
+      query = query.in("video_songs.song_id", songs);
     }
 
     const { data, error, count } = await query;
