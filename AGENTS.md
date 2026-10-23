@@ -3,13 +3,13 @@
 このファイルと `.cursor/` は git 管理。課題の正本は Linear の [運用ルール](https://linear.app/masafumi/document/運用ルール-61dcac6eef12)。
 Linear プロジェクト: [SeeKPOP](https://linear.app/masafumi/project/seekpop-d3444f6bdcd0)
 
-人が再指示しなくても、下の git / 報告 / 公開は毎回やる。
+人が再指示しなくても、下の git / チャット報告 / 公開は毎回やる。Obsidian 報告は1日の終わりに、許可を取ってからまとめて書く。
 
 ## 正本
 
 - 課題と運用手順 → Linear
 - 仕様とコード、エージェント手順（このファイルと `.cursor/`） → git
-- 作業ログ → Obsidian `SeeKPOP/報告/`（エージェントが書く）
+- 作業ログ → チャット（タスクごと）と Obsidian `SeeKPOP/報告/`（1日の終わり。書く前に許可）
 
 ## git
 
@@ -21,10 +21,9 @@ Linear プロジェクト: [SeeKPOP](https://linear.app/masafumi/project/seekpop
 
 ## 報告（省略しない）
 
-人が「報告して」と言わなくても書く。マージ待ちにしない。
+### チャット（タスクごと）
 
-パス: `/Users/masafumi/Documents/Obsidian Vault/SeeKPOP/報告/【MAS-n】種類-日付.md`  
-書き方の正本: `/Users/masafumi/Documents/Obsidian Vault/SeeKPOP/置き方.md`
+人が「報告して」と言わなくても書く。マージ待ちにしない。結論と次の一手だけ。チャットの全文は置かない。
 
 タイミング:
 
@@ -32,9 +31,16 @@ Linear プロジェクト: [SeeKPOP](https://linear.app/masafumi/project/seekpop
 - 週次抽出 — JSON を手元に書いて件数を課題に出したとき
 - 公式判定 — 人が判定し、承認分の DB 反映まで終わったとき
 
-Linear 課題にはパスだけコメントする。本文は載せない。Slack には送らない。
+### Obsidian（1日の終わり）
 
-ファイル名がタイトル。本文は `Linear: [MAS-n](url)` から始め、先頭に `#` の題は置かない。チャットの全文は置かない。結論と次の一手だけ。
+パス: `/Users/masafumi/Documents/Obsidian Vault/SeeKPOP/報告/【MAS-n】種類-日付.md`  
+書き方の正本: `/Users/masafumi/Documents/Obsidian Vault/SeeKPOP/置き方.md`
+
+タスク完了のたびに書かない。人が「今日の終わり」「今日の報告」などと言ったときに、その日分のパスと要約を出して許可を求める。OK が出るまで Obsidian へは書き込まない。
+
+書いたら Linear 課題にはパスだけコメントする。本文は載せない。Slack には送らない。
+
+ファイル名がタイトル。本文は `Linear: [MAS-n](url)` から始め、先頭に `#` の題は置かない。
 
 ## データの鮮度
 
