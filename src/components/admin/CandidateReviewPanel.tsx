@@ -68,16 +68,18 @@ const CandidateReviewPanel = () => {
   const visible = useMemo(() => {
     if (!draft) return [];
     const keyword = query.trim().toLowerCase();
-    return draft.candidates.filter((candidate) => {
-      if (statusFilter !== "all" && candidate.status !== statusFilter) return false;
-      if (!keyword) return true;
-      return (
-        candidate.title.toLowerCase().includes(keyword) ||
-        candidate.channelTitle.toLowerCase().includes(keyword) ||
-        candidate.suggestedGroups.some((group) => group.toLowerCase().includes(keyword)) ||
-        (candidate.suggestedSong || "").toLowerCase().includes(keyword)
-      );
-    });
+    return draft.candidates
+      .filter((candidate) => {
+        if (statusFilter !== "all" && candidate.status !== statusFilter) return false;
+        if (!keyword) return true;
+        return (
+          candidate.title.toLowerCase().includes(keyword) ||
+          candidate.channelTitle.toLowerCase().includes(keyword) ||
+          candidate.suggestedGroups.some((group) => group.toLowerCase().includes(keyword)) ||
+          (candidate.suggestedSong || "").toLowerCase().includes(keyword)
+        );
+      })
+      .sort((left, right) => Number(right.officialGuess) - Number(left.officialGuess));
   }, [draft, query, statusFilter]);
 
   const review = async (youtubeId: string, decision: "approved" | "rejected") => {

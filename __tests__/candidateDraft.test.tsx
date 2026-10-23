@@ -6,7 +6,7 @@ import {
   createPendingCandidate,
   listReviewUrls,
 } from "@/lib/extraction/candidateDraft";
-import { guessOfficial } from "@/lib/extraction/guessOfficial";
+import { guessChallenge, guessOfficial } from "@/lib/extraction/guessOfficial";
 
 const pending = createPendingCandidate({
   youtubeId: "abcdefghijk",
@@ -84,10 +84,50 @@ describe("guessOfficial", () => {
 
   test("手がかりが無いときは false", () => {
     const guess = guessOfficial({
-      title: "cover practice",
-      channelTitle: "random channel",
+      title: "Looks Can Kill ✨ w/ #YEJUN #IVE #Shorts",
+      channelTitle: "IVE",
       suggestedGroups: ["IVE"],
     });
     expect(guess.officialGuess).toBe(false);
+  });
+});
+
+describe("guessChallenge", () => {
+  test("vlog や teasing は抽出しない", () => {
+    expect(
+      guessChallenge({
+        title: "CHIQUITA’s solo practice vlog",
+        channelTitle: "BABYMONSTER",
+        suggestedGroups: ["BABYMONSTER"],
+      }).include
+    ).toBe(false);
+    expect(
+      guessChallenge({
+        title: "#체포하겠어 challenge teasing",
+        channelTitle: "ILLIT",
+        suggestedGroups: ["ILLIT"],
+      }).include
+    ).toBe(false);
+  });
+
+  test("challenge が無くても候補には残す。確定ではない", () => {
+    const guess = guessChallenge({
+      title: "Looks Can Kill ✨ w/ #YEJUN #IVE #Shorts",
+      channelTitle: "IVE",
+      suggestedGroups: ["IVE"],
+    });
+    expect(guess.include).toBe(true);
+    expect(guess.officialGuess).toBe(false);
+    expect(guess.officialGuessReason).toContain("人が判定する");
+  });
+
+  test("챌린지 があると推測 true。確定ではない", () => {
+    const guess = guessChallenge({
+      title: "챌린지가 안 끝나",
+      channelTitle: "MEOVV",
+      suggestedGroups: ["MEOVV"],
+    });
+    expect(guess.include).toBe(true);
+    expect(guess.officialGuess).toBe(true);
   });
 });
