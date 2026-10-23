@@ -1,4 +1,4 @@
-import { extractCandidateDrafts } from "../src/lib/extraction/extractCandidateDrafts";
+import { extractCandidateDrafts, parsePublishedAfter } from "../src/lib/extraction/extractCandidateDrafts";
 import { listReviewUrls } from "../src/lib/extraction/candidateDraft";
 import { loadLocalEnv } from "../src/lib/extraction/loadLocalEnv";
 import { writeCandidateDraftFile } from "../src/lib/extraction/writeCandidateDrafts";
@@ -28,6 +28,7 @@ async function main() {
   const argv = process.argv.slice(2);
   const issue = readArg(argv, "--issue");
   const date = readArg(argv, "--date") || new Date().toISOString().slice(0, 10);
+  const publishedAfterArg = readArg(argv, "--published-after");
   const groups = [
     ...readRepeatableArg(argv, "--group"),
     ...(readArg(argv, "--groups") || "")
@@ -37,7 +38,9 @@ async function main() {
   ];
 
   if (!issue || groups.length === 0) {
-    console.error("Usage: npm run extract:candidates -- --issue MAS-19 --group IVE --date 2026-10-06");
+    console.error(
+      "Usage: npm run extract:candidates -- --issue MAS-51 --group IVE --date 2026-10-23 [--published-after YYYY-MM-DD]"
+    );
     process.exit(1);
   }
 
@@ -45,6 +48,7 @@ async function main() {
     groups,
     officialGroups: await getAdminGroups(),
     linearIssue: issue,
+    publishedAfter: publishedAfterArg ? parsePublishedAfter(publishedAfterArg) : undefined,
   });
   const draftPath = await writeCandidateDraftFile(file, date);
   const urls = listReviewUrls(file);
