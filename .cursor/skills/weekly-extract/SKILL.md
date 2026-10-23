@@ -7,7 +7,7 @@ description: Extracts YouTube dance-challenge candidates into a local JSON draft
 
 確認済み公式チャンネル（`groups.youtube_channel_id`）の中だけ YouTube から候補を集め、手元 JSON に書いて止まる。公式チャンネル未保存のグループは取らない。公式判定も DB 投入も公開もしない。依頼に Linear の課題 ID があるときは開始時に読む。
 
-停止点では Linear を `In Review` にし、`/Users/masafumi/Documents/Obsidian Vault/SeeKPOP/報告/【MAS-n】週次抽出-YYYY-MM-DD.md` に結論だけ書く（ファイル名がタイトル。本文に同じ見出しは書かない）。人が「報告して」と言わなくても書く。
+停止点では Linear を `In Review` にし、チャットに結論だけ書く。Obsidian 報告は1日の終わりに、許可を取ってからまとめて書く。
 
 ## 停止点（省略しない）
 
@@ -27,5 +27,5 @@ npm run extract:candidates -- --issue MAS-n --group グループ名 --date YYYY-
 候補は `data/raw/YYYY-MM-DD/candidate-drafts.json`。git に入れない。DB に入れない。JSON 全文はチャットに貼らない。
 
 4. 件数と JSON の場所を Linear 課題に書く。
-5. 報告を Obsidian に書く。Linear にはパスだけコメントする。
+5. チャットに件数と JSON の場所を報告する。Obsidian にはこの時点では書かない。
 6. 判定は人が `npm run dev` の `/admin` 「候補一覧」で行う。エージェントはここで止まってよい。
