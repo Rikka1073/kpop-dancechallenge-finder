@@ -16,6 +16,7 @@ Linear プロジェクト: [SeeKPOP](https://linear.app/masafumi/project/seekpop
 - 作業ブランチは必ず `main` から切る
 - Linear 課題ごとにブランチを分ける。名前は課題番号だけ（例: `mas-14`）。1課題1PR
 - PR は **draft にしない**。Ready で作る。作成は承認不要。base は `main`
+- Linear 課題の作成・更新・コメントは承認不要。切る前にチャットで許可を求めない
 - `main` へのマージは人が手動で行う。エージェントはマージしない
 - 1つの PR に複数課題を混ぜない
 
