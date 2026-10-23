@@ -1,4 +1,4 @@
-import { getInitialSearchState, parseSearchPage, searchPath } from "@/lib/search/initialSearchState";
+import { getInitialSearchState, parseSearchPage, parseSearchQuery, searchPath } from "@/lib/search/initialSearchState";
 import { Videos } from "@/types";
 import { describe, expect, test } from "vitest";
 
@@ -34,10 +34,10 @@ const songs = [
 ];
 
 describe("getInitialSearchState", () => {
-  test("クエリが無ければ全件とグループ検索", () => {
+  test("クエリが無ければ全件", () => {
     expect(getInitialSearchState({ videos, groups, songs })).toEqual({
-      selectedButton: "groups",
-      selectedItems: [],
+      selectedGroups: [],
+      selectedSongs: [],
       filteredData: videos,
     });
   });
@@ -47,47 +47,65 @@ describe("getInitialSearchState", () => {
       videos: [videos[0]],
       groups,
       songs,
-      queryType: "group",
-      queryId: "g1",
+      groupIds: ["g1"],
     });
-    expect(state.selectedButton).toBe("groups");
-    expect(state.selectedItems).toEqual([{ id: "g1", name: "IVE" }]);
+    expect(state.selectedGroups).toEqual([{ id: "g1", name: "IVE" }]);
+    expect(state.selectedSongs).toEqual([]);
     expect(state.filteredData.map((video) => video.id)).toEqual(["v1"]);
   });
 
-  test("楽曲タブだけなら全件のまま", () => {
+  test("グループと楽曲を同時に出せる", () => {
     const state = getInitialSearchState({
-      videos,
+      videos: [videos[0]],
       groups,
       songs,
-      queryType: "song",
+      groupIds: ["g1"],
+      songIds: ["s1"],
     });
-    expect(state.selectedButton).toBe("songs");
-    expect(state.selectedItems).toEqual([]);
-    expect(state.filteredData).toEqual(videos);
+    expect(state.selectedGroups).toEqual([{ id: "g1", name: "IVE" }]);
+    expect(state.selectedSongs).toEqual([{ id: "s1", name: "ATTITUDE" }]);
   });
 
   test("searchPath がクエリを組む", () => {
     expect(searchPath()).toBe("/search");
-    expect(searchPath("groups")).toBe("/search?type=group");
-    expect(searchPath("groups", "g1")).toBe("/search?type=group&id=g1");
-    expect(searchPath("songs")).toBe("/search?type=song");
-    expect(searchPath("songs", "s2")).toBe("/search?type=song&id=s2");
-    expect(searchPath("groups", "g1", 2)).toBe("/search?type=group&id=g1&page=2");
+    expect(searchPath({ groupIds: ["g1"] })).toBe("/search?group=g1");
+    expect(searchPath({ songIds: ["s2"] })).toBe("/search?song=s2");
+    expect(searchPath({ groupIds: ["g2", "g1"], songIds: ["s1"], page: 2 })).toBe(
+      "/search?group=g1&group=g2&song=s1&page=2"
+    );
     expect(parseSearchPage("2")).toBe(2);
     expect(parseSearchPage("nope")).toBe(1);
   });
 
-  test("楽曲クエリで絞り込む", () => {
+  test("旧 type=id クエリを読む", () => {
+    expect(parseSearchQuery({ type: "group", id: "g1" })).toEqual({
+      groupIds: ["g1"],
+      songIds: [],
+      page: 1,
+    });
+    expect(parseSearchQuery({ type: "song", id: "s2", page: "3" })).toEqual({
+      groupIds: [],
+      songIds: ["s2"],
+      page: 3,
+    });
+  });
+
+  test("group と song の複数指定を読む", () => {
+    expect(parseSearchQuery({ group: ["g1", "g2"], song: "s1,s2" })).toEqual({
+      groupIds: ["g1", "g2"],
+      songIds: ["s1", "s2"],
+      page: 1,
+    });
+  });
+
+  test("楽曲クエリで選択状態を出す", () => {
     const state = getInitialSearchState({
       videos,
       groups,
       songs,
-      queryType: "song",
-      queryId: "s2",
+      songIds: ["s2"],
     });
-    expect(state.selectedButton).toBe("songs");
-    expect(state.selectedItems).toEqual([{ id: "s2", name: "Whiplash" }]);
+    expect(state.selectedSongs).toEqual([{ id: "s2", name: "Whiplash" }]);
     expect(state.filteredData).toEqual(videos);
   });
 });

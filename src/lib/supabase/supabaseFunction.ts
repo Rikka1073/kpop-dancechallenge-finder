@@ -1,7 +1,9 @@
 import "server-only";
+import { intersectVideoIds, videoIdsMatchingAll } from "@/lib/search/matchVideoIds";
 import { getSupabaseClient } from "./supabase";
 
 const VIDEO_RELATIONS = `*, video_groups!inner(groups(id, group_name)), video_songs!inner(songs(id, song_name))`;
+const VIDEO_RELATIONS_ALL_TAGS = `*, video_groups(groups(id, group_name)), video_songs(songs(id, song_name))`;
 
 function logSupabaseError(context: string, error: unknown) {
   if (error && typeof error === "object" && "message" in error) {
@@ -25,6 +27,35 @@ function logSupabaseError(context: string, error: unknown) {
 
 export const SEARCH_PAGE_SIZE = 20;
 
+function uniqueIds(ids?: string[] | null): string[] {
+  return [...new Set((ids ?? []).map((id) => id.trim()).filter(Boolean))];
+}
+
+async function videoIdsForGroups(ids: string[]): Promise<string[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("video_groups")
+    .select("video_id, group_id")
+    .in("group_id", ids);
+  if (error) {
+    throw error;
+  }
+  return videoIdsMatchingAll(
+    (data || []).map((row) => ({ video_id: row.video_id, tag_id: row.group_id })),
+    ids
+  );
+}
+
+async function videoIdsForSongs(ids: string[]): Promise<string[]> {
+  const { data, error } = await getSupabaseClient().from("video_songs").select("video_id, song_id").in("song_id", ids);
+  if (error) {
+    throw error;
+  }
+  return videoIdsMatchingAll(
+    (data || []).map((row) => ({ video_id: row.video_id, tag_id: row.song_id })),
+    ids
+  );
+}
+
 export const getAllVideos = async () => {
   try {
     const { data, error } = await getSupabaseClient()
@@ -45,30 +76,41 @@ export const getAllVideos = async () => {
 };
 
 export async function searchPublicVideos({
-  queryType,
-  queryId,
+  groupIds,
+  songIds,
   page = 1,
 }: {
-  queryType?: string | null;
-  queryId?: string | null;
+  groupIds?: string[] | null;
+  songIds?: string[] | null;
   page?: number;
 }) {
   const currentPage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
   const from = (currentPage - 1) * SEARCH_PAGE_SIZE;
   const to = from + SEARCH_PAGE_SIZE - 1;
+  const groups = uniqueIds(groupIds);
+  const songs = uniqueIds(songIds);
 
   try {
+    let matchedIds: string[] | null = null;
+    if (groups.length) {
+      matchedIds = await videoIdsForGroups(groups);
+    }
+    if (songs.length) {
+      matchedIds = intersectVideoIds(matchedIds, await videoIdsForSongs(songs));
+    }
+    if (matchedIds && matchedIds.length === 0) {
+      return { videos: [], total: 0, page: currentPage, pageSize: SEARCH_PAGE_SIZE };
+    }
+
     let query = getSupabaseClient()
       .from("videos")
-      .select(VIDEO_RELATIONS, { count: "exact" })
+      .select(matchedIds ? VIDEO_RELATIONS_ALL_TAGS : VIDEO_RELATIONS, { count: "exact" })
       .not("display", "is", false)
       .order("view_count", { ascending: false })
       .range(from, to);
 
-    if (queryType === "group" && queryId) {
-      query = query.eq("video_groups.group_id", queryId);
-    } else if (queryType === "song" && queryId) {
-      query = query.eq("video_songs.song_id", queryId);
+    if (matchedIds) {
+      query = query.in("id", matchedIds);
     }
 
     const { data, error, count } = await query;

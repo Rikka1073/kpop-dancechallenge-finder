@@ -1,17 +1,16 @@
 import { Videos } from "@/types";
 
-export type SearchType = "groups" | "songs";
-
-export function filterVideos(videos: Videos[], searchType: SearchType, selectedId?: string | null): Videos[] {
-  if (!selectedId) {
-    return videos;
-  }
-
-  if (searchType === "groups") {
-    return videos.filter((video) => video.video_groups.some((item) => item.groups.id === selectedId));
-  }
-
-  return videos.filter((video) => video.video_songs.some((item) => item.songs.id === selectedId));
+export function filterVideos(
+  videos: Videos[],
+  { groupIds = [], songIds = [] }: { groupIds?: string[]; songIds?: string[] } = {}
+): Videos[] {
+  return videos.filter((video) => {
+    const videoGroupIds = video.video_groups.map((item) => item.groups.id);
+    const videoSongIds = video.video_songs.map((item) => item.songs.id);
+    const matchesGroups = groupIds.every((id) => videoGroupIds.includes(id));
+    const matchesSongs = songIds.every((id) => videoSongIds.includes(id));
+    return matchesGroups && matchesSongs;
+  });
 }
 
 export function isVideoMissingTags(video: {

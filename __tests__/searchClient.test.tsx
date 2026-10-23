@@ -27,20 +27,25 @@ const videos: Videos[] = [
   },
 ];
 
-const groups = [{ id: "g1", group_name: "IVE" }];
-const songs = [{ id: "s1", song_name: "ATTITUDE" }];
+const groups = [
+  { id: "g1", group_name: "IVE" },
+  { id: "g2", group_name: "aespa" },
+];
+const songs = [
+  { id: "s1", song_name: "ATTITUDE" },
+  { id: "s2", song_name: "Whiplash" },
+];
 
 function renderSearch(
-  queryType?: string,
-  queryId?: string,
-  extras?: { total?: number; page?: number; pageSize?: number; pageVideos?: Videos[] },
+  query?: { groupIds?: string[]; songIds?: string[] },
+  extras?: { total?: number; page?: number; pageSize?: number; pageVideos?: Videos[] }
 ) {
   const initial = getInitialSearchState({
     videos: extras?.pageVideos ?? videos,
     groups,
     songs,
-    queryType,
-    queryId,
+    groupIds: query?.groupIds,
+    songIds: query?.songIds,
   });
   return render(
     <SearchClient
@@ -50,7 +55,7 @@ function renderSearch(
       page={extras?.page ?? 1}
       pageSize={extras?.pageSize ?? 20}
       {...initial}
-    />,
+    />
   );
 }
 
@@ -62,36 +67,48 @@ describe("SearchClient", () => {
   test("グループを選ぶと URL を更新する", () => {
     renderSearch();
     screen.getByRole("button", { name: "#IVE" }).click();
-    expect(replace).toHaveBeenCalledWith("/search?type=group&id=g1", { scroll: false });
+    expect(replace).toHaveBeenCalledWith("/search?group=g1", { scroll: false });
   });
 
-  test("選択中のグループをもう一度押すと id が外れてタブだけ残る", () => {
-    renderSearch("group", "g1");
+  test("選択中のグループをもう一度押すと外れる", () => {
+    renderSearch({ groupIds: ["g1"] });
     screen.getByRole("button", { name: "#IVE" }).click();
-    expect(replace).toHaveBeenCalledWith("/search?type=group", { scroll: false });
+    expect(replace).toHaveBeenCalledWith("/search", { scroll: false });
   });
 
-  test("グループタブで URL を更新する", () => {
-    renderSearch("song");
-    screen.getByRole("button", { name: "グループで検索" }).click();
-    expect(replace).toHaveBeenCalledWith("/search?type=group", { scroll: false });
+  test("同じ種類を複数選ぶと URL に両方載る", () => {
+    renderSearch({ groupIds: ["g1"] });
+    screen.getByRole("button", { name: "#aespa" }).click();
+    expect(replace).toHaveBeenCalledWith("/search?group=g1&group=g2", { scroll: false });
   });
 
-  test("楽曲タブで URL を更新する", () => {
-    renderSearch();
-    screen.getByRole("button", { name: "楽曲で検索" }).click();
-    expect(replace).toHaveBeenCalledWith("/search?type=song", { scroll: false });
+  test("複数グループの選択中は × でつなぐ", () => {
+    renderSearch({ groupIds: ["g1", "g2"] });
+    expect(screen.getByText("×")).toBeInTheDocument();
+    expect(screen.getByText("選んだ条件のすべてに合う動画だけ出ます")).toBeInTheDocument();
+  });
+
+  test("楽曲を足してもグループが残る", () => {
+    renderSearch({ groupIds: ["g1"] });
+    screen.getByRole("button", { name: "#ATTITUDE" }).click();
+    expect(replace).toHaveBeenCalledWith("/search?group=g1&song=s1", { scroll: false });
   });
 
   test("クリアでクエリが消える", () => {
-    renderSearch("group", "g1");
+    renderSearch({ groupIds: ["g1"], songIds: ["s1"] });
     screen.getByRole("button", { name: "クリア" }).click();
     expect(replace).toHaveBeenCalledWith("/search", { scroll: false });
   });
 
+  test("チップを外すとその ID だけ消える", () => {
+    renderSearch({ groupIds: ["g1"], songIds: ["s1"] });
+    screen.getByRole("button", { name: "IVEを外す" }).click();
+    expect(replace).toHaveBeenCalledWith("/search?song=s1", { scroll: false });
+  });
+
   test("次へで page を URL に載せる", () => {
-    renderSearch("group", "g1", { total: 40, page: 1, pageSize: 20 });
+    renderSearch({ groupIds: ["g1"] }, { total: 40, page: 1, pageSize: 20 });
     screen.getByRole("button", { name: "次へ" }).click();
-    expect(replace).toHaveBeenCalledWith("/search?type=group&id=g1&page=2", { scroll: false });
+    expect(replace).toHaveBeenCalledWith("/search?group=g1&page=2", { scroll: false });
   });
 });

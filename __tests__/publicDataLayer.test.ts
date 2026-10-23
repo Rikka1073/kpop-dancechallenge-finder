@@ -17,8 +17,15 @@ describe("公開データ層", () => {
     expect(readFileSync("next.config.mjs", "utf8")).not.toMatch("fallback");
   });
 
+  test("公開検索の絞り込みはカードのタグを欠かさない", () => {
+    const source = readFileSync("src/lib/supabase/supabaseFunction.ts", "utf8");
+    expect(source).toMatch("VIDEO_RELATIONS_ALL_TAGS");
+    expect(source).not.toMatch('in("video_groups.group_id"');
+    expect(source).not.toMatch('in("video_songs.song_id"');
+  });
+
   test("CSS は Geist 変数を使い Arial を置かない", () => {
-    expect(readFileSync("src/app/layout.tsx", "utf8")).toMatch('next/font/google');
+    expect(readFileSync("src/app/layout.tsx", "utf8")).toMatch("next/font/google");
     expect(readFileSync("src/app/globals.css", "utf8")).toMatch("var(--font-sans)");
     expect(readFileSync("src/app/globals.css", "utf8")).not.toMatch("Arial");
   });
