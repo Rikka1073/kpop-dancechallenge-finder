@@ -5,6 +5,8 @@ import {
   createSong,
   getAdminGroups,
   getAdminSongs,
+  setAllGroupDisplay,
+  setAllSongDisplay,
   updateGroup,
   updateSong,
 } from "@/lib/supabase/registerSupabaseFunction";
@@ -73,7 +75,27 @@ export async function PATCH(request: NextRequest) {
     displayOrder?: number | null;
     channelUrl?: string;
     confirmOfficial?: boolean;
+    all?: boolean;
   } | null;
+
+  if (body?.all) {
+    if (!body.type || typeof body.display !== "boolean") {
+      return jsonError("type と display が必要です");
+    }
+    try {
+      if (body.type === "group") {
+        await setAllGroupDisplay(body.display);
+        return jsonOk(await getAdminGroups());
+      }
+      if (body.type === "song") {
+        await setAllSongDisplay(body.display);
+        return jsonOk(await getAdminSongs());
+      }
+      return jsonError("type は group または song を指定してください");
+    } catch (error) {
+      return jsonError(getErrorMessage(error, "マスターデータの更新に失敗しました"));
+    }
+  }
 
   if (!body?.id || !body.type) {
     return jsonError("id と type が必要です");
