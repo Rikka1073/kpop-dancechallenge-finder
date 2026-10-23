@@ -41,6 +41,28 @@ const visibleSong = {
   display: true,
 };
 
+const visibleVideo = {
+  id: "video-visible",
+  youtube_id: "abcdefghijk",
+  title: "IVE dance",
+  thumbnail_url: "",
+  view_count: 12,
+  display: true,
+  video_groups: [{ groups: { id: "group-ive", group_name: "IVE" } }],
+  video_songs: [],
+};
+
+const hiddenVideo = {
+  id: "video-hidden",
+  youtube_id: "hiddenvideo1",
+  title: "hidden challenge",
+  thumbnail_url: "",
+  view_count: 1,
+  display: false,
+  video_groups: [],
+  video_songs: [],
+};
+
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
@@ -61,8 +83,35 @@ describe("管理画面の公式チャンネル", () => {
             }),
           } as Response;
         }
+        if (url.includes("/api/admin/videos") && init?.method === "PATCH") {
+          const body = JSON.parse(String(init.body)) as { id?: string; display?: boolean; all?: boolean };
+          if (body.all) {
+            return {
+              ok: true,
+              json: async () => ({
+                ok: true,
+                data: [visibleVideo, hiddenVideo].map((video) => ({ ...video, display: body.display })),
+              }),
+            } as Response;
+          }
+          const source = body.id === hiddenVideo.id ? hiddenVideo : visibleVideo;
+          return {
+            ok: true,
+            json: async () => ({
+              ok: true,
+              data: {
+                ...source,
+                id: body.id,
+                ...(typeof body.display === "boolean" ? { display: body.display } : {}),
+              },
+            }),
+          } as Response;
+        }
         if (url.includes("/api/admin/videos")) {
-          return { ok: true, json: async () => ({ ok: true, data: [] }) } as Response;
+          return {
+            ok: true,
+            json: async () => ({ ok: true, data: [visibleVideo, hiddenVideo] }),
+          } as Response;
         }
         if (url.includes("/api/admin/youtube/channel")) {
           return {
@@ -211,8 +260,8 @@ describe("管理画面の公式チャンネル", () => {
   test("表示切替はチャンネル設定と別メニュー", async () => {
     render(<AdminDashboard />);
     fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
-    const iveRow = (await screen.findByText("IVE")).closest("li");
-    const missingRow = (await screen.findByText("NewJeans")).closest("li");
+    const iveRow = (await screen.findByRole("checkbox", { name: "IVEを表示" })).closest("li");
+    const missingRow = (await screen.findByRole("checkbox", { name: "NewJeansを表示" })).closest("li");
     expect(iveRow).not.toBeNull();
     expect(missingRow).not.toBeNull();
     expect(within(iveRow as HTMLElement).getByText("設定済み")).toBeInTheDocument();
@@ -245,6 +294,47 @@ describe("管理画面の公式チャンネル", () => {
       expect(displayPatch).toBeDefined();
     });
     expect(screen.getByRole("checkbox", { name: "IVEを表示" })).not.toBeChecked();
+  });
+
+  test("表示切替で動画の公開状態が分かる", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    expect(await screen.findByRole("checkbox", { name: "IVE danceを表示" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "hidden challengeを表示" })).not.toBeChecked();
+  });
+
+  test("動画のチェックを外すと非表示になる", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: "IVE danceを表示" }));
+    await waitFor(() => {
+      const patches = vi.mocked(fetch).mock.calls.filter(([, init]) => init?.method === "PATCH");
+      const displayPatch = patches.find(([url, init]) => {
+        if (!String(url).includes("/api/admin/videos")) return false;
+        const body = JSON.parse(String(init?.body)) as { id?: string; display?: boolean; all?: boolean };
+        return body.id === visibleVideo.id && body.display === false && !body.all;
+      });
+      expect(displayPatch).toBeDefined();
+    });
+    expect(screen.getByRole("checkbox", { name: "IVE danceを表示" })).not.toBeChecked();
+  });
+
+  test("全非表示で動画をまとめて隠す", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    fireEvent.click(await screen.findByRole("button", { name: "動画をすべて非表示" }));
+    await waitFor(() => {
+      const patches = vi.mocked(fetch).mock.calls.filter(([, init]) => init?.method === "PATCH");
+      const bulkPatch = patches.find(([url, init]) => {
+        if (!String(url).includes("/api/admin/videos")) return false;
+        const body = JSON.parse(String(init?.body)) as { display?: boolean; all?: boolean };
+        return body.all === true && body.display === false;
+      });
+      expect(bulkPatch).toBeDefined();
+    });
+    expect(screen.getByRole("checkbox", { name: "IVE danceを表示" })).not.toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "hidden challengeを表示" })).not.toBeChecked();
+    expect(await screen.findByText("動画をすべて非表示にしました")).toBeInTheDocument();
   });
 
   test("未設定フィルタは公式チャンネルがあるグループを隠す", async () => {

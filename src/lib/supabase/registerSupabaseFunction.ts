@@ -169,6 +169,14 @@ export async function setVideoDisplay(videoId: string, display: boolean, client?
   return getAdminVideoById(videoId, db);
 }
 
+export async function setAllVideoDisplay(display: boolean, client?: AdminClient) {
+  const db = getClient(client);
+  const { error } = await db.from("videos").update({ display }).not("id", "is", null);
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function updateVideoStats(
   videoId: string,
   stats: { title: string; thumbnailUrl: string; viewCount: number },

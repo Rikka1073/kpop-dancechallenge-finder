@@ -150,8 +150,10 @@ const AdminDashboard = () => {
 
       {tab === "visibility" && (
         <VisibilityPanel
+          videos={videos}
           groups={groups}
           songs={songs}
+          onVideosChange={setVideos}
           onGroupsChange={setGroups}
           onSongsChange={setSongs}
           onError={fail}
@@ -857,21 +859,26 @@ const OfficialChannelPanel = ({
 };
 
 const VisibilityPanel = ({
+  videos,
   groups,
   songs,
+  onVideosChange,
   onGroupsChange,
   onSongsChange,
   onError,
   onNotice,
 }: {
+  videos: RegisteredVideoRecord[];
   groups: GroupRecord[];
   songs: SongRecord[];
+  onVideosChange: (videos: RegisteredVideoRecord[]) => void;
   onGroupsChange: (groups: GroupRecord[]) => void;
   onSongsChange: (songs: SongRecord[]) => void;
   onError: (error: unknown) => void;
   onNotice: (message: string) => void;
 }) => {
   const [songName, setSongName] = useState("");
+  const [videoBulkBusy, setVideoBulkBusy] = useState(false);
 
   const addSong = async () => {
     try {
@@ -911,8 +918,40 @@ const VisibilityPanel = ({
     }
   };
 
+  const toggleVideo = async (video: RegisteredVideoRecord) => {
+    try {
+      const updated = await adminRequest<RegisteredVideoRecord>("/api/admin/videos", {
+        method: "PATCH",
+        body: JSON.stringify({ id: video.id, display: video.display === false }),
+      });
+      onVideosChange(videos.map((item) => (item.id === updated.id ? updated : item)));
+    } catch (error) {
+      onError(error);
+    }
+  };
+
+  const setAllVideos = async (display: boolean) => {
+    setVideoBulkBusy(true);
+    try {
+      const updated = await adminRequest<RegisteredVideoRecord[]>("/api/admin/videos", {
+        method: "PATCH",
+        body: JSON.stringify({ display, all: true }),
+      });
+      onVideosChange(updated);
+      onNotice(display ? "動画をすべて表示にしました" : "動画をすべて非表示にしました");
+    } catch (error) {
+      onError(error);
+    } finally {
+      setVideoBulkBusy(false);
+    }
+  };
+
+  const allVideosShown = videos.length > 0 && videos.every((video) => video.display !== false);
+  const allVideosHidden = videos.length > 0 && videos.every((video) => video.display === false);
+
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-2">
       <div className="rounded-3xl bg-white p-6 shadow-lg">
         <h2 className="mb-2 text-xl font-bold">グループの表示</h2>
         <p className="mb-4 text-sm text-gray-600">
@@ -973,6 +1012,58 @@ const VisibilityPanel = ({
                   />
                   <span className={displayed ? "" : "text-gray-400"}>{song.song_name}</span>
                   {!displayed && <span className="text-xs text-gray-500">非表示</span>}
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+      <div className="rounded-3xl bg-white p-6 shadow-lg">
+        <h2 className="mb-2 text-xl font-bold">動画の表示</h2>
+        <p className="mb-4 text-sm text-gray-600">
+          チェックが入っているものが公開サイトに出ます。タグ編集は「動画一覧」です。
+        </p>
+        <div className="mb-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="btn btn-sm min-h-11 rounded-xl"
+            disabled={allVideosShown || videos.length === 0 || videoBulkBusy}
+            onClick={() => void setAllVideos(true)}
+            aria-label="動画をすべて表示"
+          >
+            全表示
+          </button>
+          <button
+            type="button"
+            className="btn btn-sm min-h-11 rounded-xl"
+            disabled={allVideosHidden || videos.length === 0 || videoBulkBusy}
+            onClick={() => void setAllVideos(false)}
+            aria-label="動画をすべて非表示"
+          >
+            全非表示
+          </button>
+        </div>
+        <ul className="max-h-[32rem] space-y-2 overflow-y-auto">
+          {videos.length === 0 && <li className="text-sm text-gray-500">まだ登録がありません。</li>}
+          {videos.map((video) => {
+            const displayed = video.display !== false;
+            const groupName = video.video_groups?.find((item) => item.groups?.group_name)?.groups?.group_name;
+            return (
+              <li key={video.id} className="rounded-xl bg-gray-50 px-3 py-2">
+                <label className="flex min-h-11 cursor-pointer items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-sm"
+                    checked={displayed}
+                    onChange={() => toggleVideo(video)}
+                    aria-label={`${video.title}を表示`}
+                  />
+                  <span className={`min-w-0 flex-1 ${displayed ? "" : "text-gray-400"}`}>
+                    {video.title}
+                    {groupName ? <span className="ml-2 text-xs text-gray-500">{groupName}</span> : null}
+                    {!displayed && <span className="ml-2 text-xs text-gray-500">非表示</span>}
+                  </span>
                 </label>
               </li>
             );
