@@ -13,8 +13,11 @@ import type { YouTubeChannelSnapshot } from "@/lib/youtube/fetchYouTubeChannel";
 import { findOfficialGroupByChannelId } from "@/lib/youtube/officialGroup";
 import type { YouTubeVideoSnapshot } from "@/lib/youtube/fetchYouTubeVideo";
 
-type Tab = "register" | "videos" | "catalog" | "candidates";
+type Tab = "register" | "videos" | "channels" | "visibility" | "candidates";
 type VideoFilter = "all" | "untagged" | "hidden";
+type ChannelFilter = "all" | "configured" | "missing";
+
+const hasOfficialChannel = (group: GroupRecord) => Boolean(group.youtube_channel_id?.trim());
 
 const AdminDashboard = () => {
   const router = useRouter();
@@ -87,8 +90,11 @@ const AdminDashboard = () => {
         <TabButton active={tab === "videos"} onClick={() => setTab("videos")}>
           動画一覧（{videos.length}）
         </TabButton>
-        <TabButton active={tab === "catalog"} onClick={() => setTab("catalog")}>
-          グループ / 楽曲
+        <TabButton active={tab === "channels"} onClick={() => setTab("channels")}>
+          公式チャンネル
+        </TabButton>
+        <TabButton active={tab === "visibility"} onClick={() => setTab("visibility")}>
+          表示切替
         </TabButton>
       </div>
 
@@ -133,8 +139,17 @@ const AdminDashboard = () => {
         />
       )}
 
-      {tab === "catalog" && (
-        <CatalogPanel
+      {tab === "channels" && (
+        <OfficialChannelPanel
+          groups={groups}
+          onGroupsChange={setGroups}
+          onError={fail}
+          onNotice={notify}
+        />
+      )}
+
+      {tab === "visibility" && (
+        <VisibilityPanel
           groups={groups}
           songs={songs}
           onGroupsChange={setGroups}
@@ -604,18 +619,14 @@ const VideoManageCard = ({
   );
 };
 
-const CatalogPanel = ({
+const OfficialChannelPanel = ({
   groups,
-  songs,
   onGroupsChange,
-  onSongsChange,
   onError,
   onNotice,
 }: {
   groups: GroupRecord[];
-  songs: SongRecord[];
   onGroupsChange: (groups: GroupRecord[]) => void;
-  onSongsChange: (songs: SongRecord[]) => void;
   onError: (error: unknown) => void;
   onNotice: (message: string) => void;
 }) => {
@@ -624,7 +635,16 @@ const CatalogPanel = ({
   const [channelPreview, setChannelPreview] = useState<YouTubeChannelSnapshot | null>(null);
   const [loadingChannel, setLoadingChannel] = useState(false);
   const [savingOfficial, setSavingOfficial] = useState(false);
-  const [songName, setSongName] = useState("");
+  const [filter, setFilter] = useState<ChannelFilter>("all");
+  const [attachingId, setAttachingId] = useState<string | null>(null);
+
+  const configuredCount = groups.filter(hasOfficialChannel).length;
+  const missingCount = groups.length - configuredCount;
+  const visibleGroups = groups.filter((group) => {
+    if (filter === "configured") return hasOfficialChannel(group);
+    if (filter === "missing") return !hasOfficialChannel(group);
+    return true;
+  });
 
   const addGroupWithoutChannel = async () => {
     const name = groupName.trim();
@@ -693,53 +713,92 @@ const CatalogPanel = ({
     }
   };
 
-  const addSong = async () => {
-    try {
-      const created = await adminRequest<SongRecord>("/api/admin/catalog", {
-        method: "POST",
-        body: JSON.stringify({ type: "song", name: songName }),
-      });
-      setSongName("");
-      onSongsChange([...songs, created]);
-      onNotice("楽曲を追加しました");
-    } catch (error) {
-      onError(error);
-    }
-  };
-
-  const toggleGroup = async (group: GroupRecord) => {
-    try {
-      const updated = await adminRequest<GroupRecord>("/api/admin/catalog", {
-        method: "PATCH",
-        body: JSON.stringify({ type: "group", id: group.id, display: group.display === false }),
-      });
-      onGroupsChange(groups.map((item) => (item.id === updated.id ? updated : item)));
-    } catch (error) {
-      onError(error);
-    }
-  };
-
-  const toggleSong = async (song: SongRecord) => {
-    try {
-      const updated = await adminRequest<SongRecord>("/api/admin/catalog", {
-        method: "PATCH",
-        body: JSON.stringify({ type: "song", id: song.id, display: song.display === false }),
-      });
-      onSongsChange(songs.map((item) => (item.id === updated.id ? updated : item)));
-    } catch (error) {
-      onError(error);
-    }
-  };
-
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
       <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <h2 className="mb-2 text-xl font-bold">グループ</h2>
+        <h2 className="mb-2 text-xl font-bold">公式チャンネル</h2>
+        <p className="mb-4 text-sm font-bold text-gray-700">
+          設定済み {configuredCount} / {groups.length}
+        </p>
+        <div className="mb-3 flex flex-wrap gap-2">
+          <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
+            すべて
+          </FilterChip>
+          <FilterChip active={filter === "missing"} onClick={() => setFilter("missing")}>
+            未設定 {missingCount}
+          </FilterChip>
+          <FilterChip active={filter === "configured"} onClick={() => setFilter("configured")}>
+            設定済み {configuredCount}
+          </FilterChip>
+        </div>
+        <ul className="space-y-2">
+          {visibleGroups.map((group) => {
+            const configured = hasOfficialChannel(group);
+            const attaching = attachingId === group.id;
+            return (
+              <li key={group.id} className="rounded-xl bg-purple-50 px-3 py-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold">{group.group_name}</span>
+                      {configured ? (
+                        <span className="badge border-none bg-green-100 text-green-800">設定済み</span>
+                      ) : (
+                        <span className="badge badge-warning">未設定</span>
+                      )}
+                    </div>
+                    {configured && (
+                      <a
+                        href={`https://www.youtube.com/channel/${group.youtube_channel_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`${group.group_name}の公式チャンネル`}
+                        className="mt-2 inline-flex min-h-11 items-center gap-1 text-sm text-purple-700 underline"
+                      >
+                        <Youtube className="h-4 w-4" />
+                        {group.youtube_channel_title || group.youtube_channel_id}
+                      </a>
+                    )}
+                  </div>
+                  {!configured && (
+                    <button
+                      type="button"
+                      className="btn btn-xs min-h-11 rounded-xl"
+                      aria-expanded={attaching}
+                      aria-label={
+                        attaching
+                          ? `${group.group_name}のチャンネル設定を閉じる`
+                          : `${group.group_name}のチャンネルを設定`
+                      }
+                      onClick={() => setAttachingId(attaching ? null : group.id)}
+                    >
+                      {attaching ? "閉じる" : "チャンネルを設定"}
+                    </button>
+                  )}
+                </div>
+                {!configured && attaching && (
+                  <AttachOfficialChannel
+                    group={group}
+                    onSaved={(updated) => {
+                      onGroupsChange(groups.map((item) => (item.id === updated.id ? updated : item)));
+                      setAttachingId(null);
+                    }}
+                    onError={onError}
+                    onNotice={onNotice}
+                  />
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <div className="rounded-3xl bg-white p-6 shadow-lg">
+        <h2 className="mb-2 text-xl font-bold">グループを追加</h2>
         <p className="mb-4 text-sm text-gray-600">
           公式チャンネルかどうかは、先に YouTube
           で自分で確認してください。取得はチャンネルIDを取るだけで、公式とは判定しません。確認したURLを貼ってから保存します。
         </p>
-        <div className="mb-4 flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <label className="flex flex-col gap-1 text-sm text-gray-600">
             グループ名
             <input
@@ -792,36 +851,97 @@ const CatalogPanel = ({
             チャンネル未設定のまま追加
           </button>
         </div>
+      </div>
+    </div>
+  );
+};
+
+const VisibilityPanel = ({
+  groups,
+  songs,
+  onGroupsChange,
+  onSongsChange,
+  onError,
+  onNotice,
+}: {
+  groups: GroupRecord[];
+  songs: SongRecord[];
+  onGroupsChange: (groups: GroupRecord[]) => void;
+  onSongsChange: (songs: SongRecord[]) => void;
+  onError: (error: unknown) => void;
+  onNotice: (message: string) => void;
+}) => {
+  const [songName, setSongName] = useState("");
+
+  const addSong = async () => {
+    try {
+      const created = await adminRequest<SongRecord>("/api/admin/catalog", {
+        method: "POST",
+        body: JSON.stringify({ type: "song", name: songName }),
+      });
+      setSongName("");
+      onSongsChange([...songs, created]);
+      onNotice("楽曲を追加しました");
+    } catch (error) {
+      onError(error);
+    }
+  };
+
+  const toggleGroup = async (group: GroupRecord) => {
+    try {
+      const updated = await adminRequest<GroupRecord>("/api/admin/catalog", {
+        method: "PATCH",
+        body: JSON.stringify({ type: "group", id: group.id, display: group.display === false }),
+      });
+      onGroupsChange(groups.map((item) => (item.id === updated.id ? updated : item)));
+    } catch (error) {
+      onError(error);
+    }
+  };
+
+  const toggleSong = async (song: SongRecord) => {
+    try {
+      const updated = await adminRequest<SongRecord>("/api/admin/catalog", {
+        method: "PATCH",
+        body: JSON.stringify({ type: "song", id: song.id, display: song.display === false }),
+      });
+      onSongsChange(songs.map((item) => (item.id === updated.id ? updated : item)));
+    } catch (error) {
+      onError(error);
+    }
+  };
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <div className="rounded-3xl bg-white p-6 shadow-lg">
+        <h2 className="mb-2 text-xl font-bold">グループの表示</h2>
+        <p className="mb-4 text-sm text-gray-600">公開サイトに出すかどうかを切り替えます。公式チャンネルの保存は「公式チャンネル」メニューです。</p>
         <ul className="space-y-2">
           {groups.map((group) => (
-            <li key={group.id} className="rounded-xl bg-purple-50 px-3 py-3">
-              <div className="flex items-center justify-between gap-2">
-                <span>
-                  {group.group_name}
-                  {group.display === false && <span className="ml-2 text-xs text-gray-500">非表示</span>}
-                </span>
-                <button type="button" className="btn btn-xs min-h-11" onClick={() => toggleGroup(group)}>
-                  {group.display === false ? "表示" : "非表示"}
-                </button>
+            <li key={group.id} className="flex items-center justify-between gap-2 rounded-xl bg-purple-50 px-3 py-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span>{group.group_name}</span>
+                {hasOfficialChannel(group) ? (
+                  <span className="badge border-none bg-green-100 text-green-800">設定済み</span>
+                ) : (
+                  <span className="badge badge-warning">未設定</span>
+                )}
+                {group.display === false && <span className="text-xs text-gray-500">非表示</span>}
               </div>
-              {group.youtube_channel_id ? (
-                <p className="mt-2 text-xs text-gray-600">
-                  確認済み: {group.youtube_channel_title || group.youtube_channel_id}
-                </p>
-              ) : (
-                <AttachOfficialChannel
-                  group={group}
-                  onSaved={(updated) => onGroupsChange(groups.map((item) => (item.id === updated.id ? updated : item)))}
-                  onError={onError}
-                  onNotice={onNotice}
-                />
-              )}
+              <button
+                type="button"
+                className="btn btn-xs min-h-11"
+                aria-label={group.display === false ? `${group.group_name}を表示` : `${group.group_name}を非表示`}
+                onClick={() => toggleGroup(group)}
+              >
+                {group.display === false ? "表示" : "非表示"}
+              </button>
             </li>
           ))}
         </ul>
       </div>
       <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-bold">楽曲</h2>
+        <h2 className="mb-4 text-xl font-bold">楽曲の表示</h2>
         <div className="mb-4 flex gap-2">
           <input
             value={songName}
@@ -841,7 +961,12 @@ const CatalogPanel = ({
                 {song.song_name}
                 {song.display === false && <span className="ml-2 text-xs text-gray-500">非表示</span>}
               </span>
-              <button type="button" className="btn btn-xs min-h-11" onClick={() => toggleSong(song)}>
+              <button
+                type="button"
+                className="btn btn-xs min-h-11"
+                aria-label={song.display === false ? `${song.song_name}を表示` : `${song.song_name}を非表示`}
+                onClick={() => toggleSong(song)}
+              >
                 {song.display === false ? "表示" : "非表示"}
               </button>
             </li>
@@ -851,6 +976,27 @@ const CatalogPanel = ({
     </div>
   );
 };
+
+const FilterChip = ({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-pressed={active}
+    className={`min-h-11 rounded-xl px-3 py-2 text-sm font-bold ${
+      active ? "bg-purple-600 text-white" : "bg-purple-50 text-gray-600 hover:bg-purple-100"
+    }`}
+  >
+    {children}
+  </button>
+);
 
 const AttachOfficialChannel = ({
   group,
@@ -910,7 +1056,6 @@ const AttachOfficialChannel = ({
 
   return (
     <div className="mt-3 flex flex-col gap-2">
-      <p className="text-xs text-gray-500">公式チャンネル未設定</p>
       <label className="flex flex-col gap-1 text-xs text-gray-600">
         確認済みチャンネルURL
         <input

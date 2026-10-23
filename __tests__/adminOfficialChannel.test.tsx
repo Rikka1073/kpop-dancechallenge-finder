@@ -126,7 +126,7 @@ describe("管理画面の公式チャンネル", () => {
 
   test("プレビュー前は公式として保存できない", async () => {
     render(<AdminDashboard />);
-    fireEvent.click(await screen.findByRole("button", { name: "グループ / 楽曲" }));
+    fireEvent.click(await screen.findByRole("button", { name: "公式チャンネル" }));
     expect(
       await screen.findByText(/公式チャンネルかどうかは、先に YouTube で自分で確認してください/)
     ).toBeInTheDocument();
@@ -135,7 +135,7 @@ describe("管理画面の公式チャンネル", () => {
 
   test("チャンネル情報を取得したあと、人が確認してから公式として保存する", async () => {
     render(<AdminDashboard />);
-    fireEvent.click(await screen.findByRole("button", { name: "グループ / 楽曲" }));
+    fireEvent.click(await screen.findByRole("button", { name: "公式チャンネル" }));
     fireEvent.change(await screen.findByPlaceholderText("グループ名"), { target: { value: "IVE" } });
     fireEvent.change(screen.getByPlaceholderText("https://www.youtube.com/@..."), {
       target: { value: "@IVEstarship" },
@@ -159,11 +159,39 @@ describe("管理画面の公式チャンネル", () => {
 
   test("未設定のグループは公式チャンネルと表示しない", async () => {
     render(<AdminDashboard />);
-    fireEvent.click(await screen.findByRole("button", { name: "グループ / 楽曲" }));
-    const row = (await screen.findByText("NewJeans")).closest("li");
-    expect(row).not.toBeNull();
-    expect(within(row as HTMLElement).getByText("公式チャンネル未設定")).toBeInTheDocument();
-    expect(screen.getByText("確認済み: IVE")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "公式チャンネル" }));
+    const missingRow = (await screen.findByText("NewJeans")).closest("li");
+    const configuredLink = await screen.findByRole("link", { name: "IVEの公式チャンネル" });
+    const configuredRow = configuredLink.closest("li");
+    expect(missingRow).not.toBeNull();
+    expect(configuredRow).not.toBeNull();
+    expect(within(missingRow as HTMLElement).getByText("未設定")).toBeInTheDocument();
+    expect(within(missingRow as HTMLElement).getByRole("button", { name: "NewJeansのチャンネルを設定" })).toBeInTheDocument();
+    expect(within(configuredRow as HTMLElement).getByText("設定済み")).toBeInTheDocument();
+    expect(configuredLink).toHaveAttribute("href", "https://www.youtube.com/channel/UCxxxxxxxxxxxxxxxxxxxxxx");
+    expect(screen.queryByRole("button", { name: "非表示" })).not.toBeInTheDocument();
+  });
+
+  test("表示切替はチャンネル設定と別メニュー", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    const iveRow = (await screen.findByText("IVE")).closest("li");
+    const missingRow = (await screen.findByText("NewJeans")).closest("li");
+    expect(iveRow).not.toBeNull();
+    expect(missingRow).not.toBeNull();
+    expect(within(iveRow as HTMLElement).getByText("設定済み")).toBeInTheDocument();
+    expect(within(missingRow as HTMLElement).getByText("未設定")).toBeInTheDocument();
+    expect(within(iveRow as HTMLElement).getByRole("button", { name: "IVEを非表示" })).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("https://www.youtube.com/@...")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "このチャンネルを公式として保存" })).not.toBeInTheDocument();
+  });
+
+  test("未設定フィルタは公式チャンネルがあるグループを隠す", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "公式チャンネル" }));
+    fireEvent.click(await screen.findByRole("button", { name: "未設定 1" }));
+    expect(screen.getByText("NewJeans")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "IVEの公式チャンネル" })).not.toBeInTheDocument();
   });
 
   test("確認済み公式チャンネルの動画だけ登録できる", async () => {
