@@ -915,29 +915,33 @@ const VisibilityPanel = ({
     <div className="grid gap-6 md:grid-cols-2">
       <div className="rounded-3xl bg-white p-6 shadow-lg">
         <h2 className="mb-2 text-xl font-bold">グループの表示</h2>
-        <p className="mb-4 text-sm text-gray-600">公開サイトに出すかどうかを切り替えます。公式チャンネルの保存は「公式チャンネル」メニューです。</p>
+        <p className="mb-4 text-sm text-gray-600">
+          チェックが入っているものが公開サイトに出ます。公式チャンネルの保存は「公式チャンネル」メニューです。
+        </p>
         <ul className="space-y-2">
-          {groups.map((group) => (
-            <li key={group.id} className="flex items-center justify-between gap-2 rounded-xl bg-purple-50 px-3 py-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span>{group.group_name}</span>
-                {hasOfficialChannel(group) ? (
-                  <span className="badge border-none bg-green-100 text-green-800">設定済み</span>
-                ) : (
-                  <span className="badge badge-warning">未設定</span>
-                )}
-                {group.display === false && <span className="text-xs text-gray-500">非表示</span>}
-              </div>
-              <button
-                type="button"
-                className="btn btn-xs min-h-11"
-                aria-label={group.display === false ? `${group.group_name}を表示` : `${group.group_name}を非表示`}
-                onClick={() => toggleGroup(group)}
-              >
-                {group.display === false ? "表示" : "非表示"}
-              </button>
-            </li>
-          ))}
+          {groups.map((group) => {
+            const displayed = group.display !== false;
+            return (
+              <li key={group.id} className="rounded-xl bg-purple-50 px-3 py-2">
+                <label className="flex min-h-11 cursor-pointer items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-sm"
+                    checked={displayed}
+                    onChange={() => toggleGroup(group)}
+                    aria-label={`${group.group_name}を表示`}
+                  />
+                  <span className={displayed ? "" : "text-gray-400"}>{group.group_name}</span>
+                  {hasOfficialChannel(group) ? (
+                    <span className="badge border-none bg-green-100 text-green-800">設定済み</span>
+                  ) : (
+                    <span className="badge badge-warning">未設定</span>
+                  )}
+                  {!displayed && <span className="text-xs text-gray-500">非表示</span>}
+                </label>
+              </li>
+            );
+          })}
         </ul>
       </div>
       <div className="rounded-3xl bg-white p-6 shadow-lg">
@@ -955,22 +959,24 @@ const VisibilityPanel = ({
           </button>
         </div>
         <ul className="space-y-2">
-          {songs.map((song) => (
-            <li key={song.id} className="flex items-center justify-between rounded-xl bg-red-50 px-3 py-2">
-              <span>
-                {song.song_name}
-                {song.display === false && <span className="ml-2 text-xs text-gray-500">非表示</span>}
-              </span>
-              <button
-                type="button"
-                className="btn btn-xs min-h-11"
-                aria-label={song.display === false ? `${song.song_name}を表示` : `${song.song_name}を非表示`}
-                onClick={() => toggleSong(song)}
-              >
-                {song.display === false ? "表示" : "非表示"}
-              </button>
-            </li>
-          ))}
+          {songs.map((song) => {
+            const displayed = song.display !== false;
+            return (
+              <li key={song.id} className="rounded-xl bg-red-50 px-3 py-2">
+                <label className="flex min-h-11 cursor-pointer items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-sm"
+                    checked={displayed}
+                    onChange={() => toggleSong(song)}
+                    aria-label={`${song.song_name}を表示`}
+                  />
+                  <span className={displayed ? "" : "text-gray-400"}>{song.song_name}</span>
+                  {!displayed && <span className="text-xs text-gray-500">非表示</span>}
+                </label>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
