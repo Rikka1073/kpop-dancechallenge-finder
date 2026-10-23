@@ -84,3 +84,14 @@ export type SongRecord = {
   song_name: string;
   display?: boolean | null;
 };
+
+export type RegisteredVideoRecord = {
+  id: string;
+  youtube_id: string;
+  title: string;
+  thumbnail_url: string;
+  view_count: number;
+  display?: boolean | null;
+  video_groups: { groups: { id: string; group_name: string } | null }[] | null;
+  video_songs: { songs: { id: string; song_name: string } | null }[] | null;
+};

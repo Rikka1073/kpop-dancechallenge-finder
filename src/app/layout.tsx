@@ -2,7 +2,18 @@ import Header from "@/components/feature/Header";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/seo/site";
 import { GoogleTagManager } from "@next/third-parties/google";
 import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+const geistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -33,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className="scroll-smooth" data-theme="light">
+    <html lang="ja" className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`} data-theme="light">
       <body className="bg-white font-sans text-black antialiased">
         <div className="relative min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
           <Header />
