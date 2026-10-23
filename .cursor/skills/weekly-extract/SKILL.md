@@ -5,7 +5,7 @@ description: Extracts YouTube dance-challenge candidates into a local JSON draft
 
 # 週次抽出
 
-確認済み公式チャンネル（`groups.youtube_channel_id`）の中だけ YouTube から候補を集め、手元 JSON に書いて止まる。公式チャンネル未保存のグループは取らない。公式判定も DB 投入も公開もしない。依頼に Linear の課題 ID があるときは開始時に読む。
+確認済み公式チャンネル（`groups.youtube_channel_id`）の中だけ、60秒以内のショートを YouTube から集め、手元 JSON に書いて止まる。長尺（MV・ダンスプラクティスなど）は取らない。公式チャンネル未保存のグループは取らない。公式判定も DB 投入も公開もしない。依頼に Linear の課題 ID があるときは開始時に読む。
 
 停止点では Linear を `In Review` にし、チャットに結論だけ書く。Obsidian 報告は1日の終わりに、許可を取ってからまとめて書く。
 

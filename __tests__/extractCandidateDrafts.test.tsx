@@ -200,6 +200,59 @@ describe("extractCandidateDrafts", () => {
 
     expect(file.candidates).toHaveLength(1);
   });
+
+  test("60秒を超える動画は捨てる", async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      if (url.pathname.endsWith("/search")) {
+        return new Response(
+          JSON.stringify({
+            items: [
+              {
+                id: { videoId: "longvideo001" },
+                snippet: {
+                  title: "MV",
+                  channelId: IVE_CHANNEL,
+                  channelTitle: "IVE",
+                  publishedAt: "2026-10-01T00:00:00Z",
+                },
+              },
+            ],
+          })
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          items: [
+            {
+              id: "longvideo001",
+              snippet: {
+                title: "MV",
+                channelId: IVE_CHANNEL,
+                channelTitle: "IVE",
+                publishedAt: "2026-10-01T00:00:00Z",
+              },
+              statistics: { viewCount: "9" },
+              contentDetails: { duration: "PT2M18S" },
+            },
+          ],
+        })
+      );
+    });
+
+    const file = await extractCandidateDrafts(
+      {
+        groups: ["IVE"],
+        officialGroups,
+        linearIssue: "MAS-53",
+        queries: ["{group} dance challenge shorts"],
+      },
+      { apiKey: "test-key", fetchImpl }
+    );
+
+    expect(file.candidates).toHaveLength(0);
+  });
 });
 
 describe("writeCandidateDraftFile", () => {
