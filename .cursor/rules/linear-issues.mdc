@@ -1,0 +1,6 @@
+---
+description: Linear 課題の作成は承認不要。切る前に聞かない。
+alwaysApply: true
+---
+
+SeeKPOP の Linear 課題（作成・更新・コメント）は承認不要。切る前にチャットで「切ってよいですか」と聞かない。PR 作成も承認不要。人が許可するものは `main` へのマージ、Obsidian への書き込み、公開だけ。
