@@ -100,6 +100,68 @@ export async function upsertVideoWithTags(
   return getAdminVideoById(videoId, db);
 }
 
+export async function findVideoByYoutubeId(youtubeId: string, client?: AdminClient) {
+  const id = youtubeId.trim();
+  if (!id) {
+    return null;
+  }
+
+  const db = getClient(client);
+  const { data, error } = await db.from("videos").select("id").eq("youtube_id", id).order("id").limit(1);
+  if (error) {
+    throw new Error(error.message);
+  }
+  return firstRow(data);
+}
+
+export async function listRegisteredYoutubeIds(client?: AdminClient): Promise<string[]> {
+  const db = getClient(client);
+  const { data, error } = await db.from("videos").select("youtube_id");
+  if (error) {
+    throw new Error(error.message);
+  }
+  return (data || []).map((row) => String(row.youtube_id || "").trim()).filter(Boolean);
+}
+
+export async function insertApprovedVideo(
+  videoData: VideoData,
+  groupIds: string[],
+  songIds: string[],
+  client?: AdminClient
+) {
+  const db = getClient(client);
+  const uniqueGroupIds = [...new Set(groupIds.filter(Boolean))];
+  const uniqueSongIds = [...new Set(songIds.filter(Boolean))];
+
+  if (uniqueGroupIds.length === 0) {
+    throw new Error("承認した動画のグループが解決できません");
+  }
+
+  const existing = await findVideoByYoutubeId(videoData.id, db);
+  if (existing?.id) {
+    return getAdminVideoById(existing.id as string, db);
+  }
+
+  const { data: inserted, error: insertError } = await db
+    .from("videos")
+    .insert({
+      youtube_id: videoData.id,
+      title: videoData.title,
+      thumbnail_url: videoData.thumbnailUrl,
+      view_count: videoData.viewCount,
+      display: false,
+    })
+    .select("id");
+
+  const insertedRow = firstRow(inserted);
+  if (insertError || !insertedRow) {
+    throw new Error(insertError?.message || "動画の登録に失敗しました");
+  }
+
+  await replaceVideoTags(insertedRow.id as string, uniqueGroupIds, uniqueSongIds, db);
+  return getAdminVideoById(insertedRow.id as string, db);
+}
+
 export async function replaceVideoTags(videoId: string, groupIds: string[], songIds: string[], client?: AdminClient) {
   const db = getClient(client);
 

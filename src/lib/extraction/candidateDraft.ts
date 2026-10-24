@@ -124,6 +124,20 @@ export function applyCandidateReview(candidate: CandidateDraft, decision: "appro
   };
 }
 
+export function newlyApprovedCandidates(
+  previous: CandidateDraftFile | null,
+  next: CandidateDraftFile
+): CandidateDraft[] {
+  const alreadyApproved = new Set(
+    (previous?.candidates ?? [])
+      .filter((candidate) => candidate.status === "approved")
+      .map((candidate) => candidate.youtubeId)
+  );
+  return next.candidates.filter(
+    (candidate) => candidate.status === "approved" && !alreadyApproved.has(candidate.youtubeId)
+  );
+}
+
 export function applyCandidateReviews(
   file: CandidateDraftFile,
   decisions: Record<string, "approved" | "rejected">
