@@ -100,12 +100,14 @@ describe("CandidateReviewPanel", () => {
     expect(screen.getByText("data/raw/2026-10-06/candidate-drafts.json")).toBeInTheDocument();
   });
 
-  test("承認と却下は同じ JSON へ書き戻す。DB には入れない", async () => {
+  test("承認は JSON へ書き戻し、DB へ入れる。却下は JSON だけ", async () => {
     render(<CandidateReviewPanel />);
     await screen.findByTestId("candidate-abcdefghijk");
 
     fireEvent.click(within(screen.getByTestId("candidate-abcdefghijk")).getByRole("button", { name: "承認" }));
-    expect(await screen.findByText("承認を JSON に書き戻しました。DBには入れていません。")).toBeInTheDocument();
+    expect(
+      await screen.findByText("承認を JSON に書き戻し、DB に入れました。公開サイトには出していません。")
+    ).toBeInTheDocument();
     expect(screen.queryByTestId("candidate-abcdefghijk")).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("判定で絞る"), { target: { value: "all" } });

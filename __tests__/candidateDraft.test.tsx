@@ -7,6 +7,7 @@ import {
   decidedYoutubeIds,
   listReviewUrls,
   mergeDecidedCandidates,
+  newlyApprovedCandidates,
 } from "@/lib/extraction/candidateDraft";
 import { guessChallenge, guessOfficial } from "@/lib/extraction/guessOfficial";
 
@@ -70,6 +71,34 @@ describe("candidateDraft", () => {
     const reviewed = applyCandidateReviews(file, { abcdefghijk: "approved" });
     expect(reviewed.candidates[0].official).toBe(true);
     expect(file.candidates[0].official).toBeNull();
+  });
+
+  test("新たに承認した候補だけを DB 登録対象にする。却下は対象外", () => {
+    const approved = applyCandidateReview(pending, "approved");
+    const rejected = applyCandidateReview(
+      { ...pending, youtubeId: "rejected0001", url: "https://www.youtube.com/shorts/rejected0001" },
+      "rejected"
+    );
+    const nextApproved = applyCandidateReview(
+      { ...pending, youtubeId: "newapproved01", url: "https://www.youtube.com/shorts/newapproved01" },
+      "approved"
+    );
+    const previous = {
+      extractedAt: "2026-10-06T00:00:00.000Z",
+      linearIssue: "MAS-13",
+      queryNotes: "test",
+      candidates: [approved, rejected, pending],
+    };
+    const next = {
+      ...previous,
+      candidates: [approved, rejected, nextApproved],
+    };
+
+    expect(newlyApprovedCandidates(previous, next).map((candidate) => candidate.youtubeId)).toEqual(["newapproved01"]);
+    expect(newlyApprovedCandidates(null, next).map((candidate) => candidate.youtubeId)).toEqual([
+      "abcdefghijk",
+      "newapproved01",
+    ]);
   });
 
   test("却下と承認の youtubeId を再抽出対象から外す", () => {

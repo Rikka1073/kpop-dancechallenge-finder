@@ -2,7 +2,12 @@ import { NextRequest } from "next/server";
 import { jsonError, jsonOk, requireAdmin, getErrorMessage } from "@/lib/admin/http";
 import { isLocalAdminEnabled, LOCAL_ADMIN_ONLY_MESSAGE } from "@/lib/admin/localOnly";
 import { assertCandidateDraftFile } from "@/lib/extraction/candidateDraft";
-import { loadCandidateDraftBundle, saveCandidateDraftFile } from "@/lib/extraction/localCandidateDrafts";
+import {
+  loadCandidateDraftBundle,
+  readExistingCandidateDraftFile,
+  saveCandidateDraftFile,
+} from "@/lib/extraction/localCandidateDrafts";
+import { registerNewlyApprovedCandidates } from "@/lib/extraction/registerApprovedCandidates";
 
 export async function GET(request: NextRequest) {
   if (!isLocalAdminEnabled()) {
@@ -40,6 +45,8 @@ export async function PUT(request: NextRequest) {
     }
 
     const draft = assertCandidateDraftFile(body?.draft);
+    const previous = await readExistingCandidateDraftFile(date);
+    await registerNewlyApprovedCandidates(previous, draft);
     return jsonOk(await saveCandidateDraftFile(date, draft));
   } catch (error) {
     return jsonError(getErrorMessage(error, "候補ドラフトの保存に失敗しました"));

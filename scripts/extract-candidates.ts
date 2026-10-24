@@ -3,7 +3,7 @@ import { listReviewUrls, mergeDecidedCandidates } from "../src/lib/extraction/ca
 import { loadLocalEnv } from "../src/lib/extraction/loadLocalEnv";
 import { listDecidedYoutubeIds, readExistingCandidateDraftFile } from "../src/lib/extraction/localCandidateDrafts";
 import { writeCandidateDraftFile } from "../src/lib/extraction/writeCandidateDrafts";
-import { getAdminGroups } from "../src/lib/supabase/registerSupabaseFunction";
+import { getAdminGroups, listRegisteredYoutubeIds } from "../src/lib/supabase/registerSupabaseFunction";
 
 loadLocalEnv();
 
@@ -47,7 +47,7 @@ async function main() {
     process.exit(1);
   }
 
-  const skipYoutubeIds = await listDecidedYoutubeIds();
+  const skipYoutubeIds = new Set([...(await listDecidedYoutubeIds()), ...(await listRegisteredYoutubeIds())]);
   const extracted = await extractCandidateDrafts({
     groups,
     officialGroups: await getAdminGroups(),

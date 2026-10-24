@@ -36,9 +36,9 @@ ADMIN_SESSION_SECRET=
 1. `npm run dev` して [http://localhost:3000/admin/login](http://localhost:3000/admin/login) にアクセスする
 2. `ADMIN_PASSWORD` でログインする
 3. 公式チャンネルは YouTube で自分で確認してから、「公式チャンネル」に URL を貼る。表示/非表示は「表示切替」。API はチャンネルIDを取るだけで、公式とは判定しない
-4. 確認したチャンネルを保存したあとに、「動画を登録」から公式チャンネルの動画だけを載せる
-5. 月次抽出は確認済み公式チャンネルの直近1ヶ月のショート（60秒以内）だけ取る。グループの動画を初めて載せるときは `--all-channel-shorts`（新人に限らない）。候補は「候補一覧」が `data/raw/YYYY-MM-DD/candidate-drafts.json` を自動で開く
-6. YouTube を開いて承認 / 却下する。判定は同じ JSON へ書き戻す
+4. 確認したチャンネルを保存したあと、月次抽出 / チャンネル全ショート抽出で候補を集める
+5. 「候補一覧」が `data/raw/YYYY-MM-DD/candidate-drafts.json` を自動で開く。YouTube を開いて承認すると DB に入る（`display=false`。公開サイトには出ない）。却下は JSON だけ
+6. 「動画を登録」は単発の手入力用。サイトに出すときは「表示切替」
 
 `groups.youtube_channel_id` を足す SQL は `supabase/migrations/` にあります。Supabase に適用してから公式チャンネルを保存してください。
 

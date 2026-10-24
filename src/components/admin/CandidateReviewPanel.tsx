@@ -40,7 +40,7 @@ const CandidateReviewPanel = () => {
       setStatusFilter("pending");
       setError("");
       setMessage(
-        `${next.draft.candidates.length}件を ${next.path} から開きました。判定はこのファイルへ書き戻します。DBには入れません。`
+        `${next.draft.candidates.length}件を ${next.path} から開きました。承認すると DB に入ります。公開サイトには出しません。`
       );
     } catch (err) {
       setBundle(null);
@@ -104,7 +104,7 @@ const CandidateReviewPanel = () => {
       setBundle(saved);
       setMessage(
         decision === "approved"
-          ? "承認を JSON に書き戻しました。DBには入れていません。"
+          ? "承認を JSON に書き戻し、DB に入れました。公開サイトには出していません。"
           : "却下を JSON に書き戻しました。DBには入れていません。"
       );
     } catch (err) {
@@ -121,7 +121,8 @@ const CandidateReviewPanel = () => {
         <h2 className="mb-2 text-xl font-bold">候補一覧</h2>
         <p className="mb-4 text-sm text-gray-600">
           同じリポジトリの <code>npm run extract:candidates</code> が手元の <code>data/raw/</code> に書いた JSON
-          を開きます。承認・却下はそのファイルへ保存します。ダウンロードや貼り付けはしません。
+          を開きます。承認すると JSON へ書き戻し、DB へ入れます（公開サイトには出ません）。却下は JSON
+          だけです。ダウンロードや貼り付けはしません。
         </p>
         {bundle && bundle.dates.length > 0 && (
           <label className="flex flex-col gap-2 text-sm text-gray-600 md:flex-row md:items-center">
