@@ -5,7 +5,7 @@ description: Extracts YouTube dance-challenge candidates from the last month int
 
 # 月次抽出
 
-確認済み公式チャンネル（`groups.youtube_channel_id`）の中だけ、公開日が直近1ヶ月の動画を YouTube から集め、手元 JSON に書いて止まる。過去分は取らない。過去ドラフトで却下・承認した youtubeId は再抽出しない。公式チャンネル未保存のグループは取らない。公式判定も DB 投入も公開もしない。依頼に Linear の課題 ID があるときは開始時に読む。
+確認済み公式チャンネル（`groups.youtube_channel_id`）の中だけ、公開日が直近1ヶ月のショート（60秒以内）を YouTube から集め、手元 JSON に書いて止まる。過去分と長尺（MV・ダンスプラクティスなど）は取らない。過去ドラフトで却下・承認した youtubeId は再抽出しない。公式チャンネル未保存のグループは取らない。公式判定も DB 投入も公開もしない。依頼に Linear の課題 ID があるときは開始時に読む。
 
 停止点では Linear を `In Review` にし、チャットに結論だけ書く。Obsidian 報告は1日の終わりに、許可を取ってからまとめて書く。
 
