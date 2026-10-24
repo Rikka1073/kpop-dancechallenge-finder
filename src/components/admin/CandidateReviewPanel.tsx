@@ -215,13 +215,6 @@ const CandidateCard = ({
     <article className="rounded-3xl bg-white p-4 shadow-md" data-testid={`candidate-${candidate.youtubeId}`}>
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <span className={`badge ${statusBadgeClass(candidate.status)}`}>{STATUS_LABEL[candidate.status]}</span>
-        <span
-          className={`badge border-none ${
-            candidate.officialGuess ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          {candidate.officialGuess ? "公式の可能性（推測）" : "公式ではなさそう（推測）"}
-        </span>
         <span className="text-sm text-gray-500">
           {published} · {formatViewCount(candidate.viewCount)} views
         </span>

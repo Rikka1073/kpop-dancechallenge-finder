@@ -80,13 +80,13 @@ describe("CandidateReviewPanel", () => {
     );
   });
 
-  test("タイトル・チャンネル・グループ・公式推測・YouTubeリンクを一覧する", async () => {
+  test("タイトル・チャンネル・グループ・YouTubeリンクを一覧する。公式推測ラベルは出さない", async () => {
     render(<CandidateReviewPanel />);
 
     const first = await screen.findByTestId("candidate-abcdefghijk");
     expect(within(first).getByRole("heading", { name: "IVE ELEVEN Dance Challenge" })).toBeInTheDocument();
     expect(within(first).getByText("IVE", { selector: "p" })).toBeInTheDocument();
-    expect(within(first).getByText("公式の可能性（推測）")).toBeInTheDocument();
+    expect(within(first).queryByText("公式の可能性（推測）")).not.toBeInTheDocument();
     expect(within(first).getByText("公式チャンネルに見える。確定ではない。")).toBeInTheDocument();
     expect(within(first).getByRole("link", { name: "YouTube" })).toHaveAttribute(
       "href",
@@ -94,7 +94,7 @@ describe("CandidateReviewPanel", () => {
     );
 
     const second = screen.getByTestId("candidate-lmnopqrstuv");
-    expect(within(second).getByText("公式ではなさそう（推測）")).toBeInTheDocument();
+    expect(within(second).queryByText("公式ではなさそう（推測）")).not.toBeInTheDocument();
     expect(within(second).getByText("NewJeans")).toBeInTheDocument();
     expect(screen.getByTestId("candidate-counts")).toHaveTextContent("未判定 2");
     expect(screen.getByText("data/raw/2026-10-06/candidate-drafts.json")).toBeInTheDocument();
