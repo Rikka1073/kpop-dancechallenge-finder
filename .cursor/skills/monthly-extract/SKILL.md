@@ -26,6 +26,8 @@ npm run extract:candidates -- --issue MAS-n --group グループ名 --date YYYY-
 
 公開日の下限は実行日から1ヶ月前。変えるときは `--published-after YYYY-MM-DD`。
 
+新人グループの公式チャンネルからショートを全件取るときは `--all-channel-shorts`。検索クエリも直近1ヶ月も使わない。デビュー前を含める。タイトルでは落とさない。60秒以下と却下済みスキップだけ残す。月次のデフォルトは変えない。
+
 候補は `data/raw/YYYY-MM-DD/candidate-drafts.json`。git に入れない。DB に入れない。JSON 全文はチャットに貼らない。
 
 4. 件数と JSON の場所を Linear 課題に書く。
