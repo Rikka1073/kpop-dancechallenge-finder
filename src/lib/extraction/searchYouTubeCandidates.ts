@@ -33,6 +33,8 @@ type VideoItem = {
   };
 };
 
+export const MAX_SHORTS_SECONDS = 60;
+
 function parseIsoDurationSeconds(duration: string | undefined): number | null {
   if (!duration) {
     return null;
@@ -49,12 +51,13 @@ function parseIsoDurationSeconds(duration: string | undefined): number | null {
   return hours * 3600 + minutes * 60 + seconds;
 }
 
-function videoUrl(youtubeId: string, duration?: string): string {
+function isYouTubeShort(duration: string | undefined): boolean {
   const seconds = parseIsoDurationSeconds(duration);
-  if (seconds !== null && seconds > 0 && seconds <= 60) {
-    return `https://www.youtube.com/shorts/${youtubeId}`;
-  }
-  return `https://www.youtube.com/watch?v=${youtubeId}`;
+  return seconds !== null && seconds > 0 && seconds <= MAX_SHORTS_SECONDS;
+}
+
+function videoUrl(youtubeId: string): string {
+  return `https://www.youtube.com/shorts/${youtubeId}`;
 }
 
 async function readYoutubeJson(url: URL, fetchImpl: typeof fetch): Promise<unknown> {
@@ -123,6 +126,9 @@ export async function searchYouTubeCandidates(options: {
       if (itemChannelId !== channelId) {
         return null;
       }
+      if (!isYouTubeShort(item.contentDetails?.duration)) {
+        return null;
+      }
       if (!Number.isNaN(publishedAfterMs) && Date.parse(publishedAt) < publishedAfterMs) {
         return null;
       }
@@ -133,7 +139,7 @@ export async function searchYouTubeCandidates(options: {
         channelTitle,
         publishedAt,
         viewCount: Number.parseInt(item.statistics?.viewCount || "0", 10) || 0,
-        url: videoUrl(youtubeId, item.contentDetails?.duration),
+        url: videoUrl(youtubeId),
       } satisfies YouTubeSearchHit;
     })
     .filter((item): item is YouTubeSearchHit => item !== null);
