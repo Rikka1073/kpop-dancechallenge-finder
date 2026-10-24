@@ -407,6 +407,143 @@ describe("extractCandidateDrafts", () => {
 
     expect(file.candidates).toHaveLength(0);
   });
+
+  test("チャンネル全ショートは検索せず uploads をページ送りする", async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      if (url.pathname.endsWith("/channels")) {
+        return new Response(
+          JSON.stringify({
+            items: [{ contentDetails: { relatedPlaylists: { uploads: "UUxxxxxxxxxxxxxxxxxxxxxx" } } }],
+          })
+        );
+      }
+      if (url.pathname.endsWith("/playlistItems")) {
+        const pageToken = url.searchParams.get("pageToken");
+        if (!pageToken) {
+          return new Response(
+            JSON.stringify({
+              items: [
+                { contentDetails: { videoId: "newshort0001" } },
+                { contentDetails: { videoId: "longvideo001" } },
+              ],
+              nextPageToken: "page2",
+            })
+          );
+        }
+        return new Response(JSON.stringify({ items: [{ contentDetails: { videoId: "oldshort0001" } }] }));
+      }
+      if (url.pathname.endsWith("/videos")) {
+        const ids = new Set((url.searchParams.get("id") || "").split(","));
+        const catalog = [
+          {
+            id: "newshort0001",
+            title: "CHIQUITA’s solo practice vlog",
+            publishedAt: "2026-10-01T00:00:00Z",
+            duration: "PT20S",
+          },
+          {
+            id: "oldshort0001",
+            title: "debut teaser short",
+            publishedAt: "2025-02-01T00:00:00Z",
+            duration: "PT15S",
+          },
+          {
+            id: "longvideo001",
+            title: "MV",
+            publishedAt: "2026-10-01T00:00:00Z",
+            duration: "PT2M18S",
+          },
+        ];
+        return new Response(
+          JSON.stringify({
+            items: catalog
+              .filter((item) => ids.has(item.id))
+              .map((item) => ({
+                id: item.id,
+                snippet: {
+                  title: item.title,
+                  channelId: IVE_CHANNEL,
+                  channelTitle: "IVE",
+                  publishedAt: item.publishedAt,
+                },
+                statistics: { viewCount: "1" },
+                contentDetails: { duration: item.duration },
+              })),
+          })
+        );
+      }
+      throw new Error(`unexpected ${url.pathname}`);
+    });
+
+    const file = await extractCandidateDrafts(
+      {
+        groups: ["IVE"],
+        officialGroups,
+        linearIssue: "MAS-56",
+        extractedAt: "2026-10-24T00:00:00.000Z",
+        channelShorts: true,
+        skipYoutubeIds: ["skipped00001"],
+      },
+      { apiKey: "test-key", fetchImpl }
+    );
+
+    const searchUrls = youtubeJsonResponse("/search", fetchImpl);
+    const channelUrls = youtubeJsonResponse("/channels", fetchImpl);
+    const playlistUrls = youtubeJsonResponse("/playlistItems", fetchImpl);
+    expect(searchUrls).toHaveLength(0);
+    expect(channelUrls).toHaveLength(1);
+    expect(playlistUrls).toHaveLength(2);
+    expect(file.queryNotes).toContain("all uploads");
+    expect(file.candidates.map((candidate) => candidate.youtubeId).sort()).toEqual(["newshort0001", "oldshort0001"]);
+    expect(file.candidates.find((candidate) => candidate.youtubeId === "newshort0001")?.officialGuess).toBe(false);
+  });
+
+  test("チャンネル全ショートでも却下済みの youtubeId は再抽出しない", async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      if (url.pathname.endsWith("/channels")) {
+        return new Response(
+          JSON.stringify({
+            items: [{ contentDetails: { relatedPlaylists: { uploads: "UUxxxxxxxxxxxxxxxxxxxxxx" } } }],
+          })
+        );
+      }
+      if (url.pathname.endsWith("/playlistItems")) {
+        return new Response(JSON.stringify({ items: [{ contentDetails: { videoId: "abcdefghijk" } }] }));
+      }
+      return new Response(
+        JSON.stringify({
+          items: [
+            {
+              id: "abcdefghijk",
+              snippet: {
+                title: "x",
+                channelId: IVE_CHANNEL,
+                channelTitle: "IVE",
+                publishedAt: "2025-02-01T00:00:00Z",
+              },
+              statistics: { viewCount: "1" },
+              contentDetails: { duration: "PT15S" },
+            },
+          ],
+        })
+      );
+    });
+
+    const file = await extractCandidateDrafts(
+      {
+        groups: ["IVE"],
+        officialGroups,
+        linearIssue: "MAS-56",
+        channelShorts: true,
+        skipYoutubeIds: ["abcdefghijk"],
+      },
+      { apiKey: "test-key", fetchImpl }
+    );
+
+    expect(file.candidates).toHaveLength(0);
+  });
 });
 
 describe("monthsAgoIso", () => {

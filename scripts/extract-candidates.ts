@@ -38,9 +38,11 @@ async function main() {
       .filter(Boolean),
   ];
 
+  const channelShorts = argv.includes("--all-channel-shorts");
+
   if (!issue || groups.length === 0) {
     console.error(
-      "Usage: npm run extract:candidates -- --issue MAS-51 --group IVE --date 2026-10-23 [--published-after YYYY-MM-DD]"
+      "Usage: npm run extract:candidates -- --issue MAS-51 --group IVE --date 2026-10-23 [--published-after YYYY-MM-DD] [--all-channel-shorts]"
     );
     process.exit(1);
   }
@@ -52,6 +54,7 @@ async function main() {
     linearIssue: issue,
     skipYoutubeIds,
     publishedAfter: publishedAfterArg ? parsePublishedAfter(publishedAfterArg) : undefined,
+    channelShorts,
   });
   const file = mergeDecidedCandidates(await readExistingCandidateDraftFile(date), extracted);
   const draftPath = await writeCandidateDraftFile(file, date);

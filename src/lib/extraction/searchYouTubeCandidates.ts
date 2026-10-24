@@ -33,6 +33,20 @@ type VideoItem = {
   };
 };
 
+type ChannelItem = {
+  contentDetails?: {
+    relatedPlaylists?: {
+      uploads?: string;
+    };
+  };
+};
+
+type PlaylistItem = {
+  contentDetails?: {
+    videoId?: string;
+  };
+};
+
 export const MAX_SHORTS_SECONDS = 60;
 
 function parseIsoDurationSeconds(duration: string | undefined): number | null {
@@ -68,6 +82,60 @@ async function readYoutubeJson(url: URL, fetchImpl: typeof fetch): Promise<unkno
   return response.json();
 }
 
+function toShortHit(
+  item: VideoItem,
+  channelId: string,
+  publishedAfterMs: number
+): YouTubeSearchHit | null {
+  const youtubeId = item.id?.trim();
+  const title = item.snippet?.title?.trim();
+  const itemChannelId = item.snippet?.channelId?.trim();
+  const channelTitle = item.snippet?.channelTitle?.trim();
+  const publishedAt = item.snippet?.publishedAt?.trim();
+  if (!youtubeId || !title || !channelTitle || !publishedAt) {
+    return null;
+  }
+  if (itemChannelId !== channelId) {
+    return null;
+  }
+  if (!isYouTubeShort(item.contentDetails?.duration)) {
+    return null;
+  }
+  if (!Number.isNaN(publishedAfterMs) && Date.parse(publishedAt) < publishedAfterMs) {
+    return null;
+  }
+
+  return {
+    youtubeId,
+    title,
+    channelTitle,
+    publishedAt,
+    viewCount: Number.parseInt(item.statistics?.viewCount || "0", 10) || 0,
+    url: videoUrl(youtubeId),
+  };
+}
+
+async function listVideosByIds(
+  videoIds: string[],
+  apiKey: string,
+  fetchImpl: typeof fetch
+): Promise<VideoItem[]> {
+  const uniqueIds = [...new Set(videoIds.map((id) => id.trim()).filter(Boolean))];
+  const items: VideoItem[] = [];
+
+  for (let index = 0; index < uniqueIds.length; index += 50) {
+    const chunk = uniqueIds.slice(index, index + 50);
+    const videosUrl = new URL("https://www.googleapis.com/youtube/v3/videos");
+    videosUrl.searchParams.set("part", "snippet,statistics,contentDetails");
+    videosUrl.searchParams.set("id", chunk.join(","));
+    videosUrl.searchParams.set("key", apiKey);
+    const videosPayload = (await readYoutubeJson(videosUrl, fetchImpl)) as { items?: VideoItem[] };
+    items.push(...(videosPayload.items || []));
+  }
+
+  return items;
+}
+
 export async function searchYouTubeCandidates(options: {
   query: string;
   channelId: string;
@@ -100,47 +168,72 @@ export async function searchYouTubeCandidates(options: {
   }
 
   const searchPayload = (await readYoutubeJson(searchUrl, fetchImpl)) as { items?: SearchItem[] };
-  const videoIds = [...new Set((searchPayload.items || []).map((item) => item.id?.videoId).filter(Boolean))] as string[];
+  const videoIds = (searchPayload.items || []).map((item) => item.id?.videoId).filter(Boolean) as string[];
+  if (videoIds.length === 0) {
+    return [];
+  }
+
+  const videos = await listVideosByIds(videoIds, options.apiKey, fetchImpl);
+  return videos
+    .map((item) => toShortHit(item, channelId, publishedAfterMs))
+    .filter((item): item is YouTubeSearchHit => item !== null);
+}
+
+export async function listChannelShorts(options: {
+  channelId: string;
+  apiKey: string;
+  publishedAfter?: string;
+  fetchImpl?: typeof fetch;
+}): Promise<YouTubeSearchHit[]> {
+  const channelId = options.channelId.trim();
+  if (!channelId) {
+    throw new Error("確認済みの公式チャンネルがありません。先にグループへ公式チャンネルを保存してください。");
+  }
+
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const publishedAfter = options.publishedAfter?.trim();
+  const publishedAfterMs = publishedAfter ? Date.parse(publishedAfter) : Number.NaN;
+
+  const channelUrl = new URL("https://www.googleapis.com/youtube/v3/channels");
+  channelUrl.searchParams.set("part", "contentDetails");
+  channelUrl.searchParams.set("id", channelId);
+  channelUrl.searchParams.set("key", options.apiKey);
+  const channelPayload = (await readYoutubeJson(channelUrl, fetchImpl)) as { items?: ChannelItem[] };
+  const uploadsPlaylistId = channelPayload.items?.[0]?.contentDetails?.relatedPlaylists?.uploads?.trim();
+  if (!uploadsPlaylistId) {
+    throw new Error("公式チャンネルのアップロード一覧が取れませんでした");
+  }
+
+  const videoIds: string[] = [];
+  let pageToken = "";
+  do {
+    const playlistUrl = new URL("https://www.googleapis.com/youtube/v3/playlistItems");
+    playlistUrl.searchParams.set("part", "contentDetails");
+    playlistUrl.searchParams.set("playlistId", uploadsPlaylistId);
+    playlistUrl.searchParams.set("maxResults", "50");
+    playlistUrl.searchParams.set("key", options.apiKey);
+    if (pageToken) {
+      playlistUrl.searchParams.set("pageToken", pageToken);
+    }
+    const playlistPayload = (await readYoutubeJson(playlistUrl, fetchImpl)) as {
+      items?: PlaylistItem[];
+      nextPageToken?: string;
+    };
+    for (const item of playlistPayload.items || []) {
+      const videoId = item.contentDetails?.videoId?.trim();
+      if (videoId) {
+        videoIds.push(videoId);
+      }
+    }
+    pageToken = playlistPayload.nextPageToken?.trim() || "";
+  } while (pageToken);
 
   if (videoIds.length === 0) {
     return [];
   }
 
-  const videosUrl = new URL("https://www.googleapis.com/youtube/v3/videos");
-  videosUrl.searchParams.set("part", "snippet,statistics,contentDetails");
-  videosUrl.searchParams.set("id", videoIds.join(","));
-  videosUrl.searchParams.set("key", options.apiKey);
-
-  const videosPayload = (await readYoutubeJson(videosUrl, fetchImpl)) as { items?: VideoItem[] };
-
-  return (videosPayload.items || [])
-    .map((item) => {
-      const youtubeId = item.id?.trim();
-      const title = item.snippet?.title?.trim();
-      const itemChannelId = item.snippet?.channelId?.trim();
-      const channelTitle = item.snippet?.channelTitle?.trim();
-      const publishedAt = item.snippet?.publishedAt?.trim();
-      if (!youtubeId || !title || !channelTitle || !publishedAt) {
-        return null;
-      }
-      if (itemChannelId !== channelId) {
-        return null;
-      }
-      if (!isYouTubeShort(item.contentDetails?.duration)) {
-        return null;
-      }
-      if (!Number.isNaN(publishedAfterMs) && Date.parse(publishedAt) < publishedAfterMs) {
-        return null;
-      }
-
-      return {
-        youtubeId,
-        title,
-        channelTitle,
-        publishedAt,
-        viewCount: Number.parseInt(item.statistics?.viewCount || "0", 10) || 0,
-        url: videoUrl(youtubeId),
-      } satisfies YouTubeSearchHit;
-    })
+  const videos = await listVideosByIds(videoIds, options.apiKey, fetchImpl);
+  return videos
+    .map((item) => toShortHit(item, channelId, publishedAfterMs))
     .filter((item): item is YouTubeSearchHit => item !== null);
 }

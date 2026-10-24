@@ -1,7 +1,7 @@
 import { OfficialChannelGroup, requireOfficialChannelId } from "../youtube/officialGroup";
 import { CandidateDraftFile, createPendingCandidate } from "./candidateDraft";
 import { guessChallenge } from "./guessOfficial";
-import { searchYouTubeCandidates } from "./searchYouTubeCandidates";
+import { listChannelShorts, searchYouTubeCandidates, type YouTubeSearchHit } from "./searchYouTubeCandidates";
 
 export const DEFAULT_QUERY_TEMPLATES = ["{group} dance challenge shorts", "{group} 댄스 챌린지"];
 export const DEFAULT_LOOKBACK_MONTHS = 1;
@@ -15,6 +15,7 @@ export type ExtractionTargets = {
   publishedAfter?: string;
   maxResultsPerQuery?: number;
   skipYoutubeIds?: Iterable<string>;
+  channelShorts?: boolean;
 };
 
 export function monthsAgoIso(from: Date | string, months = DEFAULT_LOOKBACK_MONTHS): string {
@@ -70,60 +71,91 @@ export async function extractCandidateDrafts(
     throw new Error("YOUTUBE_API_KEY が設定されていません");
   }
 
-  const templates = targets.queries?.length ? targets.queries : DEFAULT_QUERY_TEMPLATES;
-  const searches = expandQueries(groups, targets.officialGroups, templates);
   const skipYoutubeIds = new Set([...(targets.skipYoutubeIds ?? [])].map((id) => id.trim()).filter(Boolean));
   const extractedAt = targets.extractedAt || new Date().toISOString();
-  const publishedAfter = targets.publishedAfter?.trim() || monthsAgoIso(extractedAt);
+  const channelShorts = Boolean(targets.channelShorts);
+  const publishedAfter = targets.publishedAfter?.trim() || (channelShorts ? undefined : monthsAgoIso(extractedAt));
   const seen = new Set<string>();
   const candidates: CandidateDraftFile["candidates"] = [];
+  const queryNotes: string[] = [];
 
-  for (const { group, channelId, query } of searches) {
-    const hits = await searchYouTubeCandidates({
-      query,
-      channelId,
-      apiKey,
-      maxResults: targets.maxResultsPerQuery,
-      publishedAfter,
-      fetchImpl: options?.fetchImpl,
-    });
+  const groupsWithChannels = groups.map((groupName) => {
+    const official = requireOfficialChannelId(targets.officialGroups, groupName);
+    return { group: official.groupName, channelId: official.channelId };
+  });
 
-    for (const hit of hits) {
-      if (seen.has(hit.youtubeId) || skipYoutubeIds.has(hit.youtubeId)) {
-        continue;
-      }
-      seen.add(hit.youtubeId);
-
-      const guess = guessChallenge({
-        title: hit.title,
-        channelTitle: hit.channelTitle,
-        suggestedGroups: [group],
+  if (channelShorts) {
+    for (const { group, channelId } of groupsWithChannels) {
+      queryNotes.push(`channel shorts (${channelId})`);
+      const hits = await listChannelShorts({
+        channelId,
+        apiKey,
+        publishedAfter,
+        fetchImpl: options?.fetchImpl,
       });
-      if (!guess.include) {
-        continue;
-      }
-
-      candidates.push(
-        createPendingCandidate({
-          youtubeId: hit.youtubeId,
-          url: hit.url,
-          title: hit.title,
-          channelTitle: hit.channelTitle,
-          publishedAt: hit.publishedAt,
-          viewCount: hit.viewCount,
-          suggestedGroups: [group],
-          suggestedSong: null,
-          officialGuess: guess.officialGuess,
-          officialGuessReason: guess.officialGuessReason,
-        })
-      );
+      pushHits(candidates, seen, skipYoutubeIds, group, hits, { dropNonChallengeTitles: false });
+    }
+  } else {
+    const templates = targets.queries?.length ? targets.queries : DEFAULT_QUERY_TEMPLATES;
+    const searches = expandQueries(groups, targets.officialGroups, templates);
+    for (const { group, channelId, query } of searches) {
+      queryNotes.push(`${query} (${channelId})`);
+      const hits = await searchYouTubeCandidates({
+        query,
+        channelId,
+        apiKey,
+        maxResults: targets.maxResultsPerQuery,
+        publishedAfter,
+        fetchImpl: options?.fetchImpl,
+      });
+      pushHits(candidates, seen, skipYoutubeIds, group, hits, { dropNonChallengeTitles: true });
     }
   }
 
   return {
     extractedAt,
     linearIssue: targets.linearIssue,
-    queryNotes: `${searches.map((item) => `${item.query} (${item.channelId})`).join(" / ")} / since ${publishedAfter}`,
+    queryNotes: `${queryNotes.join(" / ")}${publishedAfter ? ` / since ${publishedAfter}` : " / all uploads"}`,
     candidates,
   };
+}
+
+function pushHits(
+  candidates: CandidateDraftFile["candidates"],
+  seen: Set<string>,
+  skipYoutubeIds: Set<string>,
+  group: string,
+  hits: YouTubeSearchHit[],
+  options: { dropNonChallengeTitles: boolean }
+) {
+  for (const hit of hits) {
+    if (seen.has(hit.youtubeId) || skipYoutubeIds.has(hit.youtubeId)) {
+      continue;
+    }
+    seen.add(hit.youtubeId);
+
+    const guess = guessChallenge({
+      title: hit.title,
+      channelTitle: hit.channelTitle,
+      suggestedGroups: [group],
+    });
+    if (options.dropNonChallengeTitles && !guess.include) {
+      continue;
+    }
+
+    candidates.push(
+      createPendingCandidate({
+        youtubeId: hit.youtubeId,
+        url: hit.url,
+        title: hit.title,
+        channelTitle: hit.channelTitle,
+        publishedAt: hit.publishedAt,
+        viewCount: hit.viewCount,
+        suggestedGroups: [group],
+        suggestedSong: null,
+        officialGuess: guess.officialGuess,
+        officialGuessReason: guess.officialGuessReason,
+      })
+    );
+  }
 }
