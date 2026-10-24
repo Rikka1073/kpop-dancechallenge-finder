@@ -115,7 +115,7 @@ describe("extractCandidateDrafts", () => {
       suggestedSong: null,
       officialGuess: true,
     });
-    expect(file.candidates[0].officialGuessReason).toContain("確認済み公式チャンネル");
+    expect(file.candidates[0].officialGuessReason).toContain("確定ではない");
   });
 
   test("公式チャンネル以外の動画は捨てる", async () => {
@@ -202,6 +202,59 @@ describe("extractCandidateDrafts", () => {
     );
 
     expect(file.candidates).toHaveLength(1);
+  });
+
+  test("タイトルがチャレンジ以外に見える動画は抽出しない", async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      if (url.pathname.endsWith("/search")) {
+        return new Response(
+          JSON.stringify({
+            items: [
+              {
+                id: { videoId: "vlogvideo001" },
+                snippet: {
+                  title: "CHIQUITA’s solo practice vlog",
+                  channelId: IVE_CHANNEL,
+                  channelTitle: "IVE",
+                  publishedAt: "2026-10-01T00:00:00Z",
+                },
+              },
+            ],
+          })
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          items: [
+            {
+              id: "vlogvideo001",
+              snippet: {
+                title: "CHIQUITA’s solo practice vlog",
+                channelId: IVE_CHANNEL,
+                channelTitle: "IVE",
+                publishedAt: "2026-10-01T00:00:00Z",
+              },
+              statistics: { viewCount: "9" },
+              contentDetails: { duration: "PT20S" },
+            },
+          ],
+        })
+      );
+    });
+
+    const file = await extractCandidateDrafts(
+      {
+        groups: ["IVE"],
+        officialGroups,
+        linearIssue: "MAS-55",
+        queries: ["{group} dance challenge shorts"],
+      },
+      { apiKey: "test-key", fetchImpl }
+    );
+
+    expect(file.candidates).toHaveLength(0);
   });
 
   test("却下済みの youtubeId は再抽出しない", async () => {

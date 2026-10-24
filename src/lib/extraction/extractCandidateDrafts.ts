@@ -1,5 +1,6 @@
 import { OfficialChannelGroup, requireOfficialChannelId } from "../youtube/officialGroup";
 import { CandidateDraftFile, createPendingCandidate } from "./candidateDraft";
+import { guessChallenge } from "./guessOfficial";
 import { searchYouTubeCandidates } from "./searchYouTubeCandidates";
 
 export const DEFAULT_QUERY_TEMPLATES = ["{group} dance challenge shorts", "{group} 댄스 챌린지"];
@@ -93,6 +94,15 @@ export async function extractCandidateDrafts(
       }
       seen.add(hit.youtubeId);
 
+      const guess = guessChallenge({
+        title: hit.title,
+        channelTitle: hit.channelTitle,
+        suggestedGroups: [group],
+      });
+      if (!guess.include) {
+        continue;
+      }
+
       candidates.push(
         createPendingCandidate({
           youtubeId: hit.youtubeId,
@@ -103,8 +113,8 @@ export async function extractCandidateDrafts(
           viewCount: hit.viewCount,
           suggestedGroups: [group],
           suggestedSong: null,
-          officialGuess: true,
-          officialGuessReason: "確認済み公式チャンネルの動画。ダンスチャレンジかどうかは人が判定する。",
+          officialGuess: guess.officialGuess,
+          officialGuessReason: guess.officialGuessReason,
         })
       );
     }
