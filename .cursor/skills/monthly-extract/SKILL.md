@@ -1,6 +1,6 @@
 ---
 name: monthly-extract
-description: Extracts YouTube dance-challenge candidates from the last month into a local JSON draft. Use when the user asks for 月次抽出, 週次抽出, 候補を集めて, extract candidates, or monthly candidate drafts. Not for publishing or marking official.
+description: Extracts YouTube dance-challenge candidates into a local JSON draft. Use for 月次抽出 (last month) and for first-time group video registration (all channel shorts). Triggers include 週次抽出, 候補を集めて, 新規登録, 全ショート抽出, extract candidates. Not for publishing or marking official.
 ---
 
 # 月次抽出
@@ -26,7 +26,7 @@ npm run extract:candidates -- --issue MAS-n --group グループ名 --date YYYY-
 
 公開日の下限は実行日から1ヶ月前。変えるときは `--published-after YYYY-MM-DD`。
 
-新人グループの公式チャンネルからショートを全件取るときは `--all-channel-shorts`。検索クエリも直近1ヶ月も使わない。デビュー前を含める。タイトルでは落とさない。60秒以下と却下済みスキップだけ残す。月次のデフォルトは変えない。
+グループの動画を初めてカタログに載せるときは `--all-channel-shorts`。新人に限らない。検索クエリも直近1ヶ月も使わない。チャンネル開設以降（デビュー前を含む）を取る。タイトルでは落とさない。60秒以下と却下済みスキップだけ残す。月次のデフォルトは変えない。月次は、すでに載っているグループの増分用。
 
 候補は `data/raw/YYYY-MM-DD/candidate-drafts.json`。git に入れない。DB に入れない。JSON 全文はチャットに貼らない。
 
