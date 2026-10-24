@@ -2,10 +2,12 @@ import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { createPendingCandidate } from "@/lib/extraction/candidateDraft";
+import { applyCandidateReview, createPendingCandidate } from "@/lib/extraction/candidateDraft";
 import {
   assertDraftDate,
+  listDecidedYoutubeIds,
   loadCandidateDraftBundle,
+  readExistingCandidateDraftFile,
   saveCandidateDraftFile,
 } from "@/lib/extraction/localCandidateDrafts";
 import { writeCandidateDraftFile } from "@/lib/extraction/writeCandidateDrafts";
@@ -69,5 +71,28 @@ describe("localCandidateDrafts", () => {
     await mkdir(dir, { recursive: true });
     await writeFile(path.join(dir, "candidate-drafts.json"), "{", "utf8");
     await expect(loadCandidateDraftBundle("2026-10-06", root)).rejects.toThrow("JSON として読めません");
+  });
+
+  test("過去ドラフトの却下と承認の ID を集める", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "seekpop-decided-"));
+    await writeCandidateDraftFile(
+      {
+        ...draft,
+        candidates: [applyCandidateReview(pending, "rejected")],
+      },
+      "2026-10-09",
+      root
+    );
+    await writeCandidateDraftFile(
+      {
+        ...draft,
+        candidates: [createPendingCandidate({ ...pending, youtubeId: "pending00001" })],
+      },
+      "2026-10-23",
+      root
+    );
+
+    await expect(listDecidedYoutubeIds(root)).resolves.toEqual(new Set(["abcdefghijk"]));
+    await expect(readExistingCandidateDraftFile("2026-10-01", root)).resolves.toBeNull();
   });
 });

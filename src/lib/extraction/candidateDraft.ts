@@ -140,3 +140,35 @@ export function applyCandidateReviews(
 export function listReviewUrls(file: CandidateDraftFile): string[] {
   return file.candidates.filter((candidate) => candidate.status === "pending").map((candidate) => candidate.url);
 }
+
+export function isDecidedCandidate(candidate: CandidateDraft): boolean {
+  return candidate.status === "rejected" || candidate.status === "approved";
+}
+
+export function decidedYoutubeIds(files: CandidateDraftFile[]): Set<string> {
+  const ids = new Set<string>();
+  for (const file of files) {
+    for (const candidate of file.candidates) {
+      if (isDecidedCandidate(candidate)) {
+        ids.add(candidate.youtubeId);
+      }
+    }
+  }
+  return ids;
+}
+
+export function mergeDecidedCandidates(
+  existing: CandidateDraftFile | null,
+  incoming: CandidateDraftFile
+): CandidateDraftFile {
+  if (!existing) {
+    return incoming;
+  }
+
+  const decided = existing.candidates.filter(isDecidedCandidate);
+  const decidedIds = new Set(decided.map((candidate) => candidate.youtubeId));
+  return {
+    ...incoming,
+    candidates: [...decided, ...incoming.candidates.filter((candidate) => !decidedIds.has(candidate.youtubeId))],
+  };
+}
