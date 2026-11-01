@@ -196,6 +196,7 @@ describe("extractCandidateDrafts", () => {
         groups: ["IVE"],
         officialGroups,
         linearIssue: "MAS-19",
+        extractedAt: "2026-10-06T00:00:00.000Z",
         queries: ["{group} a", "{group} b"],
       },
       { apiKey: "test-key", fetchImpl }
@@ -438,7 +439,7 @@ describe("extractCandidateDrafts", () => {
         const catalog = [
           {
             id: "newshort0001",
-            title: "CHIQUITA’s solo practice vlog",
+            title: "Looks Can Kill ✨ w/ #YEJUN #IVE #Shorts",
             publishedAt: "2026-10-01T00:00:00Z",
             duration: "PT20S",
           },
@@ -495,8 +496,53 @@ describe("extractCandidateDrafts", () => {
     expect(channelUrls).toHaveLength(1);
     expect(playlistUrls).toHaveLength(2);
     expect(file.queryNotes).toContain("all uploads");
-    expect(file.candidates.map((candidate) => candidate.youtubeId).sort()).toEqual(["newshort0001", "oldshort0001"]);
-    expect(file.candidates.find((candidate) => candidate.youtubeId === "newshort0001")?.officialGuess).toBe(false);
+    expect(file.candidates.map((candidate) => candidate.youtubeId)).toEqual(["newshort0001"]);
+    expect(file.candidates[0]?.officialGuess).toBe(false);
+  });
+
+  test("チャンネル全ショートは手がかりの無いタイトルを落とす", async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      if (url.pathname.endsWith("/channels")) {
+        return new Response(
+          JSON.stringify({
+            items: [{ contentDetails: { relatedPlaylists: { uploads: "UUxxxxxxxxxxxxxxxxxxxxxx" } } }],
+          })
+        );
+      }
+      if (url.pathname.endsWith("/playlistItems")) {
+        return new Response(JSON.stringify({ items: [{ contentDetails: { videoId: "memberclip01" } }] }));
+      }
+      return new Response(
+        JSON.stringify({
+          items: [
+            {
+              id: "memberclip01",
+              snippet: {
+                title: "cute or not? #Hearts2Hearts #하츠투하츠 #H2H #CARMEN #JIWOO",
+                channelId: IVE_CHANNEL,
+                channelTitle: "IVE",
+                publishedAt: "2025-02-01T00:00:00Z",
+              },
+              statistics: { viewCount: "1" },
+              contentDetails: { duration: "PT15S" },
+            },
+          ],
+        })
+      );
+    });
+
+    const file = await extractCandidateDrafts(
+      {
+        groups: ["IVE"],
+        officialGroups,
+        linearIssue: "MAS-58",
+        channelShorts: true,
+      },
+      { apiKey: "test-key", fetchImpl }
+    );
+
+    expect(file.candidates).toHaveLength(0);
   });
 
   test("チャンネル全ショートでも却下済みの youtubeId は再抽出しない", async () => {

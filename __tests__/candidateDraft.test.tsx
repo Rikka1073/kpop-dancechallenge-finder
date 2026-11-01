@@ -204,4 +204,41 @@ describe("guessChallenge", () => {
     expect(guess.include).toBe(true);
     expect(guess.officialGuess).toBe(true);
   });
+
+  test("全ショートは手がかりが無いタイトルを落とす", () => {
+    expect(
+      guessChallenge(
+        {
+          title: "cute or not? #Hearts2Hearts #하츠투하츠 #H2H #CARMEN #JIWOO",
+          channelTitle: "Hearts2Hearts",
+          suggestedGroups: ["Hearts2Hearts"],
+        },
+        { requireChallengeHint: true }
+      ).include
+    ).toBe(false);
+  });
+
+  test("全ショートは w/ や他グループ名があれば残す", () => {
+    expect(
+      guessChallenge(
+        {
+          title: "Looks Can Kill ✨ w/ #YEJUN #IVE #Shorts",
+          channelTitle: "IVE",
+          suggestedGroups: ["IVE"],
+        },
+        { requireChallengeHint: true }
+      ).include
+    ).toBe(true);
+    expect(
+      guessChallenge(
+        {
+          title: "언니강아 동생강아 #Hearts2Hearts #하츠투하츠 #aespa #ICONICHEART",
+          channelTitle: "Hearts2Hearts",
+          suggestedGroups: ["Hearts2Hearts"],
+          catalogGroups: ["Hearts2Hearts", "aespa", "IVE"],
+        },
+        { requireChallengeHint: true }
+      ).include
+    ).toBe(true);
+  });
 });

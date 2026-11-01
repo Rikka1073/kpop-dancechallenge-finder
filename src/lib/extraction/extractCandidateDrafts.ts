@@ -84,6 +84,8 @@ export async function extractCandidateDrafts(
     return { group: official.groupName, channelId: official.channelId };
   });
 
+  const catalogGroups = targets.officialGroups.map((group) => group.group_name);
+
   if (channelShorts) {
     for (const { group, channelId } of groupsWithChannels) {
       queryNotes.push(`channel shorts (${channelId})`);
@@ -93,7 +95,10 @@ export async function extractCandidateDrafts(
         publishedAfter,
         fetchImpl: options?.fetchImpl,
       });
-      pushHits(candidates, seen, skipYoutubeIds, group, hits, { dropNonChallengeTitles: false });
+      pushHits(candidates, seen, skipYoutubeIds, group, hits, catalogGroups, {
+        dropNonChallengeTitles: true,
+        requireChallengeHint: true,
+      });
     }
   } else {
     const templates = targets.queries?.length ? targets.queries : DEFAULT_QUERY_TEMPLATES;
@@ -108,7 +113,7 @@ export async function extractCandidateDrafts(
         publishedAfter,
         fetchImpl: options?.fetchImpl,
       });
-      pushHits(candidates, seen, skipYoutubeIds, group, hits, { dropNonChallengeTitles: true });
+      pushHits(candidates, seen, skipYoutubeIds, group, hits, catalogGroups, { dropNonChallengeTitles: true });
     }
   }
 
@@ -126,7 +131,8 @@ function pushHits(
   skipYoutubeIds: Set<string>,
   group: string,
   hits: YouTubeSearchHit[],
-  options: { dropNonChallengeTitles: boolean }
+  catalogGroups: string[],
+  options: { dropNonChallengeTitles: boolean; requireChallengeHint?: boolean }
 ) {
   for (const hit of hits) {
     if (seen.has(hit.youtubeId) || skipYoutubeIds.has(hit.youtubeId)) {
@@ -134,11 +140,15 @@ function pushHits(
     }
     seen.add(hit.youtubeId);
 
-    const guess = guessChallenge({
-      title: hit.title,
-      channelTitle: hit.channelTitle,
-      suggestedGroups: [group],
-    });
+    const guess = guessChallenge(
+      {
+        title: hit.title,
+        channelTitle: hit.channelTitle,
+        suggestedGroups: [group],
+        catalogGroups,
+      },
+      { requireChallengeHint: options.requireChallengeHint }
+    );
     if (options.dropNonChallengeTitles && !guess.include) {
       continue;
     }
