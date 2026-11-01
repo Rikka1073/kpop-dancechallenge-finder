@@ -481,6 +481,7 @@ describe("extractCandidateDrafts", () => {
       {
         groups: ["IVE"],
         officialGroups,
+        catalogSongs: ["Looks Can Kill"],
         linearIssue: "MAS-56",
         extractedAt: "2026-10-24T00:00:00.000Z",
         channelShorts: true,

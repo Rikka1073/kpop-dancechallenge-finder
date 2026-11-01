@@ -16,6 +16,7 @@ export type ExtractionTargets = {
   maxResultsPerQuery?: number;
   skipYoutubeIds?: Iterable<string>;
   channelShorts?: boolean;
+  catalogSongs?: string[];
 };
 
 export function monthsAgoIso(from: Date | string, months = DEFAULT_LOOKBACK_MONTHS): string {
@@ -85,6 +86,7 @@ export async function extractCandidateDrafts(
   });
 
   const catalogGroups = targets.officialGroups.map((group) => group.group_name);
+  const catalogSongs = (targets.catalogSongs ?? []).map((song) => song.trim()).filter(Boolean);
 
   if (channelShorts) {
     for (const { group, channelId } of groupsWithChannels) {
@@ -95,7 +97,7 @@ export async function extractCandidateDrafts(
         publishedAfter,
         fetchImpl: options?.fetchImpl,
       });
-      pushHits(candidates, seen, skipYoutubeIds, group, hits, catalogGroups, {
+      pushHits(candidates, seen, skipYoutubeIds, group, hits, catalogGroups, catalogSongs, {
         dropNonChallengeTitles: true,
         requireChallengeHint: true,
       });
@@ -113,7 +115,9 @@ export async function extractCandidateDrafts(
         publishedAfter,
         fetchImpl: options?.fetchImpl,
       });
-      pushHits(candidates, seen, skipYoutubeIds, group, hits, catalogGroups, { dropNonChallengeTitles: true });
+      pushHits(candidates, seen, skipYoutubeIds, group, hits, catalogGroups, catalogSongs, {
+        dropNonChallengeTitles: true,
+      });
     }
   }
 
@@ -132,6 +136,7 @@ function pushHits(
   group: string,
   hits: YouTubeSearchHit[],
   catalogGroups: string[],
+  catalogSongs: string[],
   options: { dropNonChallengeTitles: boolean; requireChallengeHint?: boolean }
 ) {
   for (const hit of hits) {
@@ -146,6 +151,7 @@ function pushHits(
         channelTitle: hit.channelTitle,
         suggestedGroups: [group],
         catalogGroups,
+        catalogSongs,
       },
       { requireChallengeHint: options.requireChallengeHint }
     );
