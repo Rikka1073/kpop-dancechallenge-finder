@@ -87,7 +87,7 @@ describe("CandidateReviewPanel", () => {
     expect(within(first).getByRole("heading", { name: "IVE ELEVEN Dance Challenge" })).toBeInTheDocument();
     expect(within(first).getByText("IVE", { selector: "p" })).toBeInTheDocument();
     expect(within(first).queryByText("公式の可能性（推測）")).not.toBeInTheDocument();
-    expect(within(first).getByText("公式チャンネルに見える。確定ではない。")).toBeInTheDocument();
+    expect(within(first).queryByText("公式チャンネルに見える。確定ではない。")).not.toBeInTheDocument();
     expect(within(first).getByRole("link", { name: "YouTube" })).toHaveAttribute(
       "href",
       "https://www.youtube.com/shorts/abcdefghijk"
@@ -95,6 +95,7 @@ describe("CandidateReviewPanel", () => {
 
     const second = screen.getByTestId("candidate-lmnopqrstuv");
     expect(within(second).queryByText("公式ではなさそう（推測）")).not.toBeInTheDocument();
+    expect(within(second).queryByText("手がかりが少ない。確定ではない。")).not.toBeInTheDocument();
     expect(within(second).getByText("NewJeans")).toBeInTheDocument();
     expect(screen.getByTestId("candidate-counts")).toHaveTextContent("未判定 2");
     expect(screen.getByText("data/raw/2026-10-06/candidate-drafts.json")).toBeInTheDocument();
