@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     displayOrder?: number | null;
     channelUrl?: string;
     confirmOfficial?: boolean;
+    solo?: boolean;
   } | null;
 
   const name = body?.name?.trim();
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
   try {
     if (body?.type === "group") {
       const officialChannel = body.confirmOfficial ? await fetchYouTubeChannelSnapshot(body.channelUrl || "") : null;
-      const group = await createGroup(name, body.displayOrder ?? null, officialChannel);
+      const group = await createGroup(name, body.displayOrder ?? null, officialChannel, undefined, body.solo === true);
       return jsonOk(group);
     }
     if (body?.type === "song") {
@@ -75,6 +76,7 @@ export async function PATCH(request: NextRequest) {
     displayOrder?: number | null;
     channelUrl?: string;
     confirmOfficial?: boolean;
+    solo?: boolean;
     all?: boolean;
   } | null;
 
@@ -107,6 +109,7 @@ export async function PATCH(request: NextRequest) {
       const group = await updateGroup(body.id, {
         ...(body.name ? { group_name: body.name.trim() } : {}),
         ...(typeof body.display === "boolean" ? { display: body.display } : {}),
+        ...(typeof body.solo === "boolean" ? { solo: body.solo } : {}),
         ...(body.displayOrder !== undefined ? { display_order: body.displayOrder } : {}),
         ...(officialChannel
           ? {
