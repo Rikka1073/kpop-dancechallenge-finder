@@ -222,7 +222,7 @@ const CandidateCard = ({
       </div>
       <h3 className="mb-1 font-bold">{candidate.title}</h3>
       <p className="mb-3 text-sm text-gray-600">{candidate.channelTitle}</p>
-      <div className="mb-3 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap gap-2">
         {candidate.suggestedGroups.map((group) => (
           <span key={group} className="badge border-none bg-fuchsia-100 text-purple-600">
             {group}
@@ -232,7 +232,6 @@ const CandidateCard = ({
           <span className="badge border-none bg-red-100 text-red-600">#{candidate.suggestedSong}</span>
         )}
       </div>
-      <p className="mb-4 text-sm text-gray-500">{candidate.officialGuessReason}</p>
       <div className="flex flex-wrap gap-2">
         <a href={candidate.url} target="_blank" rel="noreferrer" className="btn btn-sm rounded-xl">
           <Youtube className="h-4 w-4" />
