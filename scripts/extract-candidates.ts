@@ -3,7 +3,7 @@ import { listReviewUrls, mergeDecidedCandidates } from "../src/lib/extraction/ca
 import { loadLocalEnv } from "../src/lib/extraction/loadLocalEnv";
 import { listDecidedYoutubeIds, readExistingCandidateDraftFile } from "../src/lib/extraction/localCandidateDrafts";
 import { writeCandidateDraftFile } from "../src/lib/extraction/writeCandidateDrafts";
-import { getAdminGroups, listRegisteredYoutubeIds } from "../src/lib/supabase/registerSupabaseFunction";
+import { getAdminGroups, getAdminSongs, listRegisteredYoutubeIds } from "../src/lib/supabase/registerSupabaseFunction";
 
 loadLocalEnv();
 
@@ -48,9 +48,11 @@ async function main() {
   }
 
   const skipYoutubeIds = new Set([...(await listDecidedYoutubeIds()), ...(await listRegisteredYoutubeIds())]);
+  const [officialGroups, songs] = await Promise.all([getAdminGroups(), getAdminSongs()]);
   const extracted = await extractCandidateDrafts({
     groups,
-    officialGroups: await getAdminGroups(),
+    officialGroups,
+    catalogSongs: songs.map((song) => song.song_name),
     linearIssue: issue,
     skipYoutubeIds,
     publishedAfter: publishedAfterArg ? parsePublishedAfter(publishedAfterArg) : undefined,

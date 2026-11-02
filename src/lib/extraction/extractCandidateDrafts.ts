@@ -16,6 +16,7 @@ export type ExtractionTargets = {
   maxResultsPerQuery?: number;
   skipYoutubeIds?: Iterable<string>;
   channelShorts?: boolean;
+  catalogSongs?: string[];
 };
 
 export function monthsAgoIso(from: Date | string, months = DEFAULT_LOOKBACK_MONTHS): string {
@@ -84,6 +85,9 @@ export async function extractCandidateDrafts(
     return { group: official.groupName, channelId: official.channelId };
   });
 
+  const catalogGroups = targets.officialGroups.map((group) => group.group_name);
+  const catalogSongs = (targets.catalogSongs ?? []).map((song) => song.trim()).filter(Boolean);
+
   if (channelShorts) {
     for (const { group, channelId } of groupsWithChannels) {
       queryNotes.push(`channel shorts (${channelId})`);
@@ -93,7 +97,10 @@ export async function extractCandidateDrafts(
         publishedAfter,
         fetchImpl: options?.fetchImpl,
       });
-      pushHits(candidates, seen, skipYoutubeIds, group, hits, { dropNonChallengeTitles: false });
+      pushHits(candidates, seen, skipYoutubeIds, group, hits, catalogGroups, catalogSongs, {
+        dropNonChallengeTitles: true,
+        requireChallengeHint: true,
+      });
     }
   } else {
     const templates = targets.queries?.length ? targets.queries : DEFAULT_QUERY_TEMPLATES;
@@ -108,7 +115,9 @@ export async function extractCandidateDrafts(
         publishedAfter,
         fetchImpl: options?.fetchImpl,
       });
-      pushHits(candidates, seen, skipYoutubeIds, group, hits, { dropNonChallengeTitles: true });
+      pushHits(candidates, seen, skipYoutubeIds, group, hits, catalogGroups, catalogSongs, {
+        dropNonChallengeTitles: true,
+      });
     }
   }
 
@@ -126,7 +135,9 @@ function pushHits(
   skipYoutubeIds: Set<string>,
   group: string,
   hits: YouTubeSearchHit[],
-  options: { dropNonChallengeTitles: boolean }
+  catalogGroups: string[],
+  catalogSongs: string[],
+  options: { dropNonChallengeTitles: boolean; requireChallengeHint?: boolean }
 ) {
   for (const hit of hits) {
     if (seen.has(hit.youtubeId) || skipYoutubeIds.has(hit.youtubeId)) {
@@ -134,11 +145,16 @@ function pushHits(
     }
     seen.add(hit.youtubeId);
 
-    const guess = guessChallenge({
-      title: hit.title,
-      channelTitle: hit.channelTitle,
-      suggestedGroups: [group],
-    });
+    const guess = guessChallenge(
+      {
+        title: hit.title,
+        channelTitle: hit.channelTitle,
+        suggestedGroups: [group],
+        catalogGroups,
+        catalogSongs,
+      },
+      { requireChallengeHint: options.requireChallengeHint }
+    );
     if (options.dropNonChallengeTitles && !guess.include) {
       continue;
     }

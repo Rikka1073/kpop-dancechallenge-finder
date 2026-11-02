@@ -36,7 +36,7 @@ ADMIN_SESSION_SECRET=
 1. `npm run dev` して [http://localhost:3000/admin/login](http://localhost:3000/admin/login) にアクセスする
 2. `ADMIN_PASSWORD` でログインする
 3. 公式チャンネルは YouTube で自分で確認してから、「公式チャンネル」に URL を貼る。表示/非表示は「表示切替」。API はチャンネルIDを取るだけで、公式とは判定しない
-4. 確認したチャンネルを保存したあと、月次抽出 / チャンネル全ショート抽出で候補を集める
+4. 確認したチャンネルを保存したあと、月次抽出 / チャンネル全ショート抽出で候補を集める。全ショートはタイトルに曲名やコラボの手がかりがあるものだけ残す
 5. 「候補一覧」が `data/raw/YYYY-MM-DD/candidate-drafts.json` を自動で開く。YouTube を開いて承認すると DB に入る（`display=false`。公開サイトには出ない）。却下は JSON だけ
 6. 「動画を登録」は単発の手入力用。サイトに出すときは「表示切替」
 
