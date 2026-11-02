@@ -29,6 +29,15 @@ const unconfirmed = {
   youtube_channel_title: null,
 };
 
+const iu = {
+  id: "group-iu",
+  group_name: "IU",
+  display: true,
+  solo: true,
+  youtube_channel_id: null,
+  youtube_channel_title: null,
+};
+
 const hiddenSong = {
   id: "song-eleven",
   song_name: "ELEVEN",
@@ -144,6 +153,7 @@ describe("管理画面の公式チャンネル", () => {
             name?: string;
             confirmOfficial?: boolean;
             channelUrl?: string;
+            solo?: boolean;
           };
           return {
             ok: true,
@@ -153,6 +163,7 @@ describe("管理画面の公式チャンネル", () => {
                 id: "group-created",
                 group_name: body.name,
                 display: true,
+                solo: body.solo === true,
                 youtube_channel_id: body.confirmOfficial ? "UCxxxxxxxxxxxxxxxxxxxxxx" : null,
                 youtube_channel_title: body.confirmOfficial ? "IVE" : null,
               },
@@ -165,6 +176,7 @@ describe("管理画面の公式チャンネル", () => {
             type?: string;
             confirmOfficial?: boolean;
             display?: boolean;
+            solo?: boolean;
             all?: boolean;
           };
           if (body.all) {
@@ -181,7 +193,7 @@ describe("管理画面の公式チャンネル", () => {
               ok: true,
               json: async () => ({
                 ok: true,
-                data: [ive, unconfirmed].map((group) => ({ ...group, display: body.display })),
+                data: [ive, unconfirmed, iu].map((group) => ({ ...group, display: body.display })),
               }),
             } as Response;
           }
@@ -208,6 +220,7 @@ describe("管理画面の公式チャンネル", () => {
                 ...source,
                 id: body.id,
                 ...(typeof body.display === "boolean" ? { display: body.display } : {}),
+                ...(typeof body.solo === "boolean" ? { solo: body.solo } : {}),
                 youtube_channel_id: body.confirmOfficial ? "UCxxxxxxxxxxxxxxxxxxxxxx" : source.youtube_channel_id,
                 youtube_channel_title: body.confirmOfficial ? "IVE" : source.youtube_channel_title,
               },
@@ -219,7 +232,7 @@ describe("管理画面の公式チャンネル", () => {
             ok: true,
             json: async () => ({
               ok: true,
-              data: { groups: [ive, unconfirmed], songs: [visibleSong, hiddenSong] },
+              data: { groups: [ive, unconfirmed, iu], songs: [visibleSong, hiddenSong] },
             }),
           } as Response;
         }
@@ -270,7 +283,9 @@ describe("管理画面の公式チャンネル", () => {
     expect(missingRow).not.toBeNull();
     expect(configuredRow).not.toBeNull();
     expect(within(missingRow as HTMLElement).getByText("未設定")).toBeInTheDocument();
-    expect(within(missingRow as HTMLElement).getByRole("button", { name: "NewJeansのチャンネルを設定" })).toBeInTheDocument();
+    expect(
+      within(missingRow as HTMLElement).getByRole("button", { name: "NewJeansのチャンネルを設定" })
+    ).toBeInTheDocument();
     expect(within(configuredRow as HTMLElement).getByText("設定済み")).toBeInTheDocument();
     expect(configuredLink).toHaveAttribute("href", "https://www.youtube.com/channel/UCxxxxxxxxxxxxxxxxxxxxxx");
     expect(screen.queryByRole("button", { name: "非表示" })).not.toBeInTheDocument();
@@ -394,7 +409,7 @@ describe("管理画面の公式チャンネル", () => {
   test("未設定フィルタは公式チャンネルがあるグループを隠す", async () => {
     render(<AdminDashboard />);
     fireEvent.click(await screen.findByRole("button", { name: "公式チャンネル" }));
-    fireEvent.click(await screen.findByRole("button", { name: "未設定 1" }));
+    fireEvent.click(await screen.findByRole("button", { name: "未設定 2" }));
     expect(screen.getByText("NewJeans")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "IVEの公式チャンネル" })).not.toBeInTheDocument();
   });
@@ -410,6 +425,63 @@ describe("管理画面の公式チャンネル", () => {
     expect(submitVideoButton()).toBeEnabled();
   });
 
+  test("グループ選択はソロを人ごとに分ける", async () => {
+    render(<AdminDashboard />);
+    expect(await screen.findByRole("checkbox", { name: "IU" })).toBeInTheDocument();
+    const solo = screen.getByRole("region", { name: "ソロ" });
+    const bands = screen.getByRole("region", { name: "グループ" });
+    expect(within(solo).getByRole("checkbox", { name: "IU" })).toBeInTheDocument();
+    expect(within(bands).getByRole("checkbox", { name: "IVE" })).toBeInTheDocument();
+    expect(within(bands).queryByRole("checkbox", { name: "IU" })).not.toBeInTheDocument();
+    expect(within(solo).queryByRole("checkbox", { name: "IVE" })).not.toBeInTheDocument();
+  });
+
+  test("ソロにチェックして追加するとフラグを保存する", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("checkbox", { name: "ソロとして追加" }));
+    fireEvent.change(screen.getByPlaceholderText("新しいグループ名またはソロ名"), {
+      target: { value: "チョンハ" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "グループまたはソロを追加" }));
+
+    expect(await screen.findByRole("checkbox", { name: "チョンハ" })).toBeInTheDocument();
+    const posts = vi.mocked(fetch).mock.calls.filter(([, init]) => init?.method === "POST");
+    const catalogPost = posts.find(([url]) => String(url).includes("/api/admin/catalog"));
+    expect(JSON.parse(String(catalogPost?.[1]?.body))).toMatchObject({
+      type: "group",
+      name: "チョンハ",
+      solo: true,
+    });
+    expect(
+      within(screen.getByRole("region", { name: "ソロ" })).getByRole("checkbox", { name: "チョンハ" })
+    ).toBeInTheDocument();
+  });
+
+  test("表示切替のソロチェックで既存のグループをソロに移す", async () => {
+    render(<AdminDashboard />);
+    fireEvent.click(await screen.findByRole("button", { name: "表示切替" }));
+    expect(await screen.findByRole("checkbox", { name: "IUをソロにする" })).toBeChecked();
+    expect(
+      within(screen.getByRole("region", { name: "表示切替のグループ" })).getByRole("checkbox", {
+        name: "IVEをソロにする",
+      })
+    ).not.toBeChecked();
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "IVEをソロにする" }));
+    await waitFor(() => {
+      const patches = vi.mocked(fetch).mock.calls.filter(([, init]) => init?.method === "PATCH");
+      const soloPatch = patches.find(([url, init]) => {
+        if (!String(url).includes("/api/admin/catalog")) return false;
+        const body = JSON.parse(String(init?.body)) as { id?: string; solo?: boolean };
+        return body.id === ive.id && body.solo === true;
+      });
+      expect(soloPatch).toBeDefined();
+    });
+    expect(
+      within(screen.getByRole("region", { name: "表示切替のソロ" })).getByRole("checkbox", { name: "IVEをソロにする" })
+    ).toBeChecked();
+  });
+
   test("未確認チャンネルの動画は登録ボタンを押せない", async () => {
     render(<AdminDashboard />);
     await screen.findByRole("heading", { name: "1. YouTube URLを入力" });
@@ -418,7 +490,9 @@ describe("管理画面の公式チャンネル", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "動画情報を取得" }));
     expect(
-      await screen.findByText("確認済みの公式チャンネルではありません。先にグループへ公式チャンネルを保存してください。")
+      await screen.findByText(
+        "確認済みの公式チャンネルではありません。先にグループへ公式チャンネルを保存してください。"
+      )
     ).toBeInTheDocument();
     expect(submitVideoButton()).toBeDisabled();
   });

@@ -18,6 +18,7 @@ type VideoFilter = "all" | "untagged" | "hidden";
 type ChannelFilter = "all" | "configured" | "missing";
 
 const hasOfficialChannel = (group: GroupRecord) => Boolean(group.youtube_channel_id?.trim());
+const isSolo = (group: GroupRecord) => group.solo === true;
 
 const AdminDashboard = () => {
   const router = useRouter();
@@ -140,12 +141,7 @@ const AdminDashboard = () => {
       )}
 
       {tab === "channels" && (
-        <OfficialChannelPanel
-          groups={groups}
-          onGroupsChange={setGroups}
-          onError={fail}
-          onNotice={notify}
-        />
+        <OfficialChannelPanel groups={groups} onGroupsChange={setGroups} onError={fail} onNotice={notify} />
       )}
 
       {tab === "visibility" && (
@@ -206,6 +202,7 @@ const VideoRegisterPanel = ({
   const [groupIds, setGroupIds] = useState<string[]>([]);
   const [songIds, setSongIds] = useState<string[]>([]);
   const [newGroup, setNewGroup] = useState("");
+  const [newGroupSolo, setNewGroupSolo] = useState(false);
   const [newSong, setNewSong] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -232,9 +229,10 @@ const VideoRegisterPanel = ({
     try {
       const created = await adminRequest<GroupRecord>("/api/admin/catalog", {
         method: "POST",
-        body: JSON.stringify({ type: "group", name, displayOrder: groups.length + 1 }),
+        body: JSON.stringify({ type: "group", name, displayOrder: groups.length + 1, solo: newGroupSolo }),
       });
       setNewGroup("");
+      setNewGroupSolo(false);
       setGroupIds((prev) => [...prev, created.id]);
       onGroupCreated(created);
     } catch (error) {
@@ -334,25 +332,33 @@ const VideoRegisterPanel = ({
 
       <div className="rounded-3xl bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-bold">2. グループと楽曲を選択</h2>
-        <p className="mb-4 text-sm text-gray-600">1件以上のグループと楽曲を選ぶと、検索画面にすぐ表示されます。</p>
+        <p className="mb-4 text-sm text-gray-600">
+          1件以上のグループまたはソロと、楽曲を選ぶと、検索画面にすぐ表示されます。
+        </p>
         <div className="mb-6">
           <div className="mb-2 flex items-center gap-2 font-bold">
             <Users className="h-4 w-4 text-purple-600" />
-            グループ
+            グループとソロ
           </div>
-          <CheckboxList
-            items={groups.map((group) => ({ id: group.id, name: group.group_name, hidden: group.display === false }))}
-            selectedIds={groupIds}
-            onToggle={(id) => toggle(id, groupIds, setGroupIds)}
-          />
+          <GroupPicker groups={groups} selectedIds={groupIds} onToggle={(id) => toggle(id, groupIds, setGroupIds)} />
           <div className="mt-2 flex gap-2">
             <input
               value={newGroup}
               onChange={(event) => setNewGroup(event.target.value)}
-              placeholder="新しいグループ名"
+              placeholder="新しいグループ名またはソロ名"
               className="input w-full"
             />
-            <button type="button" onClick={addGroup} className="btn">
+            <label className="flex shrink-0 items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                checked={newGroupSolo}
+                onChange={(event) => setNewGroupSolo(event.target.checked)}
+                aria-label="ソロとして追加"
+              />
+              ソロ
+            </label>
+            <button type="button" onClick={addGroup} className="btn" aria-label="グループまたはソロを追加">
               <Plus className="h-4 w-4" />
             </button>
           </div>
@@ -593,9 +599,9 @@ const VideoManageCard = ({
       {editing && (
         <div className="mt-4 grid gap-4 border-t pt-4 md:grid-cols-2">
           <div>
-            <p className="mb-2 font-bold">グループ</p>
-            <CheckboxList
-              items={groups.map((group) => ({ id: group.id, name: group.group_name, hidden: group.display === false }))}
+            <p className="mb-2 font-bold">グループとソロ</p>
+            <GroupPicker
+              groups={groups}
               selectedIds={groupIds}
               onToggle={(id) =>
                 setGroupIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
@@ -633,6 +639,7 @@ const OfficialChannelPanel = ({
   onNotice: (message: string) => void;
 }) => {
   const [groupName, setGroupName] = useState("");
+  const [groupIsSolo, setGroupIsSolo] = useState(false);
   const [channelUrl, setChannelUrl] = useState("");
   const [channelPreview, setChannelPreview] = useState<YouTubeChannelSnapshot | null>(null);
   const [loadingChannel, setLoadingChannel] = useState(false);
@@ -654,13 +661,18 @@ const OfficialChannelPanel = ({
     try {
       const created = await adminRequest<GroupRecord>("/api/admin/catalog", {
         method: "POST",
-        body: JSON.stringify({ type: "group", name, displayOrder: groups.length + 1 }),
+        body: JSON.stringify({ type: "group", name, displayOrder: groups.length + 1, solo: groupIsSolo }),
       });
       setGroupName("");
+      setGroupIsSolo(false);
       setChannelUrl("");
       setChannelPreview(null);
       onGroupsChange([...groups, created]);
-      onNotice("グループを追加しました。公式チャンネルは未設定です。");
+      onNotice(
+        groupIsSolo
+          ? "ソロを追加しました。公式チャンネルは未設定です。"
+          : "グループを追加しました。公式チャンネルは未設定です。"
+      );
     } catch (error) {
       onError(error);
     }
@@ -701,13 +713,19 @@ const OfficialChannelPanel = ({
           displayOrder: groups.length + 1,
           channelUrl,
           confirmOfficial: true,
+          solo: groupIsSolo,
         }),
       });
       setGroupName("");
+      setGroupIsSolo(false);
       setChannelUrl("");
       setChannelPreview(null);
       onGroupsChange([...groups, created]);
-      onNotice("確認済みの公式チャンネルをグループに保存しました");
+      onNotice(
+        groupIsSolo
+          ? "確認済みの公式チャンネルをソロに保存しました"
+          : "確認済みの公式チャンネルをグループに保存しました"
+      );
     } catch (error) {
       onError(error);
     } finally {
@@ -733,69 +751,81 @@ const OfficialChannelPanel = ({
             設定済み {configuredCount}
           </FilterChip>
         </div>
-        <ul className="space-y-2">
-          {visibleGroups.map((group) => {
-            const configured = hasOfficialChannel(group);
-            const attaching = attachingId === group.id;
-            return (
-              <li key={group.id} className="rounded-xl bg-purple-50 px-3 py-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-bold">{group.group_name}</span>
-                      {configured ? (
-                        <span className="badge border-none bg-green-100 text-green-800">設定済み</span>
-                      ) : (
-                        <span className="badge badge-warning">未設定</span>
-                      )}
-                    </div>
-                    {configured && (
-                      <a
-                        href={`https://www.youtube.com/channel/${group.youtube_channel_id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={`${group.group_name}の公式チャンネル`}
-                        className="mt-2 inline-flex min-h-11 items-center gap-1 text-sm text-purple-700 underline"
-                      >
-                        <Youtube className="h-4 w-4" />
-                        {group.youtube_channel_title || group.youtube_channel_id}
-                      </a>
-                    )}
-                  </div>
-                  {!configured && (
-                    <button
-                      type="button"
-                      className="btn btn-xs min-h-11 rounded-xl"
-                      aria-expanded={attaching}
-                      aria-label={
-                        attaching
-                          ? `${group.group_name}のチャンネル設定を閉じる`
-                          : `${group.group_name}のチャンネルを設定`
-                      }
-                      onClick={() => setAttachingId(attaching ? null : group.id)}
-                    >
-                      {attaching ? "閉じる" : "チャンネルを設定"}
-                    </button>
-                  )}
-                </div>
-                {!configured && attaching && (
-                  <AttachOfficialChannel
-                    group={group}
-                    onSaved={(updated) => {
-                      onGroupsChange(groups.map((item) => (item.id === updated.id ? updated : item)));
-                      setAttachingId(null);
-                    }}
-                    onError={onError}
-                    onNotice={onNotice}
-                  />
-                )}
-              </li>
-            );
-          })}
-        </ul>
+        {(["グループ", "ソロ"] as const).map((label) => {
+          const rows = visibleGroups.filter((group) => (label === "ソロ") === isSolo(group));
+          return (
+            <section key={label} aria-label={`公式チャンネルの${label}`} className="mb-4">
+              <h3 className="mb-2 text-sm font-bold">{label}</h3>
+              {rows.length === 0 ? (
+                <p className="text-sm text-gray-500">まだありません。</p>
+              ) : (
+                <ul className="space-y-2">
+                  {rows.map((group) => {
+                    const configured = hasOfficialChannel(group);
+                    const attaching = attachingId === group.id;
+                    return (
+                      <li key={group.id} className="rounded-xl bg-purple-50 px-3 py-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-bold">{group.group_name}</span>
+                              {configured ? (
+                                <span className="badge border-none bg-green-100 text-green-800">設定済み</span>
+                              ) : (
+                                <span className="badge badge-warning">未設定</span>
+                              )}
+                            </div>
+                            {configured && (
+                              <a
+                                href={`https://www.youtube.com/channel/${group.youtube_channel_id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label={`${group.group_name}の公式チャンネル`}
+                                className="mt-2 inline-flex min-h-11 items-center gap-1 text-sm text-purple-700 underline"
+                              >
+                                <Youtube className="h-4 w-4" />
+                                {group.youtube_channel_title || group.youtube_channel_id}
+                              </a>
+                            )}
+                          </div>
+                          {!configured && (
+                            <button
+                              type="button"
+                              className="btn btn-xs min-h-11 rounded-xl"
+                              aria-expanded={attaching}
+                              aria-label={
+                                attaching
+                                  ? `${group.group_name}のチャンネル設定を閉じる`
+                                  : `${group.group_name}のチャンネルを設定`
+                              }
+                              onClick={() => setAttachingId(attaching ? null : group.id)}
+                            >
+                              {attaching ? "閉じる" : "チャンネルを設定"}
+                            </button>
+                          )}
+                        </div>
+                        {!configured && attaching && (
+                          <AttachOfficialChannel
+                            group={group}
+                            onSaved={(updated) => {
+                              onGroupsChange(groups.map((item) => (item.id === updated.id ? updated : item)));
+                              setAttachingId(null);
+                            }}
+                            onError={onError}
+                            onNotice={onNotice}
+                          />
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+          );
+        })}
       </div>
       <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <h2 className="mb-2 text-xl font-bold">グループを追加</h2>
+        <h2 className="mb-2 text-xl font-bold">グループまたはソロを追加</h2>
         <p className="mb-4 text-sm text-gray-600">
           公式チャンネルかどうかは、先に YouTube
           で自分で確認してください。取得はチャンネルIDを取るだけで、公式とは判定しません。確認したURLを貼ってから保存します。
@@ -809,6 +839,16 @@ const OfficialChannelPanel = ({
               placeholder="グループ名"
               className="input w-full"
             />
+          </label>
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-sm"
+              checked={groupIsSolo}
+              onChange={(event) => setGroupIsSolo(event.target.checked)}
+              aria-label="ソロとして追加"
+            />
+            ソロとして追加する
           </label>
           <label className="flex flex-col gap-1 text-sm text-gray-600">
             確認済みチャンネルURL
@@ -906,6 +946,18 @@ const VisibilityPanel = ({
     }
   };
 
+  const toggleSolo = async (group: GroupRecord) => {
+    try {
+      const updated = await adminRequest<GroupRecord>("/api/admin/catalog", {
+        method: "PATCH",
+        body: JSON.stringify({ type: "group", id: group.id, solo: !isSolo(group) }),
+      });
+      onGroupsChange(groups.map((item) => (item.id === updated.id ? updated : item)));
+    } catch (error) {
+      onError(error);
+    }
+  };
+
   const toggleSong = async (song: SongRecord) => {
     try {
       const updated = await adminRequest<SongRecord>("/api/admin/catalog", {
@@ -988,89 +1040,113 @@ const VisibilityPanel = ({
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
-      <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <h2 className="mb-2 text-xl font-bold">グループの表示</h2>
-        <p className="mb-4 text-sm text-gray-600">
-          チェックが入っているものが公開サイトに出ます。公式チャンネルの保存は「公式チャンネル」メニューです。
-        </p>
-        <BulkDisplayButtons
-          kind="グループ"
-          busy={bulkBusy === "group"}
-          disableShowAll={allGroupsShown || groups.length === 0}
-          disableHideAll={allGroupsHidden || groups.length === 0}
-          onShowAll={() => void setAllGroups(true)}
-          onHideAll={() => void setAllGroups(false)}
-        />
-        <ul className="space-y-2">
-          {groups.map((group) => {
-            const displayed = group.display !== false;
-            return (
-              <li key={group.id} className="rounded-xl bg-purple-50 px-3 py-2">
-                <label className="flex min-h-11 cursor-pointer items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm"
-                    checked={displayed}
-                    onChange={() => toggleGroup(group)}
-                    aria-label={`${group.group_name}を表示`}
-                  />
-                  <span className={displayed ? "" : "text-gray-400"}>{group.group_name}</span>
-                  {hasOfficialChannel(group) ? (
-                    <span className="badge border-none bg-green-100 text-green-800">設定済み</span>
-                  ) : (
-                    <span className="badge badge-warning">未設定</span>
-                  )}
-                  {!displayed && <span className="text-xs text-gray-500">非表示</span>}
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <h2 className="mb-2 text-xl font-bold">楽曲の表示</h2>
-        <BulkDisplayButtons
-          kind="楽曲"
-          busy={bulkBusy === "song"}
-          disableShowAll={allSongsShown || songs.length === 0}
-          disableHideAll={allSongsHidden || songs.length === 0}
-          onShowAll={() => void setAllSongs(true)}
-          onHideAll={() => void setAllSongs(false)}
-        />
-        <div className="mb-4 flex gap-2">
-          <input
-            value={songName}
-            onChange={(event) => setSongName(event.target.value)}
-            placeholder="楽曲名"
-            className="input w-full"
-            aria-label="楽曲名"
+        <div className="rounded-3xl bg-white p-6 shadow-lg">
+          <h2 className="mb-2 text-xl font-bold">グループとソロの表示</h2>
+          <p className="mb-4 text-sm text-gray-600">
+            左のチェックが入っているものが公開サイトに出ます。「ソロ」にチェックすると、選択欄のソロ側に分かれます。公式チャンネルの保存は「公式チャンネル」メニューです。
+          </p>
+          <BulkDisplayButtons
+            kind="グループ"
+            busy={bulkBusy === "group"}
+            disableShowAll={allGroupsShown || groups.length === 0}
+            disableHideAll={allGroupsHidden || groups.length === 0}
+            onShowAll={() => void setAllGroups(true)}
+            onHideAll={() => void setAllGroups(false)}
           />
-          <button type="button" className="btn" onClick={addSong}>
-            追加
-          </button>
-        </div>
-        <ul className="space-y-2">
-          {songs.map((song) => {
-            const displayed = song.display !== false;
+          {(["グループ", "ソロ"] as const).map((label) => {
+            const rows = groups.filter((group) => (label === "ソロ") === isSolo(group));
             return (
-              <li key={song.id} className="rounded-xl bg-red-50 px-3 py-2">
-                <label className="flex min-h-11 cursor-pointer items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm"
-                    checked={displayed}
-                    onChange={() => toggleSong(song)}
-                    aria-label={`${song.song_name}を表示`}
-                  />
-                  <span className={displayed ? "" : "text-gray-400"}>{song.song_name}</span>
-                  {!displayed && <span className="text-xs text-gray-500">非表示</span>}
-                </label>
-              </li>
+              <section key={label} aria-label={`表示切替の${label}`} className="mb-4">
+                <h3 className="mb-2 text-sm font-bold">{label}</h3>
+                {rows.length === 0 ? (
+                  <p className="text-sm text-gray-500">まだありません。</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {rows.map((group) => {
+                      const displayed = group.display !== false;
+                      return (
+                        <li key={group.id} className="rounded-xl bg-purple-50 px-3 py-2">
+                          <div className="flex min-h-11 flex-wrap items-center gap-3">
+                            <label className="flex cursor-pointer items-center gap-2">
+                              <input
+                                type="checkbox"
+                                className="checkbox checkbox-sm"
+                                checked={displayed}
+                                onChange={() => toggleGroup(group)}
+                                aria-label={`${group.group_name}を表示`}
+                              />
+                              <span className={displayed ? "" : "text-gray-400"}>{group.group_name}</span>
+                            </label>
+                            <label className="flex cursor-pointer items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                className="checkbox checkbox-sm"
+                                checked={isSolo(group)}
+                                onChange={() => toggleSolo(group)}
+                                aria-label={`${group.group_name}をソロにする`}
+                              />
+                              ソロ
+                            </label>
+                            {hasOfficialChannel(group) ? (
+                              <span className="badge border-none bg-green-100 text-green-800">設定済み</span>
+                            ) : (
+                              <span className="badge badge-warning">未設定</span>
+                            )}
+                            {!displayed && <span className="text-xs text-gray-500">非表示</span>}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </section>
             );
           })}
-        </ul>
+        </div>
+        <div className="rounded-3xl bg-white p-6 shadow-lg">
+          <h2 className="mb-2 text-xl font-bold">楽曲の表示</h2>
+          <BulkDisplayButtons
+            kind="楽曲"
+            busy={bulkBusy === "song"}
+            disableShowAll={allSongsShown || songs.length === 0}
+            disableHideAll={allSongsHidden || songs.length === 0}
+            onShowAll={() => void setAllSongs(true)}
+            onHideAll={() => void setAllSongs(false)}
+          />
+          <div className="mb-4 flex gap-2">
+            <input
+              value={songName}
+              onChange={(event) => setSongName(event.target.value)}
+              placeholder="楽曲名"
+              className="input w-full"
+              aria-label="楽曲名"
+            />
+            <button type="button" className="btn" onClick={addSong}>
+              追加
+            </button>
+          </div>
+          <ul className="space-y-2">
+            {songs.map((song) => {
+              const displayed = song.display !== false;
+              return (
+                <li key={song.id} className="rounded-xl bg-red-50 px-3 py-2">
+                  <label className="flex min-h-11 cursor-pointer items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-sm"
+                      checked={displayed}
+                      onChange={() => toggleSong(song)}
+                      aria-label={`${song.song_name}を表示`}
+                    />
+                    <span className={displayed ? "" : "text-gray-400"}>{song.song_name}</span>
+                    {!displayed && <span className="text-xs text-gray-500">非表示</span>}
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
-    </div>
       <div className="rounded-3xl bg-white p-6 shadow-lg">
         <h2 className="mb-2 text-xl font-bold">動画の表示</h2>
         <p className="mb-4 text-sm text-gray-600">
@@ -1272,19 +1348,54 @@ const AttachOfficialChannel = ({
   );
 };
 
+const GroupPicker = ({
+  groups,
+  selectedIds,
+  onToggle,
+}: {
+  groups: GroupRecord[];
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+}) => (
+  <div className="space-y-4">
+    {(["グループ", "ソロ"] as const).map((label) => {
+      const rows = groups.filter((group) => (label === "ソロ") === isSolo(group));
+      return (
+        <section key={label} aria-label={label}>
+          <h3 className="mb-2 text-sm font-bold">{label}</h3>
+          <CheckboxList
+            items={rows.map((group) => ({
+              id: group.id,
+              name: group.group_name,
+              hidden: group.display === false,
+            }))}
+            selectedIds={selectedIds}
+            onToggle={onToggle}
+            emptyText={
+              label === "ソロ"
+                ? "まだソロがありません。下の欄でソロにチェックして追加できます。"
+                : "まだグループがありません。下の欄から追加できます。"
+            }
+          />
+        </section>
+      );
+    })}
+  </div>
+);
+
 const CheckboxList = ({
   items,
   selectedIds,
   onToggle,
+  emptyText = "まだ登録がありません。下の欄から追加できます。",
 }: {
   items: { id: string; name: string; hidden?: boolean }[];
   selectedIds: string[];
   onToggle: (id: string) => void;
+  emptyText?: string;
 }) => (
   <div className="grid max-h-56 grid-cols-2 gap-2 overflow-y-auto rounded-xl border border-gray-100 p-3">
-    {items.length === 0 && (
-      <p className="col-span-2 text-sm text-gray-500">まだ登録がありません。下の欄から追加できます。</p>
-    )}
+    {items.length === 0 && <p className="col-span-2 text-sm text-gray-500">{emptyText}</p>}
     {items.map((item) => (
       <label key={item.id} className="flex cursor-pointer items-center gap-2 text-sm">
         <input

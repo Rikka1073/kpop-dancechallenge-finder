@@ -75,6 +75,7 @@ export type GroupRecord = {
   group_name: string;
   display?: boolean | null;
   display_order?: number | null;
+  solo?: boolean | null;
   youtube_channel_id?: string | null;
   youtube_channel_title?: string | null;
 };

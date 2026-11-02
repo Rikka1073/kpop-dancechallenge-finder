@@ -40,7 +40,7 @@ ADMIN_SESSION_SECRET=
 5. 「候補一覧」が `data/raw/YYYY-MM-DD/candidate-drafts.json` を自動で開く。YouTube を開いて承認すると DB に入る（`display=false`。公開サイトには出ない）。却下は JSON だけ
 6. 「動画を登録」は単発の手入力用。サイトに出すときは「表示切替」
 
-`groups.youtube_channel_id` を足す SQL は `supabase/migrations/` にあります。Supabase に適用してから公式チャンネルを保存してください。
+`groups.youtube_channel_id` と `groups.solo` を足す SQL は `supabase/migrations/` にあります。Supabase に適用してから、公式チャンネルの保存とソロの切り替えをしてください。
 
 公開サイトには、グループと楽曲が付いた動画だけが表示されます。
 

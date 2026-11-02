@@ -298,7 +298,8 @@ export async function createGroup(
   groupName: string,
   displayOrder: number | null,
   officialChannel?: { channelId: string; title: string } | null,
-  client?: AdminClient
+  client?: AdminClient,
+  solo = false
 ) {
   const db = getClient(client);
   const { data, error } = await db
@@ -307,6 +308,7 @@ export async function createGroup(
       group_name: groupName,
       display: true,
       display_order: displayOrder,
+      ...(solo ? { solo: true } : {}),
       ...(officialChannel
         ? {
             youtube_channel_id: officialChannel.channelId,
@@ -346,6 +348,7 @@ export async function updateGroup(
     group_name?: string;
     display?: boolean;
     display_order?: number | null;
+    solo?: boolean;
     youtube_channel_id?: string | null;
     youtube_channel_title?: string | null;
   },
