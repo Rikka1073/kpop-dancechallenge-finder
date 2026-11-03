@@ -50,15 +50,8 @@ export default function VideoDetail({ video }: VideoDetailProps) {
                   </div>
                 ))}
               </div>
-              <div className="mb-3 border-b-2 border-b-gray-300 pb-3 text-gray-600">
+              <div className="border-b-2 border-b-gray-300 pb-3 text-gray-600">
                 {formatViewCount(video.view_count)} views
-              </div>
-              <div>
-                このダンスチャレンジ動画は、
-                {video.video_groups.map((group: GroupDetail) => group.groups.group_name).join("と")}
-                によるコラボレーション作品です。 楽曲「
-                {video.video_songs.map((song: SongDetail) => song.songs.song_name)}
-                」に合わせた素晴らしいパフォーマンスをお楽しみください。
               </div>
               <div>
                 <Link
